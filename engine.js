@@ -1,5 +1,6 @@
 let playerName = "Player";
 let dialogueIndex = 0;
+let typingTimer = null;
 
 let relationships = {
   lucas: 0,
@@ -8,6 +9,7 @@ let relationships = {
 
 function startGame(){
   const input = document.getElementById("playerName");
+
   if(input.value.trim() !== ""){
     playerName = input.value.trim();
   }
@@ -19,6 +21,10 @@ function startGame(){
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
+
+  document.getElementById("continueButton").style.display = "block";
+  document.getElementById("choices").classList.add("hidden");
+
   showScene(introDialogue[0]);
   updateRelationships();
 }
@@ -29,9 +35,21 @@ function showScene(scene){
   changeBackground(scene.background);
 
   document.getElementById("portraitBox").classList.remove("hidden");
-  document.getElementById("portrait").innerHTML = character.portrait;
   document.getElementById("speakerName").innerHTML = character.name;
   document.getElementById("speakerTitle").innerHTML = character.title;
+
+  const portraitImage = document.getElementById("portraitImage");
+  const portraitEmoji = document.getElementById("portrait");
+
+  if(character.image && character.image !== ""){
+    portraitImage.src = character.image;
+    portraitImage.style.display = "block";
+    portraitEmoji.style.display = "none";
+  }else{
+    portraitImage.style.display = "none";
+    portraitEmoji.style.display = "flex";
+    portraitEmoji.innerHTML = character.portrait || character.emoji || "🌴";
+  }
 
   typeText(scene.text);
 }
@@ -49,13 +67,22 @@ function nextDialogue(){
 
 function changeBackground(sceneName){
   const body = document.getElementById("bodyBackground");
+
   if(backgrounds[sceneName]){
     body.style.background = backgrounds[sceneName].colors;
   }
+
+  body.style.backgroundSize = "cover";
+  body.style.backgroundPosition = "center";
 }
 
 function typeText(text){
   const story = document.getElementById("story");
+
+  if(typingTimer){
+    clearTimeout(typingTimer);
+  }
+
   story.innerHTML = "";
 
   let i = 0;
@@ -65,7 +92,7 @@ function typeText(text){
       const char = text.charAt(i);
       story.innerHTML += char === "\n" ? "<br>" : char;
       i++;
-      setTimeout(type, ui.typingSpeed);
+      typingTimer = setTimeout(type, ui.typingSpeed);
     }
   }
 
@@ -111,9 +138,9 @@ function updateRelationships(){
 }
 
 window.addEventListener("DOMContentLoaded", function(){
-  document.getElementById("newGameButton").addEventListener("click", startGame);
-  document.getElementById("continueButton").addEventListener("click", nextDialogue);
-  document.getElementById("villaButton").addEventListener("click", goToVilla);
-  document.getElementById("mayaButton").addEventListener("click", meetMaya);
-  document.getElementById("crystalButton").addEventListener("click", crystalRoute);
+  document.getElementById("newGameButton")?.addEventListener("click", startGame);
+  document.getElementById("continueButton")?.addEventListener("click", nextDialogue);
+  document.getElementById("villaButton")?.addEventListener("click", goToVilla);
+  document.getElementById("mayaButton")?.addEventListener("click", meetMaya);
+  document.getElementById("crystalButton")?.addEventListener("click", crystalRoute);
 });
