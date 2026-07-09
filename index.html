@@ -14,14 +14,13 @@
     <h1>🔥 The Island of Flames</h1>
     <h2>Season 1 — The Crystal Awakens</h2>
     <input id="playerName" placeholder="Enter your name">
-    <button id="newGameButton">▶ New Game</button>
+    <button onclick="startGame()">▶ New Game</button>
   </section>
 
   <section id="game" class="hidden">
     <h2 id="welcome">Welcome to Flame Cay</h2>
 
     <div id="portraitBox" class="hidden">
-      <img id="portraitImage" src="" alt="Portrait" style="display:none;">
       <div id="portrait">🌴</div>
       <h3 id="speakerName">Narrator</h3>
       <p id="speakerTitle">The Story Begins</p>
@@ -29,13 +28,13 @@
 
     <div class="card">
       <p id="story"></p>
-      <button id="continueButton">▶ Continue</button>
+      <button id="continueButton" onclick="nextDialogue()">▶ Continue</button>
     </div>
 
     <div id="choices" class="hidden">
-      <button id="villaButton">🏡 Enter the Villa</button>
-      <button id="mayaButton">🌿 Talk to Maya</button>
-      <button id="crystalButton">🔥 Look toward the Crystal Flame</button>
+      <button onclick="goToVilla()">🏡 Enter the Villa</button>
+      <button onclick="meetMaya()">🌿 Talk to Maya</button>
+      <button onclick="crystalRoute()">🔥 Look toward the Crystal Flame</button>
     </div>
 
     <div class="card" id="relationshipBox">
@@ -46,10 +45,144 @@
 
 </main>
 
-<script src="characters.js"></script>
-<script src="dialogue.js"></script>
-<script src="backgrounds.js"></script>
-<script src="ui.js"></script>
-<script src="engine.js"></script>
+<script>
+let playerName = "Player";
+let dialogueIndex = 0;
+
+let relationships = {
+  lucas: 0,
+  maya: 0
+};
+
+const characters = {
+  narrator: { name: "Narrator", title: "The Story Begins", portrait: "🌴" },
+  host: { name: "Host", title: "Keeper of the Crystal Flame", portrait: "🎭" },
+  lucas: { name: "Lucas Ramirez", title: "The Loyal Swimmer", portrait: "👦" },
+  maya: { name: "Maya Patel", title: "The Explorer", portrait: "🌿" }
+};
+
+const introDialogue = [
+  { speaker:"narrator", background:"arrival", text:"🔥 THE ISLAND OF FLAMES\n\nSeason 1\nEpisode 1 — The Arrival" },
+  { speaker:"narrator", background:"arrival", text:"The sun rises over the ocean.\n\nYour boat moves toward Flame Cay." },
+  { speaker:"host", background:"arrival", text:"Welcome... to The Island of Flames.\n\nTwenty singles. One island. One unforgettable summer." },
+  { speaker:"lucas", background:"villa", text:"Hey!\n\nI'm Lucas. Welcome to Flame Cay." },
+  { speaker:"maya", background:"villa", text:"I'm Maya.\n\nThere's something strange about this island..." },
+  { speaker:"narrator", background:"crystal", text:"Deep inside the jungle...\n\nThe Crystal Flame begins to glow." },
+  { speaker:"narrator", background:"villa", text:"Your first day begins now.\n\nWhere do you want to go first?" }
+];
+
+function startGame(){
+  const input = document.getElementById("playerName");
+  if(input.value.trim() !== ""){
+    playerName = input.value.trim();
+  }
+
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+  document.getElementById("welcome").innerHTML = "Welcome to Flame Cay, " + playerName + "!";
+
+  dialogueIndex = 0;
+  document.getElementById("continueButton").style.display = "block";
+  document.getElementById("choices").classList.add("hidden");
+
+  showScene(introDialogue[0]);
+  updateRelationships();
+}
+
+function nextDialogue(){
+  dialogueIndex++;
+
+  if(dialogueIndex < introDialogue.length){
+    showScene(introDialogue[dialogueIndex]);
+  }else{
+    document.getElementById("continueButton").style.display = "none";
+    document.getElementById("choices").classList.remove("hidden");
+  }
+}
+
+function showScene(scene){
+  const character = characters[scene.speaker];
+
+  changeBackground(scene.background);
+
+  document.getElementById("portraitBox").classList.remove("hidden");
+  document.getElementById("portrait").innerHTML = character.portrait;
+  document.getElementById("speakerName").innerHTML = character.name;
+  document.getElementById("speakerTitle").innerHTML = character.title;
+
+  typeText(scene.text);
+}
+
+function changeBackground(scene){
+  if(scene === "arrival"){
+    document.body.style.background = "linear-gradient(180deg,#70d8ff,#08657e)";
+  }
+
+  if(scene === "villa"){
+    document.body.style.background = "linear-gradient(180deg,#58c7e8,#0b718c)";
+  }
+
+  if(scene === "crystal"){
+    document.body.style.background = "linear-gradient(180deg,#1b335f,#061322)";
+  }
+}
+
+function typeText(text){
+  const story = document.getElementById("story");
+  story.innerHTML = "";
+
+  let i = 0;
+
+  function type(){
+    if(i < text.length){
+      const char = text.charAt(i);
+      story.innerHTML += char === "\n" ? "<br>" : char;
+      i++;
+      setTimeout(type, 30);
+    }
+  }
+
+  type();
+}
+
+function goToVilla(){
+  relationships.lucas++;
+
+  showScene({
+    speaker:"lucas",
+    background:"villa",
+    text:"Lucas walks beside you into the villa.\n\n\"This place is unreal,\" he says.\n\nYou notice him watching out for you."
+  });
+
+  updateRelationships();
+}
+
+function meetMaya(){
+  relationships.maya++;
+
+  showScene({
+    speaker:"maya",
+    background:"villa",
+    text:"Maya studies strange markings on a stone wall.\n\n\"These symbols are older than the villa,\" she says."
+  });
+
+  updateRelationships();
+}
+
+function crystalRoute(){
+  showScene({
+    speaker:"narrator",
+    background:"crystal",
+    text:"You look toward the jungle.\n\nThe Crystal Flame glows brighter.\n\nA whisper crosses the wind:\n\n\"Keeper...\""
+  });
+}
+
+function updateRelationships(){
+  document.getElementById("relationshipBox").innerHTML =
+    "❤️ Lucas: " + relationships.lucas +
+    "<br>❤️ Maya: " + relationships.maya;
+}
+</script>
+
 </body>
 </html>
