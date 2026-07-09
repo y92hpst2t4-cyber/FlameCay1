@@ -8,7 +8,6 @@ let relationships = {
 
 function startGame(){
   const input = document.getElementById("playerName");
-
   if(input.value.trim() !== ""){
     playerName = input.value.trim();
   }
@@ -20,11 +19,7 @@ function startGame(){
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
-  showScene(introDialogue[dialogueIndex]);
-
-  document.getElementById("continueButton").style.display = "block";
-  document.getElementById("choices").classList.add("hidden");
-
+  showScene(introDialogue[0]);
   updateRelationships();
 }
 
@@ -54,13 +49,9 @@ function nextDialogue(){
 
 function changeBackground(sceneName){
   const body = document.getElementById("bodyBackground");
-
   if(backgrounds[sceneName]){
     body.style.background = backgrounds[sceneName].colors;
   }
-
-  body.style.backgroundSize = "cover";
-  body.style.backgroundPosition = "center";
 }
 
 function typeText(text){
@@ -72,13 +63,7 @@ function typeText(text){
   function type(){
     if(i < text.length){
       const char = text.charAt(i);
-
-      if(char === "\n"){
-        story.innerHTML += "<br>";
-      }else{
-        story.innerHTML += char;
-      }
-
+      story.innerHTML += char === "\n" ? "<br>" : char;
       i++;
       setTimeout(type, ui.typingSpeed);
     }
@@ -105,7 +90,7 @@ function meetMaya(){
   showScene({
     speaker: "maya",
     background: "villa",
-    text: "Maya stands near the edge of the garden, studying strange markings on a stone wall.\n\n\"These symbols are older than the villa,\" she says.\n\nShe seems glad you noticed."
+    text: "Maya studies strange markings on a stone wall.\n\n\"These symbols are older than the villa,\" she says."
   });
 
   updateRelationships();
@@ -115,7 +100,7 @@ function crystalRoute(){
   showScene({
     speaker: "narrator",
     background: "crystal",
-    text: "You look toward the jungle.\n\nFor a second, the Crystal Flame glows brighter.\n\nA whisper crosses the wind:\n\n\"Keeper...\""
+    text: "You look toward the jungle.\n\nThe Crystal Flame glows brighter.\n\nA whisper crosses the wind:\n\n\"Keeper...\""
   });
 }
 
@@ -126,6 +111,7 @@ function updateRelationships(){
 }
 
 window.addEventListener("DOMContentLoaded", function(){
+  document.getElementById("newGameButton").addEventListener("click", startGame);
   document.getElementById("continueButton").addEventListener("click", nextDialogue);
   document.getElementById("villaButton").addEventListener("click", goToVilla);
   document.getElementById("mayaButton").addEventListener("click", meetMaya);
