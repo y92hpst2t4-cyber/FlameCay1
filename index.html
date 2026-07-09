@@ -55,6 +55,7 @@ let relationships = {
   lucas: 0,
   maya: 0
 };
+
 const characters = {
   narrator: {
     name: "Narrator",
@@ -131,7 +132,14 @@ function showScene(scene){
 
   changeBackground(scene.background);
 
-  document.getElementById("portraitBox").classList.remove("hidden");
+  const portraitBox = document.getElementById("portraitBox");
+
+  portraitBox.classList.remove("hidden");
+
+  portraitBox.style.animation = "none";
+  portraitBox.offsetHeight;
+  portraitBox.style.animation = "characterEnter .6s ease";
+
   document.getElementById("speakerName").innerHTML = character.name;
   document.getElementById("speakerTitle").innerHTML = character.title;
 
