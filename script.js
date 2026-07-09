@@ -29,7 +29,8 @@ function startGame() {
 
   if (welcome) {
     welcome.innerHTML = "Welcome to Flame Cay, " + playerName + "!";
-  }const story = document.getElementById("story");
+  }
+  const story = document.getElementById("story");
 
 if (story) {
   story.innerHTML =
