@@ -1,113 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Island of Flames</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Island of Flames</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body id="bodyBackground">
 
-  <main class="screen">
+<main class="screen">
+
+    <!-- ========================= -->
+    <!-- MAIN MENU -->
+    <!-- ========================= -->
 
     <section id="menu">
-      <h1>🔥 The Island of Flames</h1>
-      <h2>Season 1 — The Crystal Awakens</h2>
 
-      <input
-        id="playerName"
-        placeholder="Enter your name"
-      >
+        <h1>🔥 The Island of Flames</h1>
+        <h2>Season 1 — The Crystal Awakens</h2>
 
-      <button onclick="startGame()">
-        ▶ New Game
-      </button>
+        <input
+            id="playerName"
+            placeholder="Enter your name">
+
+        <button onclick="startGame()">
+            ▶ New Game
+        </button>
+
     </section>
+
+    <!-- ========================= -->
+    <!-- GAME -->
+    <!-- ========================= -->
 
     <section id="game" class="hidden">
 
-      <h2 id="welcome">
-        Welcome to Flame Cay
-      </h2>
+        <!-- Top Bar -->
 
-      <!-- Portrait Area -->
+        <div id="topBar">
 
-      <div id="portraitBox" class="hidden">
+            <button>☰</button>
 
-        <!-- Future real portrait -->
+            <button>💾</button>
 
-        <img
-          id="portraitImage"
-          src=""
-          alt="Character Portrait"
-          style="display:none;"
-        >
+            <button>⚙️</button>
 
-        <!-- Emoji fallback -->
-
-        <div id="portrait">
-          🌴
         </div>
 
-        <h3 id="speakerName">
-          Narrator
-        </h3>
+        <!-- Welcome -->
 
-      </div>
+        <h2 id="welcome">
+            Welcome to Flame Cay
+        </h2>
 
-      <!-- Dialogue -->
+        <!-- Portrait -->
 
-      <div class="card">
+        <div id="portraitBox" class="hidden">
 
-        <p id="story"></p>
+            <img
+                id="portraitImage"
+                src=""
+                alt="Portrait"
+                style="display:none;">
 
-        <button
-          id="continueButton"
-          onclick="nextDialogue()"
-        >
-          ▶ Continue
-        </button>
+            <div id="portrait">
+                🌴
+            </div>
 
-      </div>
+            <h3 id="speakerName">
+                Narrator
+            </h3>
 
-      <!-- Choices -->
+            <p id="speakerTitle">
+                The Story Begins
+            </p>
 
-      <div
-        id="choices"
-        class="hidden"
-      >
+        </div>
 
-        <button onclick="goToVilla()">
-          🏡 Enter the Villa
-        </button>
+        <!-- Dialogue -->
 
-        <button onclick="meetMaya()">
-          🌿 Talk to Maya
-        </button>
+        <div class="card">
 
-        <button onclick="crystalRoute()">
-          🔥 Look toward the Crystal Flame
-        </button>
+            <p id="story"></p>
 
-      </div>
+            <button
+                id="continueButton"
+                onclick="nextDialogue()">
+                ▶ Continue
+            </button>
 
-      <!-- Relationships -->
+        </div>
 
-      <div
-        class="card"
-        id="relationshipBox"
-      >
-        ❤️ Lucas: 0
-        <br>
-        ❤️ Maya: 0
-      </div>
+        <!-- Choices -->
+
+        <div
+            id="choices"
+            class="hidden">
+
+            <button onclick="goToVilla()">
+                🏡 Enter the Villa
+            </button>
+
+            <button onclick="meetMaya()">
+                🌿 Talk to Maya
+            </button>
+
+            <button onclick="crystalRoute()">
+                🔥 Look toward the Crystal Flame
+            </button>
+
+        </div>
+
+        <!-- Relationships -->
+
+        <div
+            class="card"
+            id="relationshipBox">
+
+            ❤️ Lucas: 0
+
+            <br>
+
+            ❤️ Maya: 0
+
+        </div>
 
     </section>
 
-  </main>
+</main>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
+
 </html>
