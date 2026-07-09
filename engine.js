@@ -125,7 +125,9 @@ function updateRelationships(){
     "<br>❤️ Maya: " + relationships.maya;
 }
 
-document.getElementById("continueButton").addEventListener("click", nextDialogue);
-document.getElementById("villaButton").addEventListener("click", goToVilla);
-document.getElementById("mayaButton").addEventListener("click", meetMaya);
-document.getElementById("crystalButton").addEventListener("click", crystalRoute);
+window.addEventListener("DOMContentLoaded", function(){
+  document.getElementById("continueButton").addEventListener("click", nextDialogue);
+  document.getElementById("villaButton").addEventListener("click", goToVilla);
+  document.getElementById("mayaButton").addEventListener("click", meetMaya);
+  document.getElementById("crystalButton").addEventListener("click", crystalRoute);
+});
