@@ -135,3 +135,25 @@ button:hover{
 #choices button{
     margin-top:12px;
 }
+/* =====================================
+   VERSION 0.6.2
+   Character Entrance Animation
+===================================== */
+
+#portraitBox{
+    animation: characterEnter .6s ease;
+}
+
+@keyframes characterEnter{
+
+    0%{
+        opacity:0;
+        transform:translateY(40px) scale(.95);
+    }
+
+    100%{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+
+}
