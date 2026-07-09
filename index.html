@@ -33,11 +33,9 @@
     </div>
 
     <div id="choices" class="hidden">
-      <button onclick="talkLucas()">💬 Talk to Lucas</button>
-      <button onclick="talkKai()">🌊 Talk to Kai</button>
-      <button onclick="talkLisa()">💖 Talk to Lisa</button>
-      <button onclick="followMaya()">🌿 Follow Maya</button>
-      <button onclick="crystalRoute()">🔥 Investigate the Crystal Flame</button>
+      <button onclick="goBeach()">🏖 Beach</button>
+      <button onclick="goVilla()">🏡 Villa Lounge</button>
+      <button onclick="goShrine()">💎 Crystal Shrine</button>
     </div>
 
     <div class="card" id="relationshipBox"></div>
@@ -146,7 +144,7 @@ const introDialogue = [
   { speaker:"lisa", background:"villa", text:"Lisa walks into the villa with a confident smile.\n\n\"I'm Lisa.\n\nI'm here to find love... and maybe steal a few hearts along the way.\"" },
   { speaker:"maya", background:"villa", text:"I'm Maya.\n\nThere's something strange about this island..." },
   { speaker:"narrator", background:"crystal", text:"Deep inside the jungle...\n\nThe Crystal Flame begins to glow." },
-  { speaker:"narrator", background:"villa", text:"Your first day begins now.\n\nWho do you want to spend time with?" }
+  { speaker:"narrator", background:"villa", text:"Your first day begins now.\n\nWhere do you want to explore?" }
 ];
 
 function startGame(){
@@ -158,6 +156,7 @@ function startGame(){
 
   document.getElementById("menu").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
+
   document.getElementById("welcome").innerHTML =
     "Welcome to Flame Cay, " + playerName + "!";
 
@@ -220,6 +219,10 @@ function changeBackground(scene){
     document.body.style.background = "linear-gradient(180deg,#58c7e8,#0b718c)";
   }
 
+  if(scene === "beach"){
+    document.body.style.background = "linear-gradient(180deg,#7ee8ff,#167c99)";
+  }
+
   if(scene === "crystal"){
     document.body.style.background = "linear-gradient(180deg,#1b335f,#061322)";
   }
@@ -248,49 +251,37 @@ function typeText(text){
   type();
 }
 
-function talkLucas(){
+function goBeach(){
+  relationships.kai++;
+
+  showScene({
+    speaker:"kai",
+    background:"beach",
+    text:"You walk down to the beach.\n\nKai is standing near the shoreline, watching the waves.\n\n\"Good choice,\" he says with a grin.\n\n\"The ocean always tells the truth.\""
+  });
+
+  updateRelationships();
+}
+
+function goVilla(){
   relationships.lucas++;
 
   showScene({
     speaker:"lucas",
     background:"villa",
-    text:"Lucas smiles when you walk over.\n\n\"I was hoping you'd come talk to me,\" he says.\n\nYou feel like he is being honest with you."
+    text:"You step into the villa lounge.\n\nLucas looks up and smiles.\n\n\"I was hoping you'd come in here,\" he says.\n\nThe villa suddenly feels a little warmer."
   });
 
   updateRelationships();
 }
 
-function talkKai(){
-  relationships.kai++;
-
-  showScene({
-    speaker:"kai",
-    background:"villa",
-    text:"Kai leans against the railing, watching the waves.\n\n\"You picked me? Good choice,\" he says with a grin.\n\nHis confidence is hard to ignore."
-  });
-
-  updateRelationships();
-}
-
-function talkLisa(){
-  relationships.lisa++;
-
-  showScene({
-    speaker:"lisa",
-    background:"villa",
-    text:"Lisa gives you a playful smile.\n\n\"Careful,\" she says.\n\n\"People might start thinking you're into me.\""
-  });
-
-  updateRelationships();
-}
-
-function followMaya(){
+function goShrine(){
   relationships.maya++;
 
   showScene({
     speaker:"maya",
-    background:"villa",
-    text:"Maya looks toward the jungle.\n\n\"I found something strange near the old stones,\" she whispers.\n\nYou decide to follow her."
+    background:"crystal",
+    text:"You follow Maya toward the Crystal Shrine.\n\nShe studies the glowing symbols carefully.\n\n\"These markings are older than the villa,\" she whispers.\n\n\"And I think they were waiting for you.\""
   });
 
   updateRelationships();
