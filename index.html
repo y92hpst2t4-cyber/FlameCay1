@@ -40,7 +40,8 @@
 
     <div class="card" id="relationshipBox">
       ❤️ Lucas: 0<br>
-      ❤️ Maya: 0
+      ❤️ Maya: 0<br>
+      ❤️ Kai: 0
     </div>
   </section>
 
@@ -53,7 +54,8 @@ let typingTimer = null;
 
 let relationships = {
   lucas: 0,
-  maya: 0
+  maya: 0,
+  kai: 0
 };
 
 const characters = {
@@ -78,6 +80,13 @@ const characters = {
     image: "images/AF6CC476-58A0-42B0-8044-66A742190789.png"
   },
 
+  kai: {
+    name: "Kai Nakamura",
+    title: "The Competitive Surfer",
+    emoji: "🌊",
+    image: "images/95C98E8C-8531-42AE-BAF7-DCB8A894E394.png"
+  },
+
   maya: {
     name: "Maya Patel",
     title: "The Explorer",
@@ -91,6 +100,7 @@ const introDialogue = [
   { speaker:"narrator", background:"arrival", text:"The sun rises over the ocean.\n\nYour boat moves toward Flame Cay." },
   { speaker:"host", background:"arrival", text:"Welcome... to The Island of Flames.\n\nTwenty singles. One island. One unforgettable summer." },
   { speaker:"lucas", background:"villa", text:"Hey!\n\nI'm Lucas. Welcome to Flame Cay." },
+  { speaker:"kai", background:"villa", text:"Kai flashes a confident smile.\n\n\"I'm Kai. I came here to win... and maybe fall in love along the way.\"" },
   { speaker:"maya", background:"villa", text:"I'm Maya.\n\nThere's something strange about this island..." },
   { speaker:"narrator", background:"crystal", text:"Deep inside the jungle...\n\nThe Crystal Flame begins to glow." },
   { speaker:"narrator", background:"villa", text:"Your first day begins now.\n\nWhere do you want to go first?" }
@@ -133,7 +143,6 @@ function showScene(scene){
   changeBackground(scene.background);
 
   const portraitBox = document.getElementById("portraitBox");
-
   portraitBox.classList.remove("hidden");
 
   portraitBox.style.animation = "none";
@@ -231,7 +240,8 @@ function crystalRoute(){
 function updateRelationships(){
   document.getElementById("relationshipBox").innerHTML =
     "❤️ Lucas: " + relationships.lucas +
-    "<br>❤️ Maya: " + relationships.maya;
+    "<br>❤️ Maya: " + relationships.maya +
+    "<br>❤️ Kai: " + relationships.kai;
 }
 </script>
 
