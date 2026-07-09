@@ -29,7 +29,15 @@ function startGame() {
 
   if (welcome) {
     welcome.innerHTML = "Welcome to Flame Cay, " + playerName + "!";
-  }
+  }const story = document.getElementById("story");
+
+if (story) {
+  story.innerHTML =
+    "🌅 The sun rises over the ocean.<br><br>" +
+    "🚤 Your boat cuts through the morning fog.<br><br>" +
+    "Ahead, Flame Cay appears for the first time.<br><br>" +
+    "🔥 A glowing Crystal Flame burns at the center of the island.";
+}
 }
 
 function goToVilla() {
