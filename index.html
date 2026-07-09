@@ -20,7 +20,7 @@
       <button onclick="startGame()">▶ New Game</button>
     </section>
 
-    <section id="game" style="display:none;">
+   <div id="choices" hidden>
       <h2 id="welcome">Welcome to Flame Cay</h2>
 
       <div class="card">
@@ -31,11 +31,13 @@
     ▶ Continue
 </button>
 
-      </div>
+<div id="choices" style="display:none;">
+    <button onclick="goToVilla()">🏠 Go to the Villa</button>
 
-      <button onclick="goToVilla()">🏠 Go to the Villa</button>
-      <button onclick="exploreJungle()">🌴 Explore the Jungle</button>
-      <button onclick="crystalFlame()">🔥 Investigate the Crystal Flame</button>
+    <button onclick="exploreJungle()">🌴 Explore the Jungle</button>
+
+    <button onclick="crystalFlame()">🔥 Investigate the Crystal Flame</button>
+</div>
 
       <div class="card" id="relationshipBox">
         ❤️ Lucas: 0<br>
