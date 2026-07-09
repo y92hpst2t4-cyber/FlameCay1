@@ -17,6 +17,18 @@ const introDialogue = [
 
 let typingSpeed = 35;
 
+function playClickSound() {
+  const sound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+  sound.volume = 0.4;
+  sound.play();
+}
+
+document.addEventListener("click", function(event) {
+  if (event.target.tagName === "BUTTON") {
+    playClickSound();
+  }
+});
+
 function typeText(text) {
   const story = document.getElementById("story");
   story.innerHTML = "";
