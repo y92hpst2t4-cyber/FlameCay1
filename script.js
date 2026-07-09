@@ -27,28 +27,28 @@ function startGame() {
   document.getElementById("menu").style.display = "none";
   document.getElementById("game").style.display = "block";
 
-  document.getElementById("welcome").innerHTML =
+  document.getElementById("welcome").textContent =
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
-  document.getElementById("story").innerHTML = introDialogue[0];
 
-  const continueButton = document.getElementById("continueButton");
-  if (continueButton) {
-    continueButton.style.display = "block";
-  }
+  document.getElementById("story").textContent = introDialogue[0];
+
+  document.getElementById("continueButton").style.display = "block";
+  document.getElementById("choices").style.display = "none";
 }
 
 function nextDialogue() {
   dialogueIndex++;
 
   if (dialogueIndex < introDialogue.length) {
-    document.getElementById("story").innerHTML = introDialogue[dialogueIndex];
+    document.getElementById("story").textContent = introDialogue[dialogueIndex];
   } else {
-    document.getElementById("story").innerHTML =
+    document.getElementById("story").textContent =
       "🏖️ You step onto Arrival Beach. Where do you want to go first?";
 
     document.getElementById("continueButton").style.display = "none";
+    document.getElementById("choices").style.display = "block";
   }
 }
 
@@ -56,7 +56,7 @@ function goToVilla() {
   relationships.lucas++;
   updateRelationships();
 
-  document.getElementById("story").innerHTML =
+  document.getElementById("story").textContent =
     "🏠 Lucas welcomes you into the villa. The other contestants are watching you carefully.";
 }
 
@@ -64,22 +64,19 @@ function exploreJungle() {
   relationships.maya++;
   updateRelationships();
 
-  document.getElementById("story").innerHTML =
+  document.getElementById("story").textContent =
     "🌴 You discover strange symbols carved into the trees. Someone has been here before.";
 }
 
 function crystalFlame() {
-  document.getElementById("story").innerHTML =
+  document.getElementById("story").textContent =
     "🔥 The Crystal Flame glows brighter as you step closer. You feel like it is reacting to you.";
 }
 
 function updateRelationships() {
   localStorage.setItem("relationships", JSON.stringify(relationships));
 
-  const box = document.getElementById("relationshipBox");
-  if (box) {
-    box.innerHTML =
-      "❤️ Lucas: " + relationships.lucas + "<br>" +
-      "❤️ Maya: " + relationships.maya;
-  }
+  document.getElementById("relationshipBox").innerHTML =
+    "❤️ Lucas: " + relationships.lucas + "<br>" +
+    "❤️ Maya: " + relationships.maya;
 }
