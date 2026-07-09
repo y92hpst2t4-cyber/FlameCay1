@@ -49,6 +49,7 @@
 <script>
 let playerName = "Player";
 let dialogueIndex = 0;
+let typingTimer = null;
 
 let relationships = {
   lucas: 0,
@@ -94,13 +95,15 @@ const introDialogue = [
 
 function startGame(){
   const input = document.getElementById("playerName");
+
   if(input.value.trim() !== ""){
     playerName = input.value.trim();
   }
 
   document.getElementById("menu").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
-  document.getElementById("welcome").innerHTML = "Welcome to Flame Cay, " + playerName + "!";
+  document.getElementById("welcome").innerHTML =
+    "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
   document.getElementById("continueButton").style.display = "block";
@@ -162,6 +165,11 @@ function changeBackground(scene){
 
 function typeText(text){
   const story = document.getElementById("story");
+
+  if(typingTimer){
+    clearTimeout(typingTimer);
+  }
+
   story.innerHTML = "";
 
   let i = 0;
@@ -171,7 +179,7 @@ function typeText(text){
       const char = text.charAt(i);
       story.innerHTML += char === "\n" ? "<br>" : char;
       i++;
-      setTimeout(type, 30);
+      typingTimer = setTimeout(type, 30);
     }
   }
 
