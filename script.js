@@ -12,7 +12,7 @@ const introDialogue = [
   "🚤 Your boat cuts through the morning fog.",
   "🏝️ Ahead, Flame Cay appears for the first time.",
   "🔥 A glowing Crystal Flame burns at the center of the island.",
-  "👤 HOST: Welcome to Flame Cay. Every choice you make here will be remembered."
+  "🏖️ You step onto Arrival Beach. Someone is waiting for you..."
 ];
 
 function startGame() {
@@ -22,16 +22,19 @@ function startGame() {
     playerName = input.value.trim();
   }
 
-  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("menu").style.display = "none";
   document.getElementById("game").classList.remove("hidden");
 
-  document.getElementById("welcome").textContent =
+  document.getElementById("welcome").innerHTML =
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
-  document.getElementById("story").textContent = introDialogue[0];
 
-  document.getElementById("continueButton").classList.remove("hidden");
+  document.getElementById("story").innerHTML =
+    introDialogue[dialogueIndex];
+
+  document.getElementById("continueButton").style.display = "inline-block";
+
   document.getElementById("choices").classList.add("hidden");
 
   updateRelationships();
@@ -41,39 +44,42 @@ function nextDialogue() {
   dialogueIndex++;
 
   if (dialogueIndex < introDialogue.length) {
-    document.getElementById("story").textContent = introDialogue[dialogueIndex];
+    document.getElementById("story").innerHTML =
+      introDialogue[dialogueIndex];
   } else {
-    document.getElementById("story").textContent =
-      "🏖️ You step onto Arrival Beach. Where do you want to go first?";
-
-    document.getElementById("continueButton").classList.add("hidden");
+    document.getElementById("continueButton").style.display = "none";
     document.getElementById("choices").classList.remove("hidden");
   }
 }
 
-function goToVilla() {
+function goToVillage() {
   relationships.lucas++;
-  updateRelationships();
 
-  document.getElementById("story").textContent =
-    "🏠 Lucas welcomes you into the villa. The other contestants are watching you carefully.";
+  document.getElementById("story").innerHTML =
+    "🏠 Lucas welcomes you into the village.<br><br>" +
+    "\"I'm Lucas. We've been expecting someone like you.\"";
+
+  updateRelationships();
 }
 
 function exploreJungle() {
   relationships.maya++;
-  updateRelationships();
 
-  document.getElementById("story").textContent =
-    "🌴 You discover strange symbols carved into the trees. Someone has been here before.";
+  document.getElementById("story").innerHTML =
+    "🌴 Deep in the jungle you meet Maya studying ancient ruins.<br><br>" +
+    "\"These symbols have been here for centuries,\" she says.";
+
+  updateRelationships();
 }
 
-function crystalFlame() {
-  document.getElementById("story").textContent =
-    "🔥 The Crystal Flame glows brighter as you step closer. You feel like it is reacting to you.";
+function crystalRoute() {
+  document.getElementById("story").innerHTML =
+    "🔥 You approach the Crystal Flame.<br><br>" +
+    "The fire glows brighter as if it recognizes you...";
 }
 
 function updateRelationships() {
   document.getElementById("relationshipBox").innerHTML =
-    "❤️ Lucas: " + relationships.lucas + "<br>" +
-    "❤️ Maya: " + relationships.maya;
+    "❤️ Lucas: " + relationships.lucas +
+    "<br>❤️ Maya: " + relationships.maya;
 }
