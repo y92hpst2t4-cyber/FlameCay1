@@ -41,6 +41,24 @@ function typeText(text) {
   type();
 }
 
+function showNarrator() {
+  document.getElementById("portraitBox").classList.remove("hidden");
+  document.getElementById("portrait").innerHTML = "🌴";
+  document.getElementById("speakerName").innerHTML = "Narrator";
+}
+
+function showLucas() {
+  document.getElementById("portraitBox").classList.remove("hidden");
+  document.getElementById("portrait").innerHTML = "👦";
+  document.getElementById("speakerName").innerHTML = "Lucas";
+}
+
+function showMaya() {
+  document.getElementById("portraitBox").classList.remove("hidden");
+  document.getElementById("portrait").innerHTML = "👩";
+  document.getElementById("speakerName").innerHTML = "Maya";
+}
+
 function startGame() {
   const input = document.getElementById("playerName");
 
@@ -55,7 +73,7 @@ function startGame() {
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
-
+  showNarrator();
   typeText(introDialogue[dialogueIndex]);
 
   document.getElementById("continueButton").style.display = "inline-block";
@@ -68,6 +86,7 @@ function nextDialogue() {
   dialogueIndex++;
 
   if (dialogueIndex < introDialogue.length) {
+    showNarrator();
     typeText(introDialogue[dialogueIndex]);
   } else {
     document.getElementById("continueButton").style.display = "none";
@@ -77,6 +96,7 @@ function nextDialogue() {
 
 function goToVillage() {
   relationships.lucas++;
+  showLucas();
 
   typeText(
     "🏠 Lucas welcomes you into the village.\n\n\"I'm Lucas. We've been expecting someone like you.\""
@@ -87,6 +107,7 @@ function goToVillage() {
 
 function exploreJungle() {
   relationships.maya++;
+  showMaya();
 
   typeText(
     "🌴 Deep in the jungle you meet Maya studying ancient ruins.\n\n\"These symbols have been here for centuries,\" she says."
@@ -96,6 +117,8 @@ function exploreJungle() {
 }
 
 function crystalRoute() {
+  showNarrator();
+
   typeText(
     "🔥 You approach the Crystal Flame.\n\nThe fire glows brighter as if it recognizes you..."
   );
