@@ -17,6 +17,8 @@ const introDialogue = [
 
 function startGame() {
   const input = document.getElementById("playerName");
+  const choices = document.getElementById("choices");
+  const continueButton = document.getElementById("continueButton");
 
   if (input && input.value.trim() !== "") {
     playerName = input.value.trim();
@@ -31,14 +33,16 @@ function startGame() {
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
-
   document.getElementById("story").textContent = introDialogue[0];
 
-  document.getElementById("continueButton").style.display = "block";
-  document.getElementById("choices").style.display = "none";
+  continueButton.style.display = "block";
+  choices.style.display = "none";
 }
 
 function nextDialogue() {
+  const choices = document.getElementById("choices");
+  const continueButton = document.getElementById("continueButton");
+
   dialogueIndex++;
 
   if (dialogueIndex < introDialogue.length) {
@@ -47,8 +51,8 @@ function nextDialogue() {
     document.getElementById("story").textContent =
       "🏖️ You step onto Arrival Beach. Where do you want to go first?";
 
-    document.getElementById("continueButton").style.display = "none";
-    document.getElementById("choices").style.display = "block";
+    continueButton.style.display = "none";
+    choices.style.display = "block";
   }
 }
 
