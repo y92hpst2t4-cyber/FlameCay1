@@ -1,112 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Island of Flames</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Island of Flames</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body id="bodyBackground">
-
 <main class="screen">
 
-    <section id="menu">
+  <section id="menu">
+    <h1>🔥 The Island of Flames</h1>
+    <h2>Season 1 — The Crystal Awakens</h2>
+    <input id="playerName" placeholder="Enter your name">
+    <button id="newGameButton">▶ New Game</button>
+  </section>
 
-        <h1>🔥 The Island of Flames</h1>
-        <h2>Season 1 — The Crystal Awakens</h2>
+  <section id="game" class="hidden">
+    <h2 id="welcome">Welcome to Flame Cay</h2>
 
-        <input
-            id="playerName"
-            placeholder="Enter your name">
+    <div id="portraitBox" class="hidden">
+      <img id="portraitImage" src="" alt="Portrait" style="display:none;">
+      <div id="portrait">🌴</div>
+      <h3 id="speakerName">Narrator</h3>
+      <p id="speakerTitle">The Story Begins</p>
+    </div>
 
-        <button onclick="startGame()">
-            ▶ New Game
-        </button>
+    <div class="card">
+      <p id="story"></p>
+      <button id="continueButton">▶ Continue</button>
+    </div>
 
-    </section>
+    <div id="choices" class="hidden">
+      <button id="villaButton">🏡 Enter the Villa</button>
+      <button id="mayaButton">🌿 Talk to Maya</button>
+      <button id="crystalButton">🔥 Look toward the Crystal Flame</button>
+    </div>
 
-    <section id="game" class="hidden">
-
-        <div id="topBar">
-
-            <button>☰</button>
-
-            <button>💾</button>
-
-            <button>⚙️</button>
-
-        </div>
-
-        <h2 id="welcome">
-            Welcome to Flame Cay
-        </h2>
-
-        <div id="portraitBox" class="hidden">
-
-            <img
-                id="portraitImage"
-                src=""
-                alt="Portrait"
-                style="display:none;">
-
-            <div id="portrait">
-                🌴
-            </div>
-
-            <h3 id="speakerName">
-                Narrator
-            </h3>
-
-            <p id="speakerTitle">
-                The Story Begins
-            </p>
-
-        </div>
-
-        <div class="card">
-
-            <p id="story"></p>
-
-            <button
-                id="continueButton">
-                ▶ Continue
-            </button>
-
-        </div>
-
-        <div
-            id="choices"
-            class="hidden">
-
-            <button id="villaButton">
-                🏡 Enter the Villa
-            </button>
-
-            <button id="mayaButton">
-                🌿 Talk to Maya
-            </button>
-
-            <button id="crystalButton">
-                🔥 Look toward the Crystal Flame
-            </button>
-
-        </div>
-
-        <div
-            class="card"
-            id="relationshipBox">
-
-            ❤️ Lucas: 0
-
-            <br>
-
-            ❤️ Maya: 0
-
-        </div>
-
-    </section>
+    <div class="card" id="relationshipBox">
+      ❤️ Lucas: 0<br>
+      ❤️ Maya: 0
+    </div>
+  </section>
 
 </main>
 
@@ -115,7 +51,5 @@
 <script src="backgrounds.js"></script>
 <script src="ui.js"></script>
 <script src="engine.js"></script>
-
 </body>
-
 </html>
