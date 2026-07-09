@@ -52,7 +52,11 @@ let relationships = {
   lucas: 0,
   maya: 0,
   kai: 0,
-  isabella: 0
+  isabella: 0,
+  ethan: 0,
+  sofia: 0,
+  noah: 0,
+  lisa: 0
 };
 
 const characters = {
@@ -91,6 +95,34 @@ const characters = {
     image: "images/95F834E8-3ABC-4C2F-AF14-E8D121253968.png"
   },
 
+  ethan: {
+    name: "Ethan Brooks",
+    title: "The CEO",
+    emoji: "💼",
+    image: "images/E607EF85-171E-4623-9D56-921695CE2F73.png"
+  },
+
+  sofia: {
+    name: "Sofia Rossi",
+    title: "The Heartbreaker",
+    emoji: "💖",
+    image: "images/286EA103-FC31-41AF-BD1E-3E55D7B2115F.png"
+  },
+
+  noah: {
+    name: "Noah Carter",
+    title: "The Firefighter",
+    emoji: "🚒",
+    image: "images/3C17246B-AD38-420C-8767-F53B7F3FBDDE.png"
+  },
+
+  lisa: {
+    name: "Lisa Morgan",
+    title: "The Bombshell",
+    emoji: "💖",
+    image: "images/9DBF1984-9450-4DAF-94D3-04E305D0E5DF.png"
+  },
+
   maya: {
     name: "Maya Patel",
     title: "The Explorer",
@@ -106,6 +138,10 @@ const introDialogue = [
   { speaker:"lucas", background:"villa", text:"Hey!\n\nI'm Lucas. Welcome to Flame Cay." },
   { speaker:"kai", background:"villa", text:"Kai flashes a confident smile.\n\n\"I'm Kai. I came here to win... and maybe fall in love along the way.\"" },
   { speaker:"isabella", background:"villa", text:"Isabella walks in with a bright smile.\n\n\"Hey! I'm Isabella. I came here for good vibes, great people... and maybe something real.\"" },
+  { speaker:"ethan", background:"villa", text:"I'm Ethan Brooks.\n\nI don't chase attention...\n\nI earn respect." },
+  { speaker:"sofia", background:"villa", text:"Hi... I'm Sofia.\n\nI'm here to find something real." },
+  { speaker:"noah", background:"villa", text:"Noah gives you a warm smile.\n\n\"I'm Noah. I don't back down from danger...\n\nbut finding love might be my toughest challenge yet.\"" },
+  { speaker:"lisa", background:"villa", text:"Lisa walks into the villa with a confident smile.\n\n\"I'm Lisa.\n\nI'm here to find love... and maybe steal a few hearts along the way.\"" },
   { speaker:"maya", background:"villa", text:"I'm Maya.\n\nThere's something strange about this island..." },
   { speaker:"narrator", background:"crystal", text:"Deep inside the jungle...\n\nThe Crystal Flame begins to glow." },
   { speaker:"narrator", background:"villa", text:"Your first day begins now.\n\nWhere do you want to go first?" }
@@ -247,7 +283,11 @@ function updateRelationships(){
     "❤️ Lucas: " + relationships.lucas +
     "<br>❤️ Maya: " + relationships.maya +
     "<br>❤️ Kai: " + relationships.kai +
-    "<br>❤️ Isabella: " + relationships.isabella;
+    "<br>❤️ Isabella: " + relationships.isabella +
+    "<br>❤️ Ethan: " + relationships.ethan +
+    "<br>❤️ Sofia: " + relationships.sofia +
+    "<br>❤️ Noah: " + relationships.noah +
+    "<br>❤️ Lisa: " + relationships.lisa;
 }
 </script>
 
