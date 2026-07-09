@@ -21,6 +21,7 @@
     <h2 id="welcome">Welcome to Flame Cay</h2>
 
     <div id="portraitBox" class="hidden">
+      <img id="portraitImage" src="" alt="Character Portrait">
       <div id="portrait">🌴</div>
       <h3 id="speakerName">Narrator</h3>
       <p id="speakerTitle">The Story Begins</p>
@@ -55,10 +56,30 @@ let relationships = {
 };
 
 const characters = {
-  narrator: { name: "Narrator", title: "The Story Begins", portrait: "🌴" },
-  host: { name: "Host", title: "Keeper of the Crystal Flame", portrait: "🎭" },
-  lucas: { name: "Lucas Ramirez", title: "The Loyal Swimmer", portrait: "👦" },
-  maya: { name: "Maya Patel", title: "The Explorer", portrait: "🌿" }
+  narrator: {
+    name: "Narrator",
+    title: "The Story Begins",
+    emoji: "🌴",
+    image: ""
+  },
+  host: {
+    name: "Host",
+    title: "Keeper of the Crystal Flame",
+    emoji: "🎭",
+    image: ""
+  },
+  lucas: {
+    name: "Lucas Ramirez",
+    title: "The Loyal Swimmer",
+    emoji: "👦",
+    image: "D71A2A17-5B9B-46F4-84D9-74635FC4DB17.png"
+  },
+  maya: {
+    name: "Maya Patel",
+    title: "The Explorer",
+    emoji: "🌿",
+    image: ""
+  }
 };
 
 const introDialogue = [
@@ -106,9 +127,21 @@ function showScene(scene){
   changeBackground(scene.background);
 
   document.getElementById("portraitBox").classList.remove("hidden");
-  document.getElementById("portrait").innerHTML = character.portrait;
   document.getElementById("speakerName").innerHTML = character.name;
   document.getElementById("speakerTitle").innerHTML = character.title;
+
+  const portraitImage = document.getElementById("portraitImage");
+  const portraitEmoji = document.getElementById("portrait");
+
+  if(character.image !== ""){
+    portraitImage.src = character.image;
+    portraitImage.style.display = "block";
+    portraitEmoji.style.display = "none";
+  }else{
+    portraitImage.style.display = "none";
+    portraitEmoji.style.display = "flex";
+    portraitEmoji.innerHTML = character.emoji;
+  }
 
   typeText(scene.text);
 }
