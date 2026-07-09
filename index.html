@@ -8,42 +8,106 @@
 </head>
 
 <body id="bodyBackground">
+
   <main class="screen">
 
     <section id="menu">
       <h1>🔥 The Island of Flames</h1>
       <h2>Season 1 — The Crystal Awakens</h2>
-      <input id="playerName" placeholder="Enter your name">
-      <button onclick="startGame()">▶ New Game</button>
+
+      <input
+        id="playerName"
+        placeholder="Enter your name"
+      >
+
+      <button onclick="startGame()">
+        ▶ New Game
+      </button>
     </section>
 
     <section id="game" class="hidden">
-      <h2 id="welcome">Welcome to Flame Cay</h2>
+
+      <h2 id="welcome">
+        Welcome to Flame Cay
+      </h2>
+
+      <!-- Portrait Area -->
 
       <div id="portraitBox" class="hidden">
-        <div id="portrait">🌴</div>
-        <h3 id="speakerName">Narrator</h3>
+
+        <!-- Future real portrait -->
+
+        <img
+          id="portraitImage"
+          src=""
+          alt="Character Portrait"
+          style="display:none;"
+        >
+
+        <!-- Emoji fallback -->
+
+        <div id="portrait">
+          🌴
+        </div>
+
+        <h3 id="speakerName">
+          Narrator
+        </h3>
+
       </div>
+
+      <!-- Dialogue -->
 
       <div class="card">
+
         <p id="story"></p>
-        <button id="continueButton" onclick="nextDialogue()">▶ Continue</button>
+
+        <button
+          id="continueButton"
+          onclick="nextDialogue()"
+        >
+          ▶ Continue
+        </button>
+
       </div>
 
-      <div id="choices" class="hidden">
-        <button onclick="goToVilla()">🏡 Enter the Villa</button>
-        <button onclick="meetMaya()">🌿 Talk to Maya</button>
-        <button onclick="crystalRoute()">🔥 Look toward the Crystal Flame</button>
+      <!-- Choices -->
+
+      <div
+        id="choices"
+        class="hidden"
+      >
+
+        <button onclick="goToVilla()">
+          🏡 Enter the Villa
+        </button>
+
+        <button onclick="meetMaya()">
+          🌿 Talk to Maya
+        </button>
+
+        <button onclick="crystalRoute()">
+          🔥 Look toward the Crystal Flame
+        </button>
+
       </div>
 
-      <div class="card" id="relationshipBox">
-        ❤️ Lucas: 0<br>
+      <!-- Relationships -->
+
+      <div
+        class="card"
+        id="relationshipBox"
+      >
+        ❤️ Lucas: 0
+        <br>
         ❤️ Maya: 0
       </div>
+
     </section>
 
   </main>
 
   <script src="script.js"></script>
+
 </body>
 </html>
