@@ -12,10 +12,6 @@
 
 <main class="screen">
 
-    <!-- ========================= -->
-    <!-- MAIN MENU -->
-    <!-- ========================= -->
-
     <section id="menu">
 
         <h1>🔥 The Island of Flames</h1>
@@ -31,13 +27,7 @@
 
     </section>
 
-    <!-- ========================= -->
-    <!-- GAME -->
-    <!-- ========================= -->
-
     <section id="game" class="hidden">
-
-        <!-- Top Bar -->
 
         <div id="topBar">
 
@@ -49,13 +39,9 @@
 
         </div>
 
-        <!-- Welcome -->
-
         <h2 id="welcome">
             Welcome to Flame Cay
         </h2>
-
-        <!-- Portrait -->
 
         <div id="portraitBox" class="hidden">
 
@@ -79,41 +65,34 @@
 
         </div>
 
-        <!-- Dialogue -->
-
         <div class="card">
 
             <p id="story"></p>
 
             <button
-                id="continueButton"
-                onclick="nextDialogue()">
+                id="continueButton">
                 ▶ Continue
             </button>
 
         </div>
 
-        <!-- Choices -->
-
         <div
             id="choices"
             class="hidden">
 
-            <button onclick="goToVilla()">
+            <button id="villaButton">
                 🏡 Enter the Villa
             </button>
 
-            <button onclick="meetMaya()">
+            <button id="mayaButton">
                 🌿 Talk to Maya
             </button>
 
-            <button onclick="crystalRoute()">
+            <button id="crystalButton">
                 🔥 Look toward the Crystal Flame
             </button>
 
         </div>
-
-        <!-- Relationships -->
 
         <div
             class="card"
@@ -131,7 +110,11 @@
 
 </main>
 
-<script src="script.js"></script>
+<script src="characters.js"></script>
+<script src="dialogue.js"></script>
+<script src="backgrounds.js"></script>
+<script src="ui.js"></script>
+<script src="engine.js"></script>
 
 </body>
 
