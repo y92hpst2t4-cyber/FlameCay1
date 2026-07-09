@@ -17,18 +17,46 @@ const introDialogue = [
 
 let typingSpeed = 35;
 
+// =========================
+// Sound Effect
+// =========================
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
 function playClickSound() {
-  const sound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-  sound.volume = 0.4;
-  sound.play();
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+
+  oscillator.type = "triangle";
+  oscillator.frequency.value = 650;
+
+  gain.gain.value = 0.08;
+
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+
+  oscillator.start();
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001,
+    audioContext.currentTime + 0.08
+  );
+
+  oscillator.stop(audioContext.currentTime + 0.08);
 }
 
-document.addEventListener("click", function(event) {
+document.addEventListener("click", function (event) {
   if (event.target.tagName === "BUTTON") {
     playClickSound();
   }
 });
 
+// =========================
+// Dialogue Animation
+// =========================
 function typeText(text) {
   const story = document.getElementById("story");
   story.innerHTML = "";
@@ -53,6 +81,9 @@ function typeText(text) {
   type();
 }
 
+// =========================
+// Portraits
+// =========================
 function showNarrator() {
   document.getElementById("portraitBox").classList.remove("hidden");
   document.getElementById("portrait").innerHTML = "🌴";
@@ -71,6 +102,9 @@ function showMaya() {
   document.getElementById("speakerName").innerHTML = "Maya";
 }
 
+// =========================
+// Game
+// =========================
 function startGame() {
   const input = document.getElementById("playerName");
 
@@ -85,6 +119,7 @@ function startGame() {
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
+
   showNarrator();
   typeText(introDialogue[dialogueIndex]);
 
@@ -108,6 +143,7 @@ function nextDialogue() {
 
 function goToVillage() {
   relationships.lucas++;
+
   showLucas();
 
   typeText(
@@ -119,6 +155,7 @@ function goToVillage() {
 
 function exploreJungle() {
   relationships.maya++;
+
   showMaya();
 
   typeText(
