@@ -17,17 +17,13 @@ const introDialogue = [
 
 function startGame() {
   const input = document.getElementById("playerName");
-  const choices = document.getElementById("choices");
-  const continueButton = document.getElementById("continueButton");
 
-  if (input && input.value.trim() !== "") {
+  if (input.value.trim() !== "") {
     playerName = input.value.trim();
   }
 
-  localStorage.setItem("playerName", playerName);
-
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("game").style.display = "block";
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
 
   document.getElementById("welcome").textContent =
     "Welcome to Flame Cay, " + playerName + "!";
@@ -35,14 +31,13 @@ function startGame() {
   dialogueIndex = 0;
   document.getElementById("story").textContent = introDialogue[0];
 
-  continueButton.style.display = "block";
-  choices.style.display = "none";
+  document.getElementById("continueButton").classList.remove("hidden");
+  document.getElementById("choices").classList.add("hidden");
+
+  updateRelationships();
 }
 
 function nextDialogue() {
-  const choices = document.getElementById("choices");
-  const continueButton = document.getElementById("continueButton");
-
   dialogueIndex++;
 
   if (dialogueIndex < introDialogue.length) {
@@ -51,8 +46,8 @@ function nextDialogue() {
     document.getElementById("story").textContent =
       "🏖️ You step onto Arrival Beach. Where do you want to go first?";
 
-    continueButton.style.display = "none";
-    choices.style.display = "block";
+    document.getElementById("continueButton").classList.add("hidden");
+    document.getElementById("choices").classList.remove("hidden");
   }
 }
 
@@ -78,8 +73,6 @@ function crystalFlame() {
 }
 
 function updateRelationships() {
-  localStorage.setItem("relationships", JSON.stringify(relationships));
-
   document.getElementById("relationshipBox").innerHTML =
     "❤️ Lucas: " + relationships.lucas + "<br>" +
     "❤️ Maya: " + relationships.maya;
