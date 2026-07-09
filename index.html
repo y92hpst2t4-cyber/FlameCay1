@@ -1,125 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Island of Flames</title>
-<link rel="stylesheet" href="style.css">
-
-<style>
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:linear-gradient(#6fd3ff,#006994);
-    color:white;
-    text-align:center;
-}
-
-header{
-    padding:40px;
-}
-
-h1{
-    font-size:42px;
-}
-
-button{
-    padding:15px 25px;
-    margin:10px;
-    font-size:18px;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-}
-
-#game{
-    display:none;
-    padding:20px;
-}
-
-.choice{
-    background:#ff9800;
-    color:white;
-}
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Island of Flames</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header id="menu">
-<h1>🔥 THE ISLAND OF FLAMES</h1>
+  <main class="screen">
 
-<h2>Episode 1 — The Arrival</h2>
+    <section id="menu">
+      <h1>🔥 The Island of Flames</h1>
+      <h2>Episode 1 — The Arrival</h2>
 
-<p>You arrive on Flame Cay...</p>
+      <input id="playerName" placeholder="Enter your name">
 
-<button onclick="startGame()">▶ New Game</button>
+      <button onclick="startGame()">▶ New Game</button>
+    </section>
 
-</header>
+    <section id="game" style="display:none;">
+      <h2 id="welcome">Welcome to Flame Cay</h2>
 
-<div id="game">
+      <div class="card">
+        <p id="story">
+          The boat reaches the shore. A mysterious Crystal Flame glows in the distance.
+        </p>
+      </div>
 
-<h2>🌊 Arrival Beach</h2>
+      <button onclick="goToVilla()">🏠 Go to the Villa</button>
+      <button onclick="exploreJungle()">🌴 Explore the Jungle</button>
+      <button onclick="crystalFlame()">🔥 Investigate the Crystal Flame</button>
 
-<p id="story">
-The boat slowly reaches shore.
-A mysterious Crystal Flame glows in the distance.
-</p>
+      <div class="card" id="relationshipBox">
+        ❤️ Lucas: 0<br>
+        ❤️ Maya: 0
+      </div>
+    </section>
 
-<button class="choice" onclick="choose('villa')">
-🏠 Go to the Villa
-</button>
+  </main>
 
-<button class="choice" onclick="choose('jungle')">
-🌴 Explore the Jungle
-</button>
-
-<button class="choice" onclick="choose('flame')">
-🔥 Investigate the Crystal Flame
-</button>
-
-</div>
-
-<script>
-
-function startGame(){
-
-document.getElementById("menu").style.display="none";
-
-document.getElementById("game").style.display="block";
-
-}
-
-function choose(choice){
-
-let text="";
-
-if(choice==="villa"){
-
-text="You walk toward the luxurious villa. You hear people talking inside.";
-
-}
-
-if(choice==="jungle"){
-
-text="The jungle is peaceful... until you notice strange footprints.";
-
-}
-
-if(choice==="flame"){
-
-text="The Crystal Flame grows brighter as you approach it.";
-
-}
-
-document.getElementById("story").innerHTML=text;
-
-localStorage.setItem("firstChoice",choice);
-
-}
-
-</script>
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
