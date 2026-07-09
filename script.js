@@ -15,6 +15,32 @@ const introDialogue = [
   "🏖️ You step onto Arrival Beach. Someone is waiting for you..."
 ];
 
+let typingSpeed = 35;
+
+function typeText(text) {
+  const story = document.getElementById("story");
+  story.innerHTML = "";
+
+  let i = 0;
+
+  function type() {
+    if (i < text.length) {
+      const char = text.charAt(i);
+
+      if (char === "\n") {
+        story.innerHTML += "<br>";
+      } else {
+        story.innerHTML += char;
+      }
+
+      i++;
+      setTimeout(type, typingSpeed);
+    }
+  }
+
+  type();
+}
+
 function startGame() {
   const input = document.getElementById("playerName");
 
@@ -30,11 +56,9 @@ function startGame() {
 
   dialogueIndex = 0;
 
-  document.getElementById("story").innerHTML =
-    introDialogue[dialogueIndex];
+  typeText(introDialogue[dialogueIndex]);
 
   document.getElementById("continueButton").style.display = "inline-block";
-
   document.getElementById("choices").classList.add("hidden");
 
   updateRelationships();
@@ -44,8 +68,7 @@ function nextDialogue() {
   dialogueIndex++;
 
   if (dialogueIndex < introDialogue.length) {
-    document.getElementById("story").innerHTML =
-      introDialogue[dialogueIndex];
+    typeText(introDialogue[dialogueIndex]);
   } else {
     document.getElementById("continueButton").style.display = "none";
     document.getElementById("choices").classList.remove("hidden");
@@ -55,9 +78,9 @@ function nextDialogue() {
 function goToVillage() {
   relationships.lucas++;
 
-  document.getElementById("story").innerHTML =
-    "🏠 Lucas welcomes you into the village.<br><br>" +
-    "\"I'm Lucas. We've been expecting someone like you.\"";
+  typeText(
+    "🏠 Lucas welcomes you into the village.\n\n\"I'm Lucas. We've been expecting someone like you.\""
+  );
 
   updateRelationships();
 }
@@ -65,17 +88,17 @@ function goToVillage() {
 function exploreJungle() {
   relationships.maya++;
 
-  document.getElementById("story").innerHTML =
-    "🌴 Deep in the jungle you meet Maya studying ancient ruins.<br><br>" +
-    "\"These symbols have been here for centuries,\" she says.";
+  typeText(
+    "🌴 Deep in the jungle you meet Maya studying ancient ruins.\n\n\"These symbols have been here for centuries,\" she says."
+  );
 
   updateRelationships();
 }
 
 function crystalRoute() {
-  document.getElementById("story").innerHTML =
-    "🔥 You approach the Crystal Flame.<br><br>" +
-    "The fire glows brighter as if it recognizes you...";
+  typeText(
+    "🔥 You approach the Crystal Flame.\n\nThe fire glows brighter as if it recognizes you..."
+  );
 }
 
 function updateRelationships() {
