@@ -33,9 +33,9 @@
     </div>
 
     <div id="choices" class="hidden">
-      <button onclick="goBeach()">🏖 Beach</button>
-      <button onclick="goVilla()">🏡 Villa Lounge</button>
-      <button onclick="goShrine()">💎 Crystal Shrine</button>
+      <button onclick="showBeachChoices()">🏖 Beach</button>
+      <button onclick="showVillaChoices()">🏡 Villa Lounge</button>
+      <button onclick="showShrineChoices()">💎 Crystal Shrine</button>
     </div>
 
     <div class="card" id="relationshipBox"></div>
@@ -175,7 +175,7 @@ function nextDialogue(){
     showScene(introDialogue[dialogueIndex]);
   }else{
     document.getElementById("continueButton").style.display = "none";
-    document.getElementById("choices").classList.remove("hidden");
+    showLocationChoices();
   }
 }
 
@@ -251,52 +251,143 @@ function typeText(text){
   type();
 }
 
-function goBeach(){
+function showLocationChoices(){
+  const choices = document.getElementById("choices");
+
+  choices.classList.remove("hidden");
+  choices.innerHTML = `
+    <button onclick="showBeachChoices()">🏖 Beach</button>
+    <button onclick="showVillaChoices()">🏡 Villa Lounge</button>
+    <button onclick="showShrineChoices()">💎 Crystal Shrine</button>
+  `;
+}
+
+function showBeachChoices(){
+  changeBackground("beach");
+
+  showScene({
+    speaker:"narrator",
+    background:"beach",
+    text:"You walk down to the beach.\n\nKai stands near the waves while Lisa relaxes in the sun.\n\nWho do you want to spend time with?"
+  });
+
+  document.getElementById("choices").innerHTML = `
+    <button onclick="talkKaiBeach()">🌊 Talk to Kai</button>
+    <button onclick="talkLisaBeach()">💖 Talk to Lisa</button>
+    <button onclick="showLocationChoices()">⬅ Back to Locations</button>
+  `;
+}
+
+function showVillaChoices(){
+  changeBackground("villa");
+
+  showScene({
+    speaker:"narrator",
+    background:"villa",
+    text:"You enter the villa lounge.\n\nLucas, Ethan, and Sofia are gathered near the couches.\n\nWho do you want to talk to?"
+  });
+
+  document.getElementById("choices").innerHTML = `
+    <button onclick="talkLucasVilla()">🏊 Talk to Lucas</button>
+    <button onclick="talkEthanVilla()">💼 Talk to Ethan</button>
+    <button onclick="talkSofiaVilla()">🌹 Talk to Sofia</button>
+    <button onclick="showLocationChoices()">⬅ Back to Locations</button>
+  `;
+}
+
+function showShrineChoices(){
+  changeBackground("crystal");
+
+  showScene({
+    speaker:"narrator",
+    background:"crystal",
+    text:"You follow the path toward the Crystal Shrine.\n\nMaya is studying glowing symbols carved into ancient stone.\n\nThe air feels strange here."
+  });
+
+  document.getElementById("choices").innerHTML = `
+    <button onclick="talkMayaShrine()">🌿 Follow Maya</button>
+    <button onclick="examineCrystal()">🔥 Examine the Crystal Flame</button>
+    <button onclick="showLocationChoices()">⬅ Back to Locations</button>
+  `;
+}
+
+function talkKaiBeach(){
   relationships.kai++;
-  relationships.lisa++;
 
   showScene({
     speaker:"kai",
     background:"beach",
-    text:"You head down to the beach.\n\nKai is by the water while Lisa relaxes nearby in the sun.\n\nKai grins at you.\n\n\"Good choice. The beach is where people show who they really are.\"\n\n❤️ Kai +1\n❤️ Lisa +1"
+    text:"Kai smiles as the waves crash behind him.\n\n\"You came to the right place,\" he says.\n\n\"The ocean knows when people are being real.\"\n\n❤️ Kai +1"
   });
 
   updateRelationships();
 }
 
-function goVilla(){
+function talkLisaBeach(){
+  relationships.lisa++;
+
+  showScene({
+    speaker:"lisa",
+    background:"beach",
+    text:"Lisa tilts her head and gives you a playful smile.\n\n\"I was wondering when you'd come talk to me.\"\n\nHer confidence is impossible to ignore.\n\n❤️ Lisa +1"
+  });
+
+  updateRelationships();
+}
+
+function talkLucasVilla(){
   relationships.lucas++;
-  relationships.ethan++;
-  relationships.sofia++;
 
   showScene({
     speaker:"lucas",
     background:"villa",
-    text:"You step into the villa lounge.\n\nLucas, Ethan, and Sofia are talking near the couches.\n\nLucas smiles when he sees you.\n\n\"Come sit with us. First day nerves are easier when you're not alone.\"\n\n❤️ Lucas +1\n❤️ Ethan +1\n❤️ Sofia +1"
+    text:"Lucas looks up when you sit beside him.\n\n\"I'm glad you're here,\" he says softly.\n\n\"This place feels intense, but you make it easier.\"\n\n❤️ Lucas +1"
   });
 
   updateRelationships();
 }
 
-function 
-goShrine(){
+function talkEthanVilla(){
+  relationships.ethan++;
+
+  showScene({
+    speaker:"ethan",
+    background:"villa",
+    text:"Ethan studies you with a calm smile.\n\n\"Most people talk too much on day one,\" he says.\n\n\"You seem like someone who actually listens.\"\n\n❤️ Ethan +1"
+  });
+
+  updateRelationships();
+}
+
+function talkSofiaVilla(){
+  relationships.sofia++;
+
+  showScene({
+    speaker:"sofia",
+    background:"villa",
+    text:"Sofia smiles warmly as you approach.\n\n\"I was hoping someone honest would come over.\"\n\nFor a moment, her confident mask softens.\n\n❤️ Sofia +1"
+  });
+
+  updateRelationships();
+}
+
+function talkMayaShrine(){
   relationships.maya++;
 
   showScene({
     speaker:"maya",
     background:"crystal",
-    text:"You follow Maya toward the Crystal Shrine.\n\nThe air feels colder here.\n\nMaya studies the glowing symbols carefully.\n\n\"These markings are older than the villa,\" she whispers.\n\nThe Crystal Flame pulses once, like it heard you.\n\n❤️ Maya +1"
+    text:"Maya points to the glowing symbols.\n\n\"These markings are older than the villa,\" she whispers.\n\n\"And I think they were waiting for you.\"\n\n❤️ Maya +1"
   });
 
   updateRelationships();
 }
 
-function crystalRoute(){
-  
+function examineCrystal(){
   showScene({
     speaker:"narrator",
     background:"crystal",
-    text:"You look toward the jungle.\n\nThe Crystal Flame glows brighter.\n\nA whisper crosses the wind:\n\n\"Keeper...\""
+    text:"You step closer to the Crystal Flame.\n\nThe light pulses once.\n\nA whisper moves through the air:\n\n\"Keeper...\"\n\nSomething about the island has noticed you."
   });
 }
 
