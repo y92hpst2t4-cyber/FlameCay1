@@ -1,38 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>The Island of Flames</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body id="bodyBackground">
-
 <main class="screen">
 
   <!-- MAIN MENU -->
 
   <section id="menu">
-
     <h1>🔥 The Island of Flames</h1>
+    <h2>Season 1 — The Crystal Awakens</h2>
 
-    <h2>
-      Season 1 — The Crystal Awakens
-    </h2>
-
-    <input
-      id="playerName"
-      placeholder="Enter your name"
-    >
+    <input id="playerName" placeholder="Enter your name">
 
     <button onclick="startGame()">
       ▶ New Game
     </button>
-
   </section>
 
 
@@ -72,7 +60,7 @@
 
     <!-- DIALOGUE -->
 
-    <div class="card">
+    <div id="dialogueCard" class="card">
 
       <p id="story"></p>
 
@@ -86,9 +74,32 @@
     </div>
 
 
-    <!-- CHOICE BUTTONS -->
+    <!-- CHARACTER CHOICES -->
 
     <div id="choices" class="hidden"></div>
+
+
+    <!-- WALKING SCREEN -->
+
+    <section id="walkingScreen" class="hidden">
+
+      <div class="card">
+
+        <h2 id="walkingTitle">
+          🚶 Exploring Flame Cay
+        </h2>
+
+        <p id="walkingText">
+          You follow the island path...
+        </p>
+
+        <button onclick="finishWalking()">
+          Continue Walking ➜
+        </button>
+
+      </div>
+
+    </section>
 
 
     <!-- ISLAND MAP -->
@@ -103,43 +114,43 @@
           Choose where you want to explore.
         </p>
 
-        <button onclick="visitLocation('volcano')">
+        <button onclick="startWalking('volcano')">
           🌋 Volcano Peak
         </button>
 
-        <button onclick="visitLocation('jungle')">
+        <button onclick="startWalking('jungle')">
           🌿 Whispering Jungle
         </button>
 
-        <button onclick="visitLocation('shrine')">
+        <button onclick="startWalking('shrine')">
           💎 Crystal Shrine
         </button>
 
-        <button onclick="visitLocation('beach')">
+        <button onclick="startWalking('beach')">
           🏖 Arrival Beach
         </button>
 
-        <button onclick="visitLocation('villa')">
+        <button onclick="startWalking('villa')">
           🏡 Main Villa
         </button>
 
-        <button onclick="visitLocation('gym')">
+        <button onclick="startWalking('gym')">
           💪 Gym
         </button>
 
-        <button onclick="visitLocation('kitchen')">
+        <button onclick="startWalking('kitchen')">
           🍳 Kitchen
         </button>
 
-        <button onclick="visitLocation('pool')">
+        <button onclick="startWalking('pool')">
           🏊 Infinity Pool
         </button>
 
-        <button onclick="visitLocation('firepit')">
+        <button onclick="startWalking('firepit')">
           🔥 Fire Pit
         </button>
 
-        <button onclick="visitLocation('cove')">
+        <button onclick="startWalking('cove')">
           🌙 Moonlight Cove
         </button>
 
@@ -163,10 +174,10 @@
 <script>
 
 let playerName = "Player";
-
 let dialogueIndex = 0;
-
 let typingTimer = null;
+let pendingLocation = "";
+let currentLocation = "villa";
 
 
 let relationships = {
@@ -370,6 +381,20 @@ const introDialogue = [
 ];
 
 
+const locationNames = {
+  volcano: "Volcano Peak",
+  jungle: "Whispering Jungle",
+  shrine: "Crystal Shrine",
+  beach: "Arrival Beach",
+  villa: "Main Villa",
+  gym: "Gym",
+  kitchen: "Kitchen",
+  pool: "Infinity Pool",
+  firepit: "Fire Pit",
+  cove: "Moonlight Cove"
+};
+
+
 function startGame(){
 
   const input = document.getElementById("playerName");
@@ -390,6 +415,8 @@ function startGame(){
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
+  currentLocation = "villa";
+  pendingLocation = "";
 
   document.getElementById("continueButton").style.display =
     "block";
@@ -400,6 +427,10 @@ function startGame(){
 
   document
     .getElementById("islandMap")
+    .classList.add("hidden");
+
+  document
+    .getElementById("walkingScreen")
     .classList.add("hidden");
 
   showScene(introDialogue[0]);
@@ -439,15 +470,17 @@ function showScene(scene){
     scene.background
   );
 
+  document
+    .getElementById("dialogueCard")
+    .classList.remove("hidden");
+
   const portraitBox =
     document.getElementById("portraitBox");
 
   portraitBox.classList.remove("hidden");
 
   portraitBox.style.animation = "none";
-
   portraitBox.offsetHeight;
-
   portraitBox.style.animation =
     "characterEnter .6s ease";
 
@@ -497,52 +530,38 @@ function showScene(scene){
 function changeBackground(scene){
 
   if(scene === "arrival"){
-
     document.body.style.background =
       "linear-gradient(180deg,#70d8ff,#08657e)";
-
   }
 
   if(scene === "villa"){
-
     document.body.style.background =
       "linear-gradient(180deg,#58c7e8,#0b718c)";
-
   }
 
   if(scene === "beach"){
-
     document.body.style.background =
       "linear-gradient(180deg,#7ee8ff,#167c99)";
-
   }
 
   if(scene === "crystal"){
-
     document.body.style.background =
       "linear-gradient(180deg,#1b335f,#061322)";
-
   }
 
   if(scene === "jungle"){
-
     document.body.style.background =
       "linear-gradient(180deg,#3d8b55,#153f2b)";
-
   }
 
   if(scene === "volcano"){
-
     document.body.style.background =
       "linear-gradient(180deg,#7f3b2f,#25100d)";
-
   }
 
   if(scene === "night"){
-
     document.body.style.background =
       "linear-gradient(180deg,#182650,#050812)";
-
   }
 
 }
@@ -594,11 +613,115 @@ function openIslandMap(){
     .classList.add("hidden");
 
   document
+    .getElementById("walkingScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("dialogueCard")
+    .classList.add("hidden");
+
+  document
+    .getElementById("portraitBox")
+    .classList.add("hidden");
+
+  document
     .getElementById("islandMap")
     .classList.remove("hidden");
 
-  document.getElementById("story").innerHTML =
-    "Choose a location on Flame Cay.";
+}
+
+
+function startWalking(location){
+
+  pendingLocation = location;
+
+  const destination =
+    locationNames[location] || "your destination";
+
+  document
+    .getElementById("islandMap")
+    .classList.add("hidden");
+
+  document
+    .getElementById("choices")
+    .classList.add("hidden");
+
+  document
+    .getElementById("dialogueCard")
+    .classList.add("hidden");
+
+  document
+    .getElementById("portraitBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("walkingScreen")
+    .classList.remove("hidden");
+
+  document.getElementById("walkingTitle").innerHTML =
+    "🚶 Walking to " + destination;
+
+  document.getElementById("walkingText").innerHTML =
+    getWalkingText(currentLocation, location);
+
+}
+
+
+function getWalkingText(from, to){
+
+  if(from === "villa" && to === "beach"){
+    return "You leave the villa and follow a stone path between the palms.<br><br>The sound of the ocean grows louder as Arrival Beach comes into view.";
+  }
+
+  if(from === "villa" && to === "shrine"){
+    return "You leave the bright villa behind and follow Maya's trail into the jungle.<br><br>The air becomes cooler as the Crystal Shrine appears between the trees.";
+  }
+
+  if(from === "beach" && to === "villa"){
+    return "You leave the shoreline and follow the sandy path uphill.<br><br>The Main Villa shines in the distance beneath the tropical sun.";
+  }
+
+  if(to === "jungle"){
+    return "You follow a narrow trail beneath thick green leaves.<br><br>Soft whispers seem to move through the trees around you.";
+  }
+
+  if(to === "volcano"){
+    return "You begin climbing the rocky path toward Volcano Peak.<br><br>Warm air rises from the ground beneath your feet.";
+  }
+
+  if(to === "firepit"){
+    return "You follow glowing lanterns through the darkening villa grounds.<br><br>The Fire Pit burns brightly ahead.";
+  }
+
+  if(to === "cove"){
+    return "You follow a quiet moonlit path beside the ocean.<br><br>Moonlight Cove appears beyond the palms.";
+  }
+
+  return "You leave " +
+    (locationNames[from] || "your current location") +
+    " and follow the island path toward " +
+    (locationNames[to] || "your destination") +
+    ".<br><br>The scenery slowly changes around you.";
+}
+
+
+function finishWalking(){
+
+  document
+    .getElementById("walkingScreen")
+    .classList.add("hidden");
+
+  if(pendingLocation !== ""){
+
+    currentLocation = pendingLocation;
+
+    visitLocation(
+      pendingLocation
+    );
+
+    pendingLocation = "";
+
+  }
 
 }
 
@@ -610,13 +733,15 @@ function visitLocation(location){
     .classList.add("hidden");
 
   document
+    .getElementById("dialogueCard")
+    .classList.remove("hidden");
+
+  document
     .getElementById("choices")
     .classList.remove("hidden");
 
 
   if(location === "beach"){
-
-    changeBackground("beach");
 
     showScene({
       speaker: "narrator",
@@ -633,8 +758,6 @@ function visitLocation(location){
 
   if(location === "villa"){
 
-    changeBackground("villa");
-
     showScene({
       speaker: "narrator",
       background: "villa",
@@ -649,8 +772,6 @@ function visitLocation(location){
 
 
   if(location === "shrine"){
-
-    changeBackground("crystal");
 
     showScene({
       speaker: "narrator",
@@ -671,7 +792,8 @@ function visitLocation(location){
 
     showComingSoon(
       "🌿 Whispering Jungle",
-      "You hear strange voices moving through the trees."
+      "You hear strange voices moving through the trees.",
+      "jungle"
     );
 
   }
@@ -683,7 +805,8 @@ function visitLocation(location){
 
     showComingSoon(
       "🌋 Volcano Peak",
-      "The path toward the volcano is currently locked."
+      "The path farther up the volcano is currently locked.",
+      "volcano"
     );
 
   }
@@ -695,7 +818,8 @@ function visitLocation(location){
 
     showComingSoon(
       "💪 Gym",
-      "Workout scenes will unlock in a future version."
+      "Workout scenes will unlock in a future version.",
+      "villa"
     );
 
   }
@@ -707,7 +831,8 @@ function visitLocation(location){
 
     showComingSoon(
       "🍳 Kitchen",
-      "Cooking scenes will unlock in a future version."
+      "Cooking scenes will unlock in a future version.",
+      "villa"
     );
 
   }
@@ -719,7 +844,8 @@ function visitLocation(location){
 
     showComingSoon(
       "🏊 Infinity Pool",
-      "Pool scenes will unlock in a future version."
+      "Pool scenes will unlock in a future version.",
+      "beach"
     );
 
   }
@@ -731,7 +857,8 @@ function visitLocation(location){
 
     showComingSoon(
       "🔥 Fire Pit",
-      "The first ceremony will unlock later in Episode 1."
+      "The first ceremony will unlock later in Episode 1.",
+      "night"
     );
 
   }
@@ -743,7 +870,8 @@ function visitLocation(location){
 
     showComingSoon(
       "🌙 Moonlight Cove",
-      "Romantic night scenes will unlock in a future version."
+      "Romantic night scenes will unlock in a future version.",
+      "night"
     );
 
   }
@@ -751,11 +879,11 @@ function visitLocation(location){
 }
 
 
-function showComingSoon(title, description){
+function showComingSoon(title, description, background){
 
   showScene({
     speaker: "narrator",
-    background: "villa",
+    background: background,
     text:
       title +
       "\n\n" +
