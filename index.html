@@ -1,52 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>The Island of Flames</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body id="bodyBackground">
+
 <main class="screen">
 
+  <!-- MAIN MENU -->
+
   <section id="menu">
+
     <h1>🔥 The Island of Flames</h1>
-    <h2>Season 1 — The Crystal Awakens</h2>
-    <input id="playerName" placeholder="Enter your name">
-    <button onclick="startGame()">▶ New Game</button>
+
+    <h2>
+      Season 1 — The Crystal Awakens
+    </h2>
+
+    <input
+      id="playerName"
+      placeholder="Enter your name"
+    >
+
+    <button onclick="startGame()">
+      ▶ New Game
+    </button>
+
   </section>
 
+
+  <!-- GAME SCREEN -->
+
   <section id="game" class="hidden">
-    <h2 id="welcome">Welcome to Flame Cay</h2>
+
+    <h2 id="welcome">
+      Welcome to Flame Cay
+    </h2>
+
+
+    <!-- CHARACTER PORTRAIT -->
 
     <div id="portraitBox" class="hidden">
-      <img id="portraitImage" src="" alt="Character Portrait">
-      <div id="portrait">🌴</div>
-      <h3 id="speakerName">Narrator</h3>
-      <p id="speakerTitle">The Story Begins</p>
+
+      <img
+        id="portraitImage"
+        src=""
+        alt="Character Portrait"
+      >
+
+      <div id="portrait">
+        🌴
+      </div>
+
+      <h3 id="speakerName">
+        Narrator
+      </h3>
+
+      <p id="speakerTitle">
+        The Story Begins
+      </p>
+
     </div>
+
+
+    <!-- DIALOGUE -->
 
     <div class="card">
+
       <p id="story"></p>
-      <button id="continueButton" onclick="nextDialogue()">▶ Continue</button>
+
+      <button
+        id="continueButton"
+        onclick="nextDialogue()"
+      >
+        ▶ Continue
+      </button>
+
     </div>
 
-    <div id="choices" class="hidden">
-      <button onclick="showBeachChoices()">🏖 Beach</button>
-      <button onclick="showVillaChoices()">🏡 Villa Lounge</button>
-      <button onclick="showShrineChoices()">💎 Crystal Shrine</button>
-    </div>
 
-    <div class="card" id="relationshipBox"></div>
+    <!-- CHOICE BUTTONS -->
+
+    <div id="choices" class="hidden"></div>
+
+
+    <!-- ISLAND MAP -->
+
+    <section id="islandMap" class="hidden">
+
+      <div class="card">
+
+        <h2>🗺️ Flame Cay Map</h2>
+
+        <p>
+          Choose where you want to explore.
+        </p>
+
+        <button onclick="visitLocation('volcano')">
+          🌋 Volcano Peak
+        </button>
+
+        <button onclick="visitLocation('jungle')">
+          🌿 Whispering Jungle
+        </button>
+
+        <button onclick="visitLocation('shrine')">
+          💎 Crystal Shrine
+        </button>
+
+        <button onclick="visitLocation('beach')">
+          🏖 Arrival Beach
+        </button>
+
+        <button onclick="visitLocation('villa')">
+          🏡 Main Villa
+        </button>
+
+        <button onclick="visitLocation('gym')">
+          💪 Gym
+        </button>
+
+        <button onclick="visitLocation('kitchen')">
+          🍳 Kitchen
+        </button>
+
+        <button onclick="visitLocation('pool')">
+          🏊 Infinity Pool
+        </button>
+
+        <button onclick="visitLocation('firepit')">
+          🔥 Fire Pit
+        </button>
+
+        <button onclick="visitLocation('cove')">
+          🌙 Moonlight Cove
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- RELATIONSHIP TRACKER -->
+
+    <div
+      class="card"
+      id="relationshipBox"
+    ></div>
+
   </section>
 
 </main>
 
+
 <script>
+
 let playerName = "Player";
+
 let dialogueIndex = 0;
+
 let typingTimer = null;
+
 
 let relationships = {
   lucas: 0,
@@ -59,7 +180,9 @@ let relationships = {
   lisa: 0
 };
 
+
 const characters = {
+
   narrator: {
     name: "Narrator",
     title: "The Story Begins",
@@ -79,6 +202,13 @@ const characters = {
     title: "The Loyal Swimmer",
     emoji: "👦",
     image: "images/AF6CC476-58A0-42B0-8044-66A742190789.png"
+  },
+
+  maya: {
+    name: "Maya Patel",
+    title: "The Explorer",
+    emoji: "🌿",
+    image: "images/0487E1B8-561B-4FDC-BAAE-EE223F61D754.png"
   },
 
   kai: {
@@ -121,115 +251,307 @@ const characters = {
     title: "The Bombshell",
     emoji: "💖",
     image: "images/9DBF1984-9450-4DAF-94D3-04E305D0E5DF.png"
-  },
-
-  maya: {
-    name: "Maya Patel",
-    title: "The Explorer",
-    emoji: "🌿",
-    image: "images/0487E1B8-561B-4FDC-BAAE-EE223F61D754.png"
   }
+
 };
 
+
 const introDialogue = [
-  { speaker:"narrator", background:"arrival", text:"🔥 THE ISLAND OF FLAMES\n\nSeason 1\nEpisode 1 — The Arrival" },
-  { speaker:"narrator", background:"arrival", text:"The sun rises over the ocean.\n\nYour boat moves toward Flame Cay." },
-  { speaker:"host", background:"arrival", text:"Welcome... to The Island of Flames.\n\nTwenty singles. One island. One unforgettable summer." },
-  { speaker:"lucas", background:"villa", text:"Hey!\n\nI'm Lucas. Welcome to Flame Cay." },
-  { speaker:"kai", background:"villa", text:"Kai flashes a confident smile.\n\n\"I'm Kai. I came here to win... and maybe fall in love along the way.\"" },
-  { speaker:"isabella", background:"villa", text:"Isabella walks in with a bright smile.\n\n\"Hey! I'm Isabella. I came here for good vibes, great people... and maybe something real.\"" },
-  { speaker:"ethan", background:"villa", text:"I'm Ethan Brooks.\n\nI don't chase attention...\n\nI earn respect." },
-  { speaker:"sofia", background:"villa", text:"Hi... I'm Sofia.\n\nI'm here to find something real." },
-  { speaker:"noah", background:"villa", text:"Noah gives you a warm smile.\n\n\"I'm Noah. I don't back down from danger...\n\nbut finding love might be my toughest challenge yet.\"" },
-  { speaker:"lisa", background:"villa", text:"Lisa walks into the villa with a confident smile.\n\n\"I'm Lisa.\n\nI'm here to find love... and maybe steal a few hearts along the way.\"" },
-  { speaker:"maya", background:"villa", text:"I'm Maya.\n\nThere's something strange about this island..." },
-  { speaker:"narrator", background:"crystal", text:"Deep inside the jungle...\n\nThe Crystal Flame begins to glow." },
-  { speaker:"narrator", background:"villa", text:"Your first day begins now.\n\nWhere do you want to explore?" }
+
+  {
+    speaker: "narrator",
+    background: "arrival",
+    text:
+      "🔥 THE ISLAND OF FLAMES\n\n" +
+      "Season 1\n" +
+      "Episode 1 — The Arrival"
+  },
+
+  {
+    speaker: "narrator",
+    background: "arrival",
+    text:
+      "The sun rises over the ocean.\n\n" +
+      "Your boat moves toward Flame Cay."
+  },
+
+  {
+    speaker: "host",
+    background: "arrival",
+    text:
+      "Welcome... to The Island of Flames.\n\n" +
+      "Twenty singles.\n\n" +
+      "One island.\n\n" +
+      "One unforgettable summer."
+  },
+
+  {
+    speaker: "lucas",
+    background: "villa",
+    text:
+      "Hey!\n\n" +
+      "I'm Lucas.\n\n" +
+      "Welcome to Flame Cay."
+  },
+
+  {
+    speaker: "kai",
+    background: "villa",
+    text:
+      "Kai flashes a confident smile.\n\n" +
+      "\"I'm Kai. I came here to win... and maybe fall in love along the way.\""
+  },
+
+  {
+    speaker: "isabella",
+    background: "villa",
+    text:
+      "Isabella walks in with a bright smile.\n\n" +
+      "\"Hey! I'm Isabella. I came here for good vibes, great people... and maybe something real.\""
+  },
+
+  {
+    speaker: "ethan",
+    background: "villa",
+    text:
+      "I'm Ethan Brooks.\n\n" +
+      "I don't chase attention...\n\n" +
+      "I earn respect."
+  },
+
+  {
+    speaker: "sofia",
+    background: "villa",
+    text:
+      "Hi... I'm Sofia.\n\n" +
+      "I'm here to find something real."
+  },
+
+  {
+    speaker: "noah",
+    background: "villa",
+    text:
+      "Noah gives you a warm smile.\n\n" +
+      "\"I'm Noah. I don't back down from danger... but finding love might be my toughest challenge yet.\""
+  },
+
+  {
+    speaker: "lisa",
+    background: "villa",
+    text:
+      "Lisa walks into the villa with a confident smile.\n\n" +
+      "\"I'm Lisa. I'm here to find love... and maybe steal a few hearts along the way.\""
+  },
+
+  {
+    speaker: "maya",
+    background: "villa",
+    text:
+      "I'm Maya.\n\n" +
+      "There's something strange about this island..."
+  },
+
+  {
+    speaker: "narrator",
+    background: "crystal",
+    text:
+      "Deep inside the jungle...\n\n" +
+      "The Crystal Flame begins to glow."
+  },
+
+  {
+    speaker: "narrator",
+    background: "villa",
+    text:
+      "Your first day begins now.\n\n" +
+      "Flame Cay is yours to explore."
+  }
+
 ];
 
+
 function startGame(){
+
   const input = document.getElementById("playerName");
 
   if(input.value.trim() !== ""){
     playerName = input.value.trim();
   }
 
-  document.getElementById("menu").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
+  document
+    .getElementById("menu")
+    .classList.add("hidden");
+
+  document
+    .getElementById("game")
+    .classList.remove("hidden");
 
   document.getElementById("welcome").innerHTML =
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
-  document.getElementById("continueButton").style.display = "block";
-  document.getElementById("choices").classList.add("hidden");
+
+  document.getElementById("continueButton").style.display =
+    "block";
+
+  document
+    .getElementById("choices")
+    .classList.add("hidden");
+
+  document
+    .getElementById("islandMap")
+    .classList.add("hidden");
 
   showScene(introDialogue[0]);
+
   updateRelationships();
 }
 
+
 function nextDialogue(){
+
   dialogueIndex++;
 
   if(dialogueIndex < introDialogue.length){
-    showScene(introDialogue[dialogueIndex]);
+
+    showScene(
+      introDialogue[dialogueIndex]
+    );
+
   }else{
-    document.getElementById("continueButton").style.display = "none";
-    showLocationChoices();
+
+    document.getElementById("continueButton").style.display =
+      "none";
+
+    openIslandMap();
+
   }
+
 }
 
+
 function showScene(scene){
-  const character = characters[scene.speaker];
 
-  changeBackground(scene.background);
+  const character =
+    characters[scene.speaker];
 
-  const portraitBox = document.getElementById("portraitBox");
+  changeBackground(
+    scene.background
+  );
+
+  const portraitBox =
+    document.getElementById("portraitBox");
+
   portraitBox.classList.remove("hidden");
 
   portraitBox.style.animation = "none";
+
   portraitBox.offsetHeight;
-  portraitBox.style.animation = "characterEnter .6s ease";
 
-  document.getElementById("speakerName").innerHTML = character.name;
-  document.getElementById("speakerTitle").innerHTML = character.title;
+  portraitBox.style.animation =
+    "characterEnter .6s ease";
 
-  const portraitImage = document.getElementById("portraitImage");
-  const portraitEmoji = document.getElementById("portrait");
+  document.getElementById("speakerName").innerHTML =
+    character.name;
+
+  document.getElementById("speakerTitle").innerHTML =
+    character.title;
+
+  const portraitImage =
+    document.getElementById("portraitImage");
+
+  const portraitEmoji =
+    document.getElementById("portrait");
 
   if(character.image !== ""){
-    portraitImage.src = character.image;
-    portraitImage.style.display = "block";
-    portraitEmoji.style.display = "none";
+
+    portraitImage.src =
+      character.image;
+
+    portraitImage.style.display =
+      "block";
+
+    portraitEmoji.style.display =
+      "none";
+
   }else{
-    portraitImage.style.display = "none";
-    portraitEmoji.style.display = "flex";
-    portraitEmoji.innerHTML = character.emoji;
+
+    portraitImage.style.display =
+      "none";
+
+    portraitEmoji.style.display =
+      "flex";
+
+    portraitEmoji.innerHTML =
+      character.emoji;
+
   }
 
-  typeText(scene.text);
+  typeText(
+    scene.text
+  );
+
 }
 
+
 function changeBackground(scene){
+
   if(scene === "arrival"){
-    document.body.style.background = "linear-gradient(180deg,#70d8ff,#08657e)";
+
+    document.body.style.background =
+      "linear-gradient(180deg,#70d8ff,#08657e)";
+
   }
 
   if(scene === "villa"){
-    document.body.style.background = "linear-gradient(180deg,#58c7e8,#0b718c)";
+
+    document.body.style.background =
+      "linear-gradient(180deg,#58c7e8,#0b718c)";
+
   }
 
   if(scene === "beach"){
-    document.body.style.background = "linear-gradient(180deg,#7ee8ff,#167c99)";
+
+    document.body.style.background =
+      "linear-gradient(180deg,#7ee8ff,#167c99)";
+
   }
 
   if(scene === "crystal"){
-    document.body.style.background = "linear-gradient(180deg,#1b335f,#061322)";
+
+    document.body.style.background =
+      "linear-gradient(180deg,#1b335f,#061322)";
+
   }
+
+  if(scene === "jungle"){
+
+    document.body.style.background =
+      "linear-gradient(180deg,#3d8b55,#153f2b)";
+
+  }
+
+  if(scene === "volcano"){
+
+    document.body.style.background =
+      "linear-gradient(180deg,#7f3b2f,#25100d)";
+
+  }
+
+  if(scene === "night"){
+
+    document.body.style.background =
+      "linear-gradient(180deg,#182650,#050812)";
+
+  }
+
 }
 
+
 function typeText(text){
-  const story = document.getElementById("story");
+
+  const story =
+    document.getElementById("story");
 
   if(typingTimer){
     clearTimeout(typingTimer);
@@ -240,168 +562,435 @@ function typeText(text){
   let i = 0;
 
   function type(){
+
     if(i < text.length){
-      const char = text.charAt(i);
-      story.innerHTML += char === "\n" ? "<br>" : char;
+
+      const char =
+        text.charAt(i);
+
+      story.innerHTML +=
+        char === "\n"
+          ? "<br>"
+          : char;
+
       i++;
-      typingTimer = setTimeout(type, 30);
+
+      typingTimer =
+        setTimeout(type, 30);
+
     }
+
   }
 
   type();
+
 }
 
-function showLocationChoices(){
-  const choices = document.getElementById("choices");
 
-  choices.classList.remove("hidden");
-  choices.innerHTML = `
-    <button onclick="showBeachChoices()">🏖 Beach</button>
-    <button onclick="showVillaChoices()">🏡 Villa Lounge</button>
-    <button onclick="showShrineChoices()">💎 Crystal Shrine</button>
+function openIslandMap(){
+
+  document
+    .getElementById("choices")
+    .classList.add("hidden");
+
+  document
+    .getElementById("islandMap")
+    .classList.remove("hidden");
+
+  document.getElementById("story").innerHTML =
+    "Choose a location on Flame Cay.";
+
+}
+
+
+function visitLocation(location){
+
+  document
+    .getElementById("islandMap")
+    .classList.add("hidden");
+
+  document
+    .getElementById("choices")
+    .classList.remove("hidden");
+
+
+  if(location === "beach"){
+
+    changeBackground("beach");
+
+    showScene({
+      speaker: "narrator",
+      background: "beach",
+      text:
+        "You arrive at Arrival Beach.\n\n" +
+        "Kai stands near the water while Lisa relaxes nearby."
+    });
+
+    showBeachChoices();
+
+  }
+
+
+  if(location === "villa"){
+
+    changeBackground("villa");
+
+    showScene({
+      speaker: "narrator",
+      background: "villa",
+      text:
+        "You enter the Main Villa.\n\n" +
+        "Lucas, Ethan, and Sofia are talking in the lounge."
+    });
+
+    showVillaChoices();
+
+  }
+
+
+  if(location === "shrine"){
+
+    changeBackground("crystal");
+
+    showScene({
+      speaker: "narrator",
+      background: "crystal",
+      text:
+        "You reach the Crystal Shrine.\n\n" +
+        "Maya studies glowing symbols carved into the stone."
+    });
+
+    showShrineChoices();
+
+  }
+
+
+  if(location === "jungle"){
+
+    changeBackground("jungle");
+
+    showComingSoon(
+      "🌿 Whispering Jungle",
+      "You hear strange voices moving through the trees."
+    );
+
+  }
+
+
+  if(location === "volcano"){
+
+    changeBackground("volcano");
+
+    showComingSoon(
+      "🌋 Volcano Peak",
+      "The path toward the volcano is currently locked."
+    );
+
+  }
+
+
+  if(location === "gym"){
+
+    changeBackground("villa");
+
+    showComingSoon(
+      "💪 Gym",
+      "Workout scenes will unlock in a future version."
+    );
+
+  }
+
+
+  if(location === "kitchen"){
+
+    changeBackground("villa");
+
+    showComingSoon(
+      "🍳 Kitchen",
+      "Cooking scenes will unlock in a future version."
+    );
+
+  }
+
+
+  if(location === "pool"){
+
+    changeBackground("beach");
+
+    showComingSoon(
+      "🏊 Infinity Pool",
+      "Pool scenes will unlock in a future version."
+    );
+
+  }
+
+
+  if(location === "firepit"){
+
+    changeBackground("night");
+
+    showComingSoon(
+      "🔥 Fire Pit",
+      "The first ceremony will unlock later in Episode 1."
+    );
+
+  }
+
+
+  if(location === "cove"){
+
+    changeBackground("night");
+
+    showComingSoon(
+      "🌙 Moonlight Cove",
+      "Romantic night scenes will unlock in a future version."
+    );
+
+  }
+
+}
+
+
+function showComingSoon(title, description){
+
+  showScene({
+    speaker: "narrator",
+    background: "villa",
+    text:
+      title +
+      "\n\n" +
+      description
+  });
+
+  document.getElementById("choices").innerHTML = `
+    <button onclick="openIslandMap()">
+      ⬅ Back to Map
+    </button>
   `;
+
 }
+
 
 function showBeachChoices(){
-  changeBackground("beach");
-
-  showScene({
-    speaker:"narrator",
-    background:"beach",
-    text:"You walk down to the beach.\n\nKai stands near the waves while Lisa relaxes in the sun.\n\nWho do you want to spend time with?"
-  });
 
   document.getElementById("choices").innerHTML = `
-    <button onclick="talkKaiBeach()">🌊 Talk to Kai</button>
-    <button onclick="talkLisaBeach()">💖 Talk to Lisa</button>
-    <button onclick="showLocationChoices()">⬅ Back to Locations</button>
+
+    <button onclick="talkKaiBeach()">
+      🌊 Talk to Kai
+    </button>
+
+    <button onclick="talkLisaBeach()">
+      💖 Talk to Lisa
+    </button>
+
+    <button onclick="openIslandMap()">
+      ⬅ Back to Map
+    </button>
+
   `;
+
 }
+
 
 function showVillaChoices(){
-  changeBackground("villa");
-
-  showScene({
-    speaker:"narrator",
-    background:"villa",
-    text:"You enter the villa lounge.\n\nLucas, Ethan, and Sofia are gathered near the couches.\n\nWho do you want to talk to?"
-  });
 
   document.getElementById("choices").innerHTML = `
-    <button onclick="talkLucasVilla()">🏊 Talk to Lucas</button>
-    <button onclick="talkEthanVilla()">💼 Talk to Ethan</button>
-    <button onclick="talkSofiaVilla()">🌹 Talk to Sofia</button>
-    <button onclick="showLocationChoices()">⬅ Back to Locations</button>
+
+    <button onclick="talkLucasVilla()">
+      🏊 Talk to Lucas
+    </button>
+
+    <button onclick="talkEthanVilla()">
+      💼 Talk to Ethan
+    </button>
+
+    <button onclick="talkSofiaVilla()">
+      🌹 Talk to Sofia
+    </button>
+
+    <button onclick="openIslandMap()">
+      ⬅ Back to Map
+    </button>
+
   `;
+
 }
+
 
 function showShrineChoices(){
-  changeBackground("crystal");
-
-  showScene({
-    speaker:"narrator",
-    background:"crystal",
-    text:"You follow the path toward the Crystal Shrine.\n\nMaya is studying glowing symbols carved into ancient stone.\n\nThe air feels strange here."
-  });
 
   document.getElementById("choices").innerHTML = `
-    <button onclick="talkMayaShrine()">🌿 Follow Maya</button>
-    <button onclick="examineCrystal()">🔥 Examine the Crystal Flame</button>
-    <button onclick="showLocationChoices()">⬅ Back to Locations</button>
+
+    <button onclick="talkMayaShrine()">
+      🌿 Follow Maya
+    </button>
+
+    <button onclick="examineCrystal()">
+      🔥 Examine the Crystal Flame
+    </button>
+
+    <button onclick="openIslandMap()">
+      ⬅ Back to Map
+    </button>
+
   `;
+
 }
 
+
 function talkKaiBeach(){
+
   relationships.kai++;
 
   showScene({
-    speaker:"kai",
-    background:"beach",
-    text:"Kai smiles as the waves crash behind him.\n\n\"You came to the right place,\" he says.\n\n\"The ocean knows when people are being real.\"\n\n❤️ Kai +1"
+    speaker: "kai",
+    background: "beach",
+    text:
+      "Kai smiles as the waves crash behind him.\n\n" +
+      "\"The ocean knows when people are being real.\"\n\n" +
+      "❤️ Kai +1"
   });
 
   updateRelationships();
+
 }
 
+
 function talkLisaBeach(){
+
   relationships.lisa++;
 
   showScene({
-    speaker:"lisa",
-    background:"beach",
-    text:"Lisa tilts her head and gives you a playful smile.\n\n\"I was wondering when you'd come talk to me.\"\n\nHer confidence is impossible to ignore.\n\n❤️ Lisa +1"
+    speaker: "lisa",
+    background: "beach",
+    text:
+      "Lisa gives you a playful smile.\n\n" +
+      "\"I was wondering when you would come talk to me.\"\n\n" +
+      "❤️ Lisa +1"
   });
 
   updateRelationships();
+
 }
 
+
 function talkLucasVilla(){
+
   relationships.lucas++;
 
   showScene({
-    speaker:"lucas",
-    background:"villa",
-    text:"Lucas looks up when you sit beside him.\n\n\"I'm glad you're here,\" he says softly.\n\n\"This place feels intense, but you make it easier.\"\n\n❤️ Lucas +1"
+    speaker: "lucas",
+    background: "villa",
+    text:
+      "Lucas smiles when you sit beside him.\n\n" +
+      "\"This place feels intense, but you make it easier.\"\n\n" +
+      "❤️ Lucas +1"
   });
 
   updateRelationships();
+
 }
 
+
 function talkEthanVilla(){
+
   relationships.ethan++;
 
   showScene({
-    speaker:"ethan",
-    background:"villa",
-    text:"Ethan studies you with a calm smile.\n\n\"Most people talk too much on day one,\" he says.\n\n\"You seem like someone who actually listens.\"\n\n❤️ Ethan +1"
+    speaker: "ethan",
+    background: "villa",
+    text:
+      "Ethan studies you with a calm smile.\n\n" +
+      "\"You seem like someone who actually listens.\"\n\n" +
+      "❤️ Ethan +1"
   });
 
   updateRelationships();
+
 }
 
+
 function talkSofiaVilla(){
+
   relationships.sofia++;
 
   showScene({
-    speaker:"sofia",
-    background:"villa",
-    text:"Sofia smiles warmly as you approach.\n\n\"I was hoping someone honest would come over.\"\n\nFor a moment, her confident mask softens.\n\n❤️ Sofia +1"
+    speaker: "sofia",
+    background: "villa",
+    text:
+      "Sofia smiles warmly.\n\n" +
+      "\"I was hoping someone honest would come over.\"\n\n" +
+      "❤️ Sofia +1"
   });
 
   updateRelationships();
+
 }
 
+
 function talkMayaShrine(){
+
   relationships.maya++;
 
   showScene({
-    speaker:"maya",
-    background:"crystal",
-    text:"Maya points to the glowing symbols.\n\n\"These markings are older than the villa,\" she whispers.\n\n\"And I think they were waiting for you.\"\n\n❤️ Maya +1"
+    speaker: "maya",
+    background: "crystal",
+    text:
+      "Maya points toward the glowing symbols.\n\n" +
+      "\"I think they were waiting for you.\"\n\n" +
+      "❤️ Maya +1"
   });
 
   updateRelationships();
+
 }
+
 
 function examineCrystal(){
+
   showScene({
-    speaker:"narrator",
-    background:"crystal",
-    text:"You step closer to the Crystal Flame.\n\nThe light pulses once.\n\nA whisper moves through the air:\n\n\"Keeper...\"\n\nSomething about the island has noticed you."
+    speaker: "narrator",
+    background: "crystal",
+    text:
+      "You step closer to the Crystal Flame.\n\n" +
+      "The light pulses once.\n\n" +
+      "A whisper moves through the air:\n\n" +
+      "\"Keeper...\""
   });
+
 }
 
+
 function updateRelationships(){
+
   document.getElementById("relationshipBox").innerHTML =
-    "❤️ Lucas: " + relationships.lucas +
-    "<br>❤️ Maya: " + relationships.maya +
-    "<br>❤️ Kai: " + relationships.kai +
-    "<br>❤️ Isabella: " + relationships.isabella +
-    "<br>❤️ Ethan: " + relationships.ethan +
-    "<br>❤️ Sofia: " + relationships.sofia +
-    "<br>❤️ Noah: " + relationships.noah +
-    "<br>❤️ Lisa: " + relationships.lisa;
+
+    "❤️ Lucas: " +
+    relationships.lucas +
+
+    "<br>❤️ Maya: " +
+    relationships.maya +
+
+    "<br>❤️ Kai: " +
+    relationships.kai +
+
+    "<br>❤️ Isabella: " +
+    relationships.isabella +
+
+    "<br>❤️ Ethan: " +
+    relationships.ethan +
+
+    "<br>❤️ Sofia: " +
+    relationships.sofia +
+
+    "<br>❤️ Noah: " +
+    relationships.noah +
+
+    "<br>❤️ Lisa: " +
+    relationships.lisa;
+
 }
+
 </script>
 
 </body>
