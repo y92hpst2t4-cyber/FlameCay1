@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>The Island of Flames</title>
 
@@ -51,7 +55,8 @@
       </h3>
 
       <h3>
-        ☀️ <span id="timePeriod">Morning</span>
+        <span id="timeIcon">☀️</span>
+        <span id="timePeriod">Morning</span>
       </h3>
 
     </div>
@@ -178,6 +183,10 @@
           🌙 Moonlight Cove
         </button>
 
+        <button onclick="advanceTime()">
+          ⏰ Advance Time
+        </button>
+
       </div>
 
     </section>
@@ -200,6 +209,7 @@
 let playerName = "Player";
 let dialogueIndex = 0;
 let typingTimer = null;
+
 let pendingLocation = "";
 let currentLocation = "villa";
 
@@ -424,7 +434,8 @@ const locationNames = {
 
 function startGame(){
 
-  const input = document.getElementById("playerName");
+  const input =
+    document.getElementById("playerName");
 
   if(input.value.trim() !== ""){
     playerName = input.value.trim();
@@ -442,6 +453,7 @@ function startGame(){
     "Welcome to Flame Cay, " + playerName + "!";
 
   dialogueIndex = 0;
+
   currentLocation = "villa";
   pendingLocation = "";
 
@@ -512,7 +524,9 @@ function showScene(scene){
   portraitBox.classList.remove("hidden");
 
   portraitBox.style.animation = "none";
+
   portraitBox.offsetHeight;
+
   portraitBox.style.animation =
     "characterEnter .6s ease";
 
@@ -562,38 +576,59 @@ function showScene(scene){
 function changeBackground(scene){
 
   if(scene === "arrival"){
+
     document.body.style.background =
       "linear-gradient(180deg,#70d8ff,#08657e)";
+
   }
 
   if(scene === "villa"){
+
     document.body.style.background =
       "linear-gradient(180deg,#58c7e8,#0b718c)";
+
   }
 
   if(scene === "beach"){
+
     document.body.style.background =
       "linear-gradient(180deg,#7ee8ff,#167c99)";
+
   }
 
   if(scene === "crystal"){
+
     document.body.style.background =
       "linear-gradient(180deg,#1b335f,#061322)";
+
   }
 
   if(scene === "jungle"){
+
     document.body.style.background =
       "linear-gradient(180deg,#3d8b55,#153f2b)";
+
   }
 
   if(scene === "volcano"){
+
     document.body.style.background =
       "linear-gradient(180deg,#7f3b2f,#25100d)";
+
+  }
+
+  if(scene === "afternoon"){
+
+    document.body.style.background =
+      "linear-gradient(180deg,#ffbf69,#267b91)";
+
   }
 
   if(scene === "night"){
+
     document.body.style.background =
       "linear-gradient(180deg,#182650,#050812)";
+
   }
 
 }
@@ -663,6 +698,127 @@ function openIslandMap(){
 }
 
 
+function advanceTime(){
+
+  if(currentTime === "Morning"){
+
+    currentTime = "Afternoon";
+
+  }else if(currentTime === "Afternoon"){
+
+    currentTime = "Evening";
+
+  }else{
+
+    currentDay++;
+    currentTime = "Morning";
+
+  }
+
+  updateTimeDisplay();
+
+  document
+    .getElementById("islandMap")
+    .classList.add("hidden");
+
+  document
+    .getElementById("choices")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("dialogueCard")
+    .classList.remove("hidden");
+
+
+  if(currentTime === "Morning"){
+
+    showScene({
+      speaker: "narrator",
+      background: "arrival",
+      text:
+        "A new morning begins on Flame Cay.\n\n" +
+        "The island wakes beneath the rising sun.\n\n" +
+        "📅 Day " + currentDay +
+        "\n☀️ Morning"
+    });
+
+  }
+
+
+  if(currentTime === "Afternoon"){
+
+    showScene({
+      speaker: "narrator",
+      background: "afternoon",
+      text:
+        "The morning slowly fades into afternoon.\n\n" +
+        "The islanders begin moving to new locations.\n\n" +
+        "📅 Day " + currentDay +
+        "\n🌤️ Afternoon"
+    });
+
+  }
+
+
+  if(currentTime === "Evening"){
+
+    showScene({
+      speaker: "narrator",
+      background: "night",
+      text:
+        "The sun disappears beyond the ocean.\n\n" +
+        "Lanterns glow across Flame Cay as evening begins.\n\n" +
+        "📅 Day " + currentDay +
+        "\n🌙 Evening"
+    });
+
+  }
+
+
+  document.getElementById("choices").innerHTML = `
+    <button onclick="openIslandMap()">
+      🗺️ Return to Map
+    </button>
+  `;
+
+}
+
+
+function updateTimeDisplay(){
+
+  document.getElementById("dayNumber").innerHTML =
+    currentDay;
+
+  document.getElementById("timePeriod").innerHTML =
+    currentTime;
+
+
+  if(currentTime === "Morning"){
+
+    document.getElementById("timeIcon").innerHTML =
+      "☀️";
+
+  }
+
+
+  if(currentTime === "Afternoon"){
+
+    document.getElementById("timeIcon").innerHTML =
+      "🌤️";
+
+  }
+
+
+  if(currentTime === "Evening"){
+
+    document.getElementById("timeIcon").innerHTML =
+      "🌙";
+
+  }
+
+}
+
+
 function startWalking(location){
 
   pendingLocation = location;
@@ -702,31 +858,45 @@ function startWalking(location){
 function getWalkingText(from, to){
 
   if(from === "villa" && to === "beach"){
+
     return "You leave the villa and follow a stone path between the palms.<br><br>The sound of the ocean grows louder as Arrival Beach comes into view.";
+
   }
 
   if(from === "villa" && to === "shrine"){
+
     return "You leave the bright villa behind and follow Maya's trail into the jungle.<br><br>The air becomes cooler as the Crystal Shrine appears between the trees.";
+
   }
 
   if(from === "beach" && to === "villa"){
+
     return "You leave the shoreline and follow the sandy path uphill.<br><br>The Main Villa shines in the distance beneath the tropical sun.";
+
   }
 
   if(to === "jungle"){
+
     return "You follow a narrow trail beneath thick green leaves.<br><br>Soft whispers seem to move through the trees around you.";
+
   }
 
   if(to === "volcano"){
+
     return "You begin climbing the rocky path toward Volcano Peak.<br><br>Warm air rises from the ground beneath your feet.";
+
   }
 
   if(to === "firepit"){
+
     return "You follow glowing lanterns through the darkening villa grounds.<br><br>The Fire Pit burns brightly ahead.";
+
   }
 
   if(to === "cove"){
+
     return "You follow a quiet moonlit path beside the ocean.<br><br>Moonlight Cove appears beyond the palms.";
+
   }
 
   return "You leave " +
@@ -821,8 +991,6 @@ function visitLocation(location){
 
   if(location === "jungle"){
 
-    changeBackground("jungle");
-
     showComingSoon(
       "🌿 Whispering Jungle",
       "You hear strange voices moving through the trees.",
@@ -833,8 +1001,6 @@ function visitLocation(location){
 
 
   if(location === "volcano"){
-
-    changeBackground("volcano");
 
     showComingSoon(
       "🌋 Volcano Peak",
@@ -847,8 +1013,6 @@ function visitLocation(location){
 
   if(location === "gym"){
 
-    changeBackground("villa");
-
     showComingSoon(
       "💪 Gym",
       "Workout scenes will unlock in a future version.",
@@ -859,8 +1023,6 @@ function visitLocation(location){
 
 
   if(location === "kitchen"){
-
-    changeBackground("villa");
 
     showComingSoon(
       "🍳 Kitchen",
@@ -873,8 +1035,6 @@ function visitLocation(location){
 
   if(location === "pool"){
 
-    changeBackground("beach");
-
     showComingSoon(
       "🏊 Infinity Pool",
       "Pool scenes will unlock in a future version.",
@@ -886,8 +1046,6 @@ function visitLocation(location){
 
   if(location === "firepit"){
 
-    changeBackground("night");
-
     showComingSoon(
       "🔥 Fire Pit",
       "The first ceremony will unlock later in Episode 1.",
@@ -898,8 +1056,6 @@ function visitLocation(location){
 
 
   if(location === "cove"){
-
-    changeBackground("night");
 
     showComingSoon(
       "🌙 Moonlight Cove",
@@ -1118,17 +1274,6 @@ function examineCrystal(){
       "A whisper moves through the air:\n\n" +
       "\"Keeper...\""
   });
-
-}
-
-
-function updateTimeDisplay(){
-
-  document.getElementById("dayNumber").innerHTML =
-    currentDay;
-
-  document.getElementById("timePeriod").innerHTML =
-    currentTime;
 
 }
 
