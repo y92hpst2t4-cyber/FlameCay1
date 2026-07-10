@@ -1751,14 +1751,65 @@ function firePitEvent(){
     text:
       "The Host raises one hand toward the Crystal Flame.\n\n" +
       "\"Every choice you made today has been seen.\"\n\n" +
-      "\"Tomorrow, the island will begin judging your connections.\"\n\n" +
-      "✅ Evening activity complete."
+      "\"The island will remember the connections you created.\"\n\n" +
+      "\"Rest now. Tomorrow, your first true test begins.\"\n\n" +
+      "✅ Evening event complete."
   });
 
-  showCompletedActionButtons();
+  document.getElementById("choices").innerHTML = `
+    <button onclick="endNight()">
+      🌙 End the Night
+    </button>
+  `;
 
 }
 
+function endNight(){
+
+  currentDay++;
+  currentTime = "Morning";
+  actionUsed = false;
+
+  currentLocation = "villa";
+  pendingLocation = "";
+
+  updateTimeDisplay();
+  updateRelationships();
+
+  document
+    .getElementById("islandMap")
+    .classList.add("hidden");
+
+  document
+    .getElementById("walkingScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("choices")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("dialogueCard")
+    .classList.remove("hidden");
+
+  showScene({
+    speaker: "narrator",
+    background: "arrival",
+    text:
+      "Morning sunlight spreads across Flame Cay.\n\n" +
+      "The Islanders begin waking inside the villa.\n\n" +
+      "📅 Day " + currentDay +
+      "\n☀️ Morning\n\n" +
+      "⭐ One new activity is available."
+  });
+
+  document.getElementById("choices").innerHTML = `
+    <button onclick="openIslandMap()">
+      🗺️ Begin Day ${currentDay}
+    </button>
+  `;
+
+}
 
 function updateRelationships(){
 
