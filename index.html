@@ -99,6 +99,7 @@ let kaiStats={friendship:0,romance:0,competition:0};
 let isabellaStats={friendship:0,romance:0,social:0};
 let ethanStats={friendship:0,romance:0,strategy:0};
 let sofiaStats={friendship:0,romance:0,openness:0};
+let noahStats={friendship:0,romance:0,courage:0};
 
 const characters={
 narrator:{name:'Narrator',title:'The Story Begins',emoji:'🌴',image:''},
@@ -148,6 +149,7 @@ kaiStats={friendship:0,romance:0,competition:0};
 isabellaStats={friendship:0,romance:0,social:0};
 ethanStats={friendship:0,romance:0,strategy:0};
 sofiaStats={friendship:0,romance:0,openness:0};
+noahStats={friendship:0,romance:0,courage:0};
 q('continueButton').style.display='block';
 ['choices','islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
 showScene(introDialogue[0]);
@@ -287,7 +289,7 @@ return;
 }
 if(currentDay===2&&currentTime==='Morning'){
 showScene({speaker:'noah',background:'beach',text:'Noah is jogging along the shoreline, pulling a heavy training rope.'});
-choices('<button onclick="basicTalk(\'noah\',\'beach\',\'Noah wipes sweat from his forehead.\\n\\n❤️ Noah +1\\n\\n✅ Activity complete.\')">🚒 Talk to Noah</button>'+backMap());
+choices('<button onclick="openNoahMenu(\'beach\',\'visitBeach\')">🚒 Talk to Noah</button>'+backMap());
 return;
 }
 if(currentDay===2&&currentTime==='Afternoon'){
@@ -355,7 +357,7 @@ if(currentTime==='Evening'){showEmpty('💪 Gym','The gym is empty for the eveni
 
 if(currentDay===1){
 showScene({speaker:'noah',background:currentTime==='Afternoon'?'afternoon':'villa',text:'Noah is finishing a workout in the gym.'});
-choices('<button onclick="basicTalk(\'noah\',\''+(currentTime==='Afternoon'?'afternoon':'villa')+'\',\'Noah hands you a bottle of water.\\n\\n❤️ Noah +1\\n\\n✅ Activity complete.\')">🚒 Talk to Noah</button>'+backMap());
+choices('<button onclick="openNoahMenu(\''+(currentTime==='Afternoon'?'afternoon':'villa')+'\',\'visitGym\')">🚒 Talk to Noah</button>'+backMap());
 return;
 }
 if(currentDay===2){
@@ -392,7 +394,7 @@ return;
 }
 if(currentDay===2&&currentTime==='Afternoon'){
 showScene({speaker:'noah',background:'afternoon',text:'Noah and Sofia are splashing each other in the pool.'});
-choices('<button onclick="basicTalk(\'noah\',\'afternoon\',\'Noah waves you over to join them.\\n\\n❤️ Noah +1\\n\\n✅ Activity complete.\')">🚒 Talk to Noah</button><button onclick="openSofiaMenu(\'afternoon\',\'visitPool\')">🌹 Talk to Sofia</button>'+backMap());
+choices('<button onclick="openNoahMenu(\'afternoon\',\'visitPool\')">🚒 Talk to Noah</button><button onclick="openSofiaMenu(\'afternoon\',\'visitPool\')">🌹 Talk to Sofia</button>'+backMap());
 return;
 }
 showEmpty('🏊 Infinity Pool','The pool is quiet right now.','beach');
@@ -510,6 +512,15 @@ showScene({speaker:'sofia',background:bg,text:'Sofia gives you a thoughtful smil
 choices('<button onclick="specialTalk(\'sofia\',\'friendship\',\'You ask Sofia what she enjoys outside the villa.\\n\\nShe tells you she loves quiet mornings, music, and discovering new places.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🌹 Get to know Sofia</button><button onclick="specialTalk(\'sofia\',\'romance\',\'You tell Sofia that her calm energy makes her stand out.\\n\\nShe smiles and looks away for a moment.\\n\\n💕 Romance +1\\n❤️ Connection +1\')">💕 Flirt with Sofia</button><button onclick="specialTalk(\'sofia\',\'openness\',\'You gently ask Sofia about what made her guard her heart.\\n\\nShe admits that trusting people has not always been easy.\\n\\n💬 Openness +1\\n❤️ Connection +1\')">💬 Ask about her past</button><button onclick="'+back+'()">⬅ Back</button>');
 }
 
+
+function openNoahMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'noah',background:bg,text:'Noah gives you a warm, steady smile.\n\n"What would you like to talk about?"'});
+choices('<button onclick="specialTalk(\'noah\',\'friendship\',\'You ask Noah what he is like outside the villa.\\n\\nHe tells you he values loyalty, family, and helping people when they need it most.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🚒 Get to know Noah</button><button onclick="specialTalk(\'noah\',\'romance\',\'You tell Noah that his calm confidence is hard to ignore.\\n\\nHe smiles and says the feeling might be mutual.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Flirt with Noah</button><button onclick="specialTalk(\'noah\',\'courage\',\'You ask Noah how he stays brave when things become dangerous.\\n\\nHe says courage means being scared and still choosing to help.\\n\\n💪 Courage +1\\n❤️ Connection +1\')">💪 Ask about courage</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
 function specialTalk(person,stat,text){
 if(actionAlreadyUsed())return;
 relationships[person]++;
@@ -519,6 +530,7 @@ if(person==='kai')kaiStats[stat]++;
 if(person==='isabella')isabellaStats[stat]++;
 if(person==='ethan')ethanStats[stat]++;
 if(person==='sofia')sofiaStats[stat]++;
+if(person==='noah')noahStats[stat]++;
 completeAction();
 updateRelationships();
 showScene({speaker:person,background:menuBackground,text:text+'\n\n✅ Activity complete.'});
@@ -604,8 +616,12 @@ q('relationshipBox').innerHTML=
 '<br>&nbsp;&nbsp;💕 Romance: '+sofiaStats.romance+
 '<br>&nbsp;&nbsp;💬 Openness: '+sofiaStats.openness+
 
-'<br><br>❤️ Noah: '+relationships.noah+
-'<br>❤️ Lisa: '+relationships.lisa;
+'<br><br>❤️ Noah Connection: '+relationships.noah+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+noahStats.friendship+
+'<br>&nbsp;&nbsp;❤️ Romance: '+noahStats.romance+
+'<br>&nbsp;&nbsp;💪 Courage: '+noahStats.courage+
+
+'<br><br>❤️ Lisa: '+relationships.lisa;
 }
 </script>
 </body>
