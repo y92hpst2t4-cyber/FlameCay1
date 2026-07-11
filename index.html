@@ -38,6 +38,9 @@ background:#fff;
 .challengeButton{background:linear-gradient(90deg,#00a8a8,#087f8c)}
 .challengeScore{text-align:center;font-size:22px;font-weight:700;color:#7b2cff}
 .bombshellButton{background:linear-gradient(90deg,#ff477e,#ff7b00)}
+.eliminationButton{background:linear-gradient(90deg,#b00020,#5a0010)}
+.safeButton{background:linear-gradient(90deg,#2e9d58,#176b3a)}
+.dangerCard{border-left-color:#b00020;background:rgba(255,245,245,.97)}
 @keyframes characterEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
@@ -46,7 +49,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 1.5.0b — Portrait Loading Fix</strong></p>
+<p><strong>Version 1.6.0 — First Elimination</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 </section>
@@ -108,7 +111,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[];
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -176,7 +179,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -1115,33 +1118,150 @@ speaker:coupledWith,
 background:'night',
 text:reactions[bombshellChoice][coupledWith]
 });
-choices('<button onclick="showVersionComplete()">✅ Finish Version 1.5.0</button>');
+choices('<button class="eliminationButton" onclick="startFirstElimination()">🔥 Continue to the First Elimination</button>');
+}
+
+function getEligibleEliminationPool(){
+return ['lucas','maya','kai','isabella','ethan','sofia','noah','lisa']
+.filter(person=>person!==coupledWith);
+}
+
+function calculateAtRisk(){
+const tieOrder=['lisa','ethan','kai','isabella','sofia','noah','maya','lucas'];
+
+atRisk=getEligibleEliminationPool()
+.sort((a,b)=>{
+if(relationships[a]!==relationships[b]){
+return relationships[a]-relationships[b];
+}
+return tieOrder.indexOf(a)-tieOrder.indexOf(b);
+})
+.slice(0,3);
+}
+
+function startFirstElimination(){
+if(eliminationComplete){
+showVersionComplete();
+return;
+}
+
+calculateAtRisk();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The celebration suddenly stops.\n\nThe Crystal Flame turns red.\n\n"Islanders... tonight, one person will leave Flame Cay."\n\n"The three weakest connections are now at risk."'
+});
+
+choices('<button class="eliminationButton" onclick="revealAtRiskIslanders()">🔥 Reveal the Bottom Three</button>');
+}
+
+function revealAtRiskIslanders(){
+const first=characters[atRisk[0]].name;
+const second=characters[atRisk[1]].name;
+const third=characters[atRisk[2]].name;
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The Islanders at risk are:\n\n⚠️ '+first+'\n⚠️ '+second+'\n⚠️ '+third+'\n\n"'+playerName+', you must save one of them."'
+});
+
+choices(
+'<div class="card dangerCard"><h3>🛡️ Save One Islander</h3>'+
+'<button class="safeButton" onclick="saveAtRiskIslander(\''+atRisk[0]+'\')">Save '+characters[atRisk[0]].name+'</button>'+
+'<button class="safeButton" onclick="saveAtRiskIslander(\''+atRisk[1]+'\')">Save '+characters[atRisk[1]].name+'</button>'+
+'<button class="safeButton" onclick="saveAtRiskIslander(\''+atRisk[2]+'\')">Save '+characters[atRisk[2]].name+'</button></div>'
+);
+}
+
+function saveAtRiskIslander(person){
+if(savedPerson)return;
+
+savedPerson=person;
+relationships[person]+=2;
+
+const remaining=atRisk.filter(name=>name!==person);
+
+if(relationships[remaining[0]]<relationships[remaining[1]]){
+eliminatedPerson=remaining[0];
+}else if(relationships[remaining[1]]<relationships[remaining[0]]){
+eliminatedPerson=remaining[1];
+}else{
+const tieOrder=['lisa','ethan','kai','isabella','sofia','noah','maya','lucas'];
+eliminatedPerson=tieOrder.indexOf(remaining[0])<tieOrder.indexOf(remaining[1])
+?remaining[0]
+:remaining[1];
+}
+
+eliminationComplete=true;
+updateRelationships();
+
+showScene({
+speaker:person,
+background:'night',
+text:'You choose to save '+characters[person].name+'.\n\n❤️ Connection +2\n\nThe Crystal Flame now decides between '+characters[remaining[0]].name+' and '+characters[remaining[1]].name+'.'
+});
+
+choices('<button class="eliminationButton" onclick="revealEliminatedIslander()">🔥 Reveal Who Is Leaving</button>');
+}
+
+function revealEliminatedIslander(){
+const farewells={
+lucas:'Lucas takes a breath and nods.\n\n"I wish I had more time, but I respect the decision."',
+maya:'Maya looks toward the jungle one last time.\n\n"The island still has secrets. Be careful."',
+kai:'Kai gives a disappointed smile.\n\n"I hate losing, but I will leave with my head high."',
+isabella:'Isabella wipes away a tear.\n\n"Keep bringing good energy, even when things get hard."',
+ethan:'Ethan stays composed.\n\n"Every decision has a consequence. This one is mine."',
+sofia:'Sofia speaks softly.\n\n"I hope everyone here finds something real."',
+noah:'Noah nods with quiet respect.\n\n"Take care of each other. That matters more than winning."',
+lisa:'Lisa forces a confident smile.\n\n"Flame Cay has not seen the last surprise yet."'
+};
+
+showScene({
+speaker:eliminatedPerson,
+background:'night',
+text:characters[eliminatedPerson].name+' has been eliminated.\n\n'+farewells[eliminatedPerson]
+});
+
+choices('<button class="eliminationButton" onclick="showEliminationAftermath()">🌙 Say Goodbye</button>');
+}
+
+function showEliminationAftermath(){
+const savedName=characters[savedPerson].name;
+const eliminatedName=characters[eliminatedPerson].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The villa falls silent as '+eliminatedName+' leaves Flame Cay.\n\n"'+savedName+' is safe because of your choice."\n\n"The Crystal Flame remembers who you protected... and who you allowed to leave."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 1.6.0</button>');
 }
 
 function showVersionComplete(){
-const partnerName=characters[coupledWith].name;
-const reactionNames={
-flirt:'You flirted with Valentina',
-friendly:'You welcomed Valentina as a friend',
-loyal:'You stayed loyal to '+partnerName
-};
+const savedName=savedPerson?characters[savedPerson].name:'No one';
+const eliminatedName=eliminatedPerson?characters[eliminatedPerson].name:'No one';
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 1.5.0 COMPLETE\n\nThe first Bombshell has arrived.\n\nBombshell: Valentina Reyes\nYour choice: '+reactionNames[bombshellChoice]+'\n\nThe island has changed. New tension begins next in Version 1.5.1.'
+text:'✅ VERSION 1.6.0 COMPLETE\n\nYou completed the First Elimination.\n\nSaved: '+savedName+'\nEliminated: '+eliminatedName+'\n\nThe next morning begins in Version 1.6.1.'
 });
-choices('<button onclick="showBombshellSummary()">💥 View Bombshell Summary</button>');
+
+choices('<button onclick="showEliminationSummary()">🔥 View Elimination Summary</button>');
 }
 
-function showBombshellSummary(){
-const partnerName=characters[coupledWith].name;
+function showEliminationSummary(){
+const riskNames=atRisk.map(person=>characters[person].name).join(', ');
 
 showScene({
-speaker:'valentina',
+speaker:'host',
 background:'night',
-text:'💥 BOMBSHELL SUMMARY\n\nOfficial Partner: '+partnerName+'\nValentina Connection: '+relationships.valentina+'\nValentina Friendship: '+valentinaStats.friendship+'\nValentina Romance: '+valentinaStats.romance+'\nValentina Boldness: '+valentinaStats.boldness+'\n\nYour choice will affect future drama.'
+text:'🔥 ELIMINATION SUMMARY\n\nBottom Three: '+riskNames+'\n\nSaved by You: '+characters[savedPerson].name+'\nEliminated: '+characters[eliminatedPerson].name+'\n\nYour decision will affect future friendships, trust, and drama.'
 });
+
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
 }
 
@@ -1154,42 +1274,42 @@ q('relationshipBox').innerHTML=
 (challengeComplete?'<br>&nbsp;&nbsp;🏆 Challenge Score: '+challengeScore+' / 9':'')+
 '<br><br>'
 :'<strong>🔥 Official Couple: Not chosen yet</strong><br><br>')+
-'❤️ Lucas Connection: '+relationships.lucas+
+(eliminatedPerson==='lucas'?'❌ Lucas — ELIMINATED':'❤️ Lucas Connection: '+relationships.lucas)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+lucasStats.friendship+
 '<br>&nbsp;&nbsp;❤️ Romance: '+lucasStats.romance+
 '<br>&nbsp;&nbsp;💚 Trust: '+lucasStats.trust+
 
-'<br><br>❤️ Maya Connection: '+relationships.maya+
+'<br><br>'+(eliminatedPerson==='maya'?'❌ Maya — ELIMINATED':'❤️ Maya Connection: '+relationships.maya)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+mayaStats.friendship+
 '<br>&nbsp;&nbsp;💚 Trust: '+mayaStats.trust+
 '<br>&nbsp;&nbsp;🔥 Mystery: '+mayaStats.mystery+
 
-'<br><br>❤️ Kai Connection: '+relationships.kai+
+'<br><br>'+(eliminatedPerson==='kai'?'❌ Kai — ELIMINATED':'❤️ Kai Connection: '+relationships.kai)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+kaiStats.friendship+
 '<br>&nbsp;&nbsp;❤️ Romance: '+kaiStats.romance+
 '<br>&nbsp;&nbsp;🏆 Competition: '+kaiStats.competition+
 
-'<br><br>❤️ Isabella Connection: '+relationships.isabella+
+'<br><br>'+(eliminatedPerson==='isabella'?'❌ Isabella — ELIMINATED':'❤️ Isabella Connection: '+relationships.isabella)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+isabellaStats.friendship+
 '<br>&nbsp;&nbsp;💕 Romance: '+isabellaStats.romance+
 '<br>&nbsp;&nbsp;🎭 Social: '+isabellaStats.social+
 
-'<br><br>❤️ Ethan Connection: '+relationships.ethan+
+'<br><br>'+(eliminatedPerson==='ethan'?'❌ Ethan — ELIMINATED':'❤️ Ethan Connection: '+relationships.ethan)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+ethanStats.friendship+
 '<br>&nbsp;&nbsp;❤️ Romance: '+ethanStats.romance+
 '<br>&nbsp;&nbsp;🧠 Strategy: '+ethanStats.strategy+
 
-'<br><br>❤️ Sofia Connection: '+relationships.sofia+
+'<br><br>'+(eliminatedPerson==='sofia'?'❌ Sofia — ELIMINATED':'❤️ Sofia Connection: '+relationships.sofia)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+sofiaStats.friendship+
 '<br>&nbsp;&nbsp;💕 Romance: '+sofiaStats.romance+
 '<br>&nbsp;&nbsp;💬 Openness: '+sofiaStats.openness+
 
-'<br><br>❤️ Noah Connection: '+relationships.noah+
+'<br><br>'+(eliminatedPerson==='noah'?'❌ Noah — ELIMINATED':'❤️ Noah Connection: '+relationships.noah)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+noahStats.friendship+
 '<br>&nbsp;&nbsp;❤️ Romance: '+noahStats.romance+
 '<br>&nbsp;&nbsp;💪 Courage: '+noahStats.courage+
 
-'<br><br>❤️ Lisa Connection: '+relationships.lisa+
+'<br><br>'+(eliminatedPerson==='lisa'?'❌ Lisa — ELIMINATED':'❤️ Lisa Connection: '+relationships.lisa)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+lisaStats.friendship+
 '<br>&nbsp;&nbsp;💕 Romance: '+lisaStats.romance+
 '<br>&nbsp;&nbsp;🎭 Honesty: '+lisaStats.honesty+
