@@ -28,6 +28,7 @@ input{width:100%;padding:12px;border:2px solid #ccc;border-radius:8px;margin-bot
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
+<p><strong>Version 1.2.5 — Day 3 Morning</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 </section>
@@ -207,7 +208,7 @@ q('actionStatus').textContent=actionUsed?'✅ Activity complete':'⭐ One activi
 }
 
 function getTimeIcon(){return currentTime==='Morning'?'☀️':currentTime==='Afternoon'?'🌤️':'🌙'}
-function getAdvanceButtonText(){return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit'}
+function getAdvanceButtonText(){if(currentDay===3&&currentTime==='Morning')return '✅ Finish Version 1.2.5';return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit'}
 
 function openIslandMap(){
 ['choices','walkingScreen','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
@@ -227,6 +228,11 @@ return true;
 function completeAction(){actionUsed=true;updateTimeDisplay()}
 
 function advanceTime(){
+if(currentDay===3&&currentTime==='Morning'){
+showVersionComplete();
+return;
+}
+
 if(currentTime==='Evening'){
 q('islandMap').classList.add('hidden');
 q('walkingScreen').classList.add('hidden');
@@ -274,7 +280,7 @@ q('choices').classList.remove('hidden');
 ({beach:visitBeach,villa:visitVilla,shrine:visitShrine,jungle:visitJungle,gym:visitGym,kitchen:visitKitchen,pool:visitPool,firepit:visitFirePit,cove:visitCove,volcano:visitVolcano}[loc]||visitVilla)();
 }
 
-/* DAY 1 + DAY 2 SCHEDULES */
+/* DAY 1 + DAY 2 + DAY 3 MORNING SCHEDULES */
 
 function visitBeach(){
 if(currentTime==='Evening'){showEmpty('🏖 Arrival Beach','The beach is quiet. Everyone has gone to the Fire Pit.','night');return}
@@ -297,6 +303,11 @@ return;
 if(currentDay===2&&currentTime==='Afternoon'){
 showScene({speaker:'isabella',background:'afternoon',text:'Isabella and Lisa are setting up a beach volleyball net.'});
 choices('<button onclick="openIsabellaMenu(\'afternoon\',\'visitBeach\')">🦋 Talk to Isabella</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'kai',background:'beach',text:'Kai stands at the edge of the water, watching the waves.\n\n"Today feels different," he says. "Like the island is waiting for something."'});
+choices('<button onclick="openKaiMenu(\'beach\',\'visitBeach\')">🌊 Talk to Kai</button>'+backMap());
 return;
 }
 showEmpty('🏖 Arrival Beach','The beach is peaceful right now.','beach');
@@ -325,6 +336,11 @@ showScene({speaker:'lucas',background:'afternoon',text:'Lucas is setting up a ga
 choices('<button onclick="openLucasMenu()">🏊 Talk to Lucas</button>'+backMap());
 return;
 }
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'lucas',background:'villa',text:'Lucas is making breakfast in the villa kitchen.\n\nHe looks nervous about the first coupling.'});
+choices('<button onclick="openLucasMenu()">🏊 Talk to Lucas</button>'+backMap());
+return;
+}
 showEmpty('🏡 Main Villa','The villa is quiet right now.','villa');
 }
 
@@ -332,6 +348,11 @@ function visitShrine(){
 if(currentTime==='Evening'){
 showScene({speaker:'maya',background:'crystal',text:'Maya stands inside the glowing shrine.\n\n"The Flame is stronger tonight," she whispers.'});
 choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the Crystal Flame</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'maya',background:'crystal',text:'Maya has uncovered a new symbol inside the shrine.\n\nIt looks like two flames joining together.'});
+choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the new symbol</button>'+backMap());
 return;
 }
 showScene({speaker:'maya',background:'crystal',text:'Maya studies the glowing symbols carved into the shrine.'});
@@ -351,6 +372,11 @@ showScene({speaker:'kai',background:'jungle',text:'Kai is practicing balance on 
 choices('<button onclick="openKaiMenu(\'jungle\',\'visitJungle\')">🌊 Talk to Kai</button>'+backMap());
 return;
 }
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'noah',background:'jungle',text:'Noah is following a trail of glowing stones through the jungle.'});
+choices('<button onclick="openNoahMenu(\'jungle\',\'visitJungle\')">🚒 Talk to Noah</button>'+backMap());
+return;
+}
 showEmpty('🌿 Whispering Jungle','You hear leaves moving deeper in the trees.','jungle');
 }
 
@@ -365,6 +391,11 @@ return;
 if(currentDay===2){
 showScene({speaker:'ethan',background:currentTime==='Afternoon'?'afternoon':'villa',text:'Ethan is wrapping his wrists for a lifting session.'});
 choices('<button onclick="openEthanMenu(\''+(currentTime==='Afternoon'?'afternoon':'villa')+'\',\'visitGym\')">💼 Talk to Ethan</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'ethan',background:'villa',text:'Ethan is training alone, but he keeps checking the villa entrance.'});
+choices('<button onclick="openEthanMenu(\'villa\',\'visitGym\')">💼 Talk to Ethan</button>'+backMap());
 return;
 }
 showEmpty('💪 Gym','The gym is quiet right now.','villa');
@@ -383,6 +414,11 @@ showScene({speaker:'lisa',background:'villa',text:'Lisa is trying to figure out 
 choices('<button onclick="openLisaMenu(\'villa\',\'visitKitchen\')">💖 Talk to Lisa</button>'+backMap());
 return;
 }
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'sofia',background:'villa',text:'Sofia is preparing fruit for everyone.\n\nShe seems quieter than usual.'});
+choices('<button onclick="openSofiaMenu(\'villa\',\'visitKitchen\')">🌹 Talk to Sofia</button>'+backMap());
+return;
+}
 showEmpty('🍳 Kitchen','Nobody is spending time in the kitchen right now.','villa');
 }
 
@@ -397,6 +433,11 @@ return;
 if(currentDay===2&&currentTime==='Afternoon'){
 showScene({speaker:'noah',background:'afternoon',text:'Noah and Sofia are splashing each other in the pool.'});
 choices('<button onclick="openNoahMenu(\'afternoon\',\'visitPool\')">🚒 Talk to Noah</button><button onclick="openSofiaMenu(\'afternoon\',\'visitPool\')">🌹 Talk to Sofia</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'isabella',background:'beach',text:'Isabella is sitting beside the pool, quietly watching everyone.'});
+choices('<button onclick="openIsabellaMenu(\'beach\',\'visitPool\')">🦋 Talk to Isabella</button>'+backMap());
 return;
 }
 showEmpty('🏊 Infinity Pool','The pool is quiet right now.','beach');
@@ -415,6 +456,11 @@ showScene({speaker:'isabella',background:'afternoon',text:'Isabella is collectin
 choices('<button onclick="openIsabellaMenu(\'afternoon\',\'visitCove\')">🦋 Talk to Isabella</button>'+backMap());
 return;
 }
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'lisa',background:'beach',text:'Lisa is standing alone at Moonlight Cove with a sealed note in her hand.'});
+choices('<button onclick="openLisaMenu(\'beach\',\'visitCove\')">💖 Talk to Lisa</button>'+backMap());
+return;
+}
 showEmpty('🌙 Moonlight Cove','The cove is peaceful right now.','beach');
 }
 
@@ -428,6 +474,10 @@ return;
 if(currentDay===2){
 showScene({speaker:'ethan',background:'volcano',text:'Ethan stands near an observation ledge looking over Flame Cay.'});
 choices('<button onclick="openEthanMenu(\'volcano\',\'visitVolcano\')">💼 Talk to Ethan</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showEmpty('🌋 Volcano Peak','A new gate blocks the upper trail. A Crystal Flame symbol glows on the lock.','volcano');
 return;
 }
 showEmpty('🌋 Volcano Peak','The view stretches across all of Flame Cay.','volcano');
@@ -565,7 +615,8 @@ choices('<button onclick="openIslandMap()">🗺️ Return to Map</button><button
 function examineCrystal(){
 if(actionAlreadyUsed())return;
 completeAction();
-showScene({speaker:'narrator',background:'crystal',text:currentDay===1?'The Crystal Flame pulses.\n\nA whisper moves through the air: "Keeper..."\n\n✅ Activity complete.':'The Crystal Flame shows you a brief image of Volcano Peak.\n\n✅ Activity complete.'});
+let crystalText=currentDay===1?'The Crystal Flame pulses.\n\nA whisper moves through the air: "Keeper..."\n\n✅ Activity complete.':currentDay===2?'The Crystal Flame shows you a brief image of Volcano Peak.\n\n✅ Activity complete.':'The new symbol glows and shows two silhouettes standing together at the Fire Pit.\n\nA whisper says: "Choose with your heart."\n\n✅ Activity complete.';
+showScene({speaker:'narrator',background:'crystal',text:crystalText});
 showCompletedButtons();
 }
 
@@ -594,6 +645,12 @@ pendingLocation='';
 updateTimeDisplay();
 showScene({speaker:'narrator',background:'arrival',text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+'\n☀️ Morning\n\n⭐ One new activity is available.'});
 choices('<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>');
+}
+
+function showVersionComplete(){
+['islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
+showScene({speaker:'narrator',background:'crystal',text:'✅ VERSION 1.2.5 COMPLETE\n\nYou finished Day 3 Morning.\n\nThe first coupling is coming next in Version 1.2.6.'});
+choices('<button onclick="openIslandMap()">🗺️ Return to Day 3 Morning</button>');
 }
 
 function updateRelationships(){
