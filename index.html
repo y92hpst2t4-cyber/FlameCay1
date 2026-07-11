@@ -42,6 +42,13 @@ background:#fff;
 .safeButton{background:linear-gradient(90deg,#2e9d58,#176b3a)}
 .dangerCard{border-left-color:#b00020;background:rgba(255,245,245,.97)}
 .dayFiveButton{background:linear-gradient(90deg,#5d3fd3,#9c4dcc)}
+.saveButton{background:linear-gradient(90deg,#1877d2,#0d4f9c)}
+.loadButton{background:linear-gradient(90deg,#6750a4,#452b7a)}
+.deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
+.slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
+.slotCard p{margin:5px 0;line-height:1.4}
+#saveStatus{font-weight:700;color:#3c2b73}
+#savePanel{border-left-color:#1877d2}
 @keyframes characterEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
@@ -50,9 +57,17 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 1.6.1 — Morning After the Elimination</strong></p>
+<p><strong>Version 2.0.0 — Save & Load System</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
+<button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
+<button class="loadButton" onclick="openLoadMenu()">📂 Load Game</button>
+
+<div id="loadMenu" class="card hidden">
+<h3>📂 Load Game</h3>
+<div id="loadSlotList"></div>
+<button onclick="closeLoadMenu()">⬅ Back</button>
+</div>
 </section>
 
 <section id="game" class="hidden">
@@ -107,12 +122,25 @@ background:#fff;
 </div>
 </section>
 
+<div class="card" id="savePanel">
+<h3>💾 Save Game</h3>
+<p id="saveStatus">Choose a save slot.</p>
+<button class="saveButton" onclick="saveGame(1)">💾 Save Slot 1</button>
+<button class="saveButton" onclick="saveGame(2)">💾 Save Slot 2</button>
+<button class="saveButton" onclick="saveGame(3)">💾 Save Slot 3</button>
+<button class="loadButton" onclick="openInGameLoadMenu()">📂 Load Another Save</button>
+<div id="inGameLoadMenu" class="hidden">
+<div id="inGameLoadSlotList"></div>
+<button onclick="closeInGameLoadMenu()">⬅ Close Load Menu</button>
+</div>
+</div>
+
 <div class="card" id="relationshipBox"></div>
 </section>
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[];
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.0.0';
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -170,6 +198,319 @@ const introDialogue=[
 
 const locationNames={volcano:'Volcano Peak',jungle:'Whispering Jungle',shrine:'Crystal Shrine',beach:'Arrival Beach',villa:'Main Villa',gym:'Gym',kitchen:'Kitchen',pool:'Infinity Pool',firepit:'Fire Pit',cove:'Moonlight Cove'};
 
+const SAVE_PREFIX='islandOfFlames_slot_';
+const AUTO_SAVE_KEY='islandOfFlames_autoSave';
+
+function getSaveData(){
+return{
+saveVersion,
+savedAt:new Date().toISOString(),
+playerName,
+dialogueIndex,
+currentLocation,
+currentDay,
+currentTime,
+actionUsed,
+eveningEventDone,
+relationships,
+lucasStats,
+mayaStats,
+kaiStats,
+isabellaStats,
+ethanStats,
+sofiaStats,
+noahStats,
+lisaStats,
+valentinaStats,
+coupledWith,
+couplingRomance,
+couplingTrust,
+ceremonyComplete,
+challengeScore,
+challengeQuestion,
+challengeComplete,
+bombshellChoice,
+bombshellComplete,
+eliminationComplete,
+eliminatedPerson,
+savedPerson,
+atRisk
+};
+}
+
+function applySaveData(data){
+playerName=data.playerName||'Player';
+dialogueIndex=Number(data.dialogueIndex||0);
+currentLocation=data.currentLocation||'villa';
+currentDay=Number(data.currentDay||1);
+currentTime=data.currentTime||'Morning';
+actionUsed=Boolean(data.actionUsed);
+eveningEventDone=Boolean(data.eveningEventDone);
+
+relationships=Object.assign(
+{lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0},
+data.relationships||{}
+);
+
+lucasStats=Object.assign({friendship:0,romance:0,trust:0},data.lucasStats||{});
+mayaStats=Object.assign({friendship:0,trust:0,mystery:0},data.mayaStats||{});
+kaiStats=Object.assign({friendship:0,romance:0,competition:0},data.kaiStats||{});
+isabellaStats=Object.assign({friendship:0,romance:0,social:0},data.isabellaStats||{});
+ethanStats=Object.assign({friendship:0,romance:0,strategy:0},data.ethanStats||{});
+sofiaStats=Object.assign({friendship:0,romance:0,openness:0},data.sofiaStats||{});
+noahStats=Object.assign({friendship:0,romance:0,courage:0},data.noahStats||{});
+lisaStats=Object.assign({friendship:0,romance:0,honesty:0},data.lisaStats||{});
+valentinaStats=Object.assign({friendship:0,romance:0,boldness:0},data.valentinaStats||{});
+
+coupledWith=data.coupledWith||'';
+couplingRomance=Number(data.couplingRomance||0);
+couplingTrust=Number(data.couplingTrust||0);
+ceremonyComplete=Boolean(data.ceremonyComplete);
+challengeScore=Number(data.challengeScore||0);
+challengeQuestion=Number(data.challengeQuestion||0);
+challengeComplete=Boolean(data.challengeComplete);
+bombshellChoice=data.bombshellChoice||'';
+bombshellComplete=Boolean(data.bombshellComplete);
+eliminationComplete=Boolean(data.eliminationComplete);
+eliminatedPerson=data.eliminatedPerson||'';
+savedPerson=data.savedPerson||'';
+atRisk=Array.isArray(data.atRisk)?data.atRisk:[];
+lastSaveTime=data.savedAt||'';
+
+q('playerName').value=playerName;
+q('menu').classList.add('hidden');
+q('game').classList.remove('hidden');
+q('welcome').textContent='Welcome back to Flame Cay, '+playerName+'!';
+q('continueButton').style.display='none';
+
+updateTimeDisplay();
+updateRelationships();
+resumeSavedProgress();
+}
+
+function saveGame(slot,showMessage=true){
+try{
+const data=getSaveData();
+localStorage.setItem(SAVE_PREFIX+slot,JSON.stringify(data));
+localStorage.setItem(AUTO_SAVE_KEY,JSON.stringify(data));
+currentSaveSlot=slot;
+lastSaveTime=data.savedAt;
+
+if(showMessage&&q('saveStatus')){
+q('saveStatus').textContent='✅ Saved to Slot '+slot+' — '+formatSaveDate(data.savedAt);
+}
+
+refreshSaveMenus();
+}catch(error){
+if(q('saveStatus')){
+q('saveStatus').textContent='❌ Save failed. Your browser may have storage disabled.';
+}
+}
+}
+
+function autoSaveGame(){
+try{
+const data=getSaveData();
+localStorage.setItem(AUTO_SAVE_KEY,JSON.stringify(data));
+lastSaveTime=data.savedAt;
+refreshContinueButton();
+}catch(error){}
+}
+
+function loadGame(slot){
+try{
+const raw=localStorage.getItem(SAVE_PREFIX+slot);
+if(!raw)return;
+currentSaveSlot=slot;
+closeLoadMenu();
+closeInGameLoadMenu();
+applySaveData(JSON.parse(raw));
+}catch(error){
+alert('This save file could not be loaded.');
+}
+}
+
+function continueLatestSave(){
+try{
+const raw=localStorage.getItem(AUTO_SAVE_KEY);
+if(!raw)return;
+currentSaveSlot=0;
+applySaveData(JSON.parse(raw));
+}catch(error){
+alert('The latest save could not be loaded.');
+}
+}
+
+function deleteSave(slot){
+try{
+localStorage.removeItem(SAVE_PREFIX+slot);
+refreshSaveMenus();
+refreshContinueButton();
+}catch(error){}
+}
+
+function formatSaveDate(iso){
+if(!iso)return 'Unknown time';
+const date=new Date(iso);
+if(Number.isNaN(date.getTime()))return 'Unknown time';
+return date.toLocaleString();
+}
+
+function getSaveSummary(data){
+const partner=data.coupledWith&&characters[data.coupledWith]
+?characters[data.coupledWith].name
+:'Not chosen';
+
+const eliminated=data.eliminatedPerson&&characters[data.eliminatedPerson]
+?characters[data.eliminatedPerson].name
+:'None';
+
+return{
+player:data.playerName||'Player',
+day:data.currentDay||1,
+time:data.currentTime||'Morning',
+partner,
+eliminated,
+savedAt:formatSaveDate(data.savedAt)
+};
+}
+
+function buildSaveSlotHtml(slot,inGame=false){
+const raw=localStorage.getItem(SAVE_PREFIX+slot);
+
+if(!raw){
+return '<div class="slotCard"><h3>Save Slot '+slot+'</h3><p>Empty slot</p>'+
+(inGame?'<button class="saveButton" onclick="saveGame('+slot+')">💾 Save Here</button>':'')+
+'</div>';
+}
+
+try{
+const data=JSON.parse(raw);
+const summary=getSaveSummary(data);
+
+return '<div class="slotCard">'+
+'<h3>Save Slot '+slot+'</h3>'+
+'<p><strong>'+summary.player+'</strong></p>'+
+'<p>📅 Day '+summary.day+' — '+summary.time+'</p>'+
+'<p>❤️ Partner: '+summary.partner+'</p>'+
+'<p>❌ Eliminated: '+summary.eliminated+'</p>'+
+'<p>🕒 '+summary.savedAt+'</p>'+
+'<button class="loadButton" onclick="loadGame('+slot+')">▶ Load Slot '+slot+'</button>'+
+(inGame?'<button class="saveButton" onclick="saveGame('+slot+')">💾 Overwrite Slot '+slot+'</button>':'')+
+'<button class="deleteButton" onclick="deleteSave('+slot+')">🗑️ Delete Slot '+slot+'</button>'+
+'</div>';
+}catch(error){
+return '<div class="slotCard"><h3>Save Slot '+slot+'</h3><p>Save data is damaged.</p>'+
+'<button class="deleteButton" onclick="deleteSave('+slot+')">🗑️ Delete Slot</button></div>';
+}
+}
+
+function refreshSaveMenus(){
+if(q('loadSlotList')){
+q('loadSlotList').innerHTML=[1,2,3].map(slot=>buildSaveSlotHtml(slot,false)).join('');
+}
+if(q('inGameLoadSlotList')){
+q('inGameLoadSlotList').innerHTML=[1,2,3].map(slot=>buildSaveSlotHtml(slot,true)).join('');
+}
+refreshContinueButton();
+}
+
+function refreshContinueButton(){
+const hasAutoSave=Boolean(localStorage.getItem(AUTO_SAVE_KEY));
+if(q('continueGameButton')){
+q('continueGameButton').classList.toggle('hidden',!hasAutoSave);
+}
+}
+
+function openLoadMenu(){
+refreshSaveMenus();
+q('loadMenu').classList.remove('hidden');
+}
+
+function closeLoadMenu(){
+q('loadMenu').classList.add('hidden');
+}
+
+function openInGameLoadMenu(){
+refreshSaveMenus();
+q('inGameLoadMenu').classList.remove('hidden');
+}
+
+function closeInGameLoadMenu(){
+q('inGameLoadMenu').classList.add('hidden');
+}
+
+function resumeSavedProgress(){
+['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
+
+if(currentDay>=5&&eliminationComplete){
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+'\n\nYour progress has been restored.'
+});
+choices('<button onclick="openIslandMap()">🗺️ Continue Day '+currentDay+'</button>');
+return;
+}
+
+if(eliminationComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe first elimination is complete.'
+});
+choices('<button onclick="beginDayFive()">☀️ Continue to Day 5</button>');
+return;
+}
+
+if(bombshellComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nValentina has arrived on Flame Cay.'
+});
+choices('<button onclick="startFirstElimination()">🔥 Continue to the Elimination</button>');
+return;
+}
+
+if(challengeComplete){
+showScene({
+speaker:'narrator',
+background:'afternoon',
+text:'💾 SAVE LOADED\n\nThe First Challenge is complete.'
+});
+choices('<button onclick="startBombshellArrival()">💥 Continue to the Bombshell Arrival</button>');
+return;
+}
+
+if(ceremonyComplete){
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nYou are officially coupled with '+characters[coupledWith].name+'.'
+});
+choices('<button onclick="beginDayFour()">☀️ Continue to Day 4</button>');
+return;
+}
+
+if(currentDay===3){
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nDay 3 Morning has been restored.'
+});
+choices('<button onclick="openIslandMap()">🗺️ Continue Day 3</button>');
+return;
+}
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+' has been restored.'
+});
+choices('<button onclick="openIslandMap()">🗺️ Continue Game</button>');
+}
+
 function q(id){return document.getElementById(id)}
 function choices(html){q('choices').innerHTML=html;q('choices').classList.remove('hidden')}
 function backMap(){return '<button onclick="openIslandMap()">⬅ Back to Map</button>'}
@@ -180,7 +521,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -288,7 +629,7 @@ choices('<button onclick="openIslandMap()">🗺️ Return to Map</button>');
 return true;
 }
 
-function completeAction(){actionUsed=true;updateTimeDisplay()}
+function completeAction(){actionUsed=true;updateTimeDisplay();autoSaveGame()}
 
 function advanceTime(){
 if(currentDay===3&&currentTime==='Morning'){
@@ -837,6 +1178,7 @@ couplingRomance=5;
 couplingTrust=2;
 ceremonyComplete=true;
 updateRelationships();
+autoSaveGame();
 
 const reactions={
 lucas:'Lucas looks surprised, then smiles warmly.\n\n"I will not take this choice for granted."',
@@ -875,6 +1217,7 @@ eveningEventDone=false;
 currentLocation='villa';
 pendingLocation='';
 updateTimeDisplay();
+autoSaveGame();
 
 const partnerName=characters[coupledWith].name;
 showScene({
@@ -963,6 +1306,7 @@ challengeThree();
 function finishChallengeAnswer(points){
 challengeScore+=points;
 challengeComplete=true;
+autoSaveGame();
 
 let resultText='';
 let rewardText='';
@@ -1056,6 +1400,7 @@ function chooseBombshellReaction(choice){
 if(bombshellChoice)return;
 bombshellChoice=choice;
 bombshellComplete=true;
+autoSaveGame();
 
 let sceneText='';
 
@@ -1208,6 +1553,7 @@ eliminatedPerson=tieOrder.indexOf(remaining[0])<tieOrder.indexOf(remaining[1])
 
 eliminationComplete=true;
 updateRelationships();
+autoSaveGame();
 
 showScene({
 speaker:person,
@@ -1260,6 +1606,7 @@ eveningEventDone=false;
 currentLocation='villa';
 pendingLocation='';
 updateTimeDisplay();
+autoSaveGame();
 
 const partnerName=characters[coupledWith].name;
 const savedName=characters[savedPerson].name;
@@ -1591,7 +1938,10 @@ q('relationshipBox').innerHTML=
 '<br>&nbsp;&nbsp;🔥 Boldness: '+valentinaStats.boldness;
 }
 
-window.addEventListener('load',preloadPortraits);
+window.addEventListener('load',()=>{
+preloadPortraits();
+refreshSaveMenus();
+});
 </script>
 </body>
 </html>
