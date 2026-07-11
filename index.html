@@ -31,6 +31,7 @@ input{width:100%;padding:12px;border:2px solid #ccc;border-radius:8px;margin-bot
 .ceremonyButton{background:linear-gradient(90deg,#7b2cff,#d7265e)}
 .challengeButton{background:linear-gradient(90deg,#00a8a8,#087f8c)}
 .challengeScore{text-align:center;font-size:22px;font-weight:700;color:#7b2cff}
+.bombshellButton{background:linear-gradient(90deg,#ff477e,#ff7b00)}
 @keyframes characterEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
@@ -39,7 +40,7 @@ input{width:100%;padding:12px;border:2px solid #ccc;border-radius:8px;margin-bot
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 1.4.0 — First Challenge</strong></p>
+<p><strong>Version 1.5.0 — First Bombshell Arrival</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 </section>
@@ -101,10 +102,10 @@ input{width:100%;padding:12px;border:2px solid #ccc;border-radius:8px;margin-bot
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
-let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0};
+let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 let lucasStats={friendship:0,romance:0,trust:0};
 let mayaStats={friendship:0,trust:0,mystery:0};
 let kaiStats={friendship:0,romance:0,competition:0};
@@ -113,6 +114,8 @@ let ethanStats={friendship:0,romance:0,strategy:0};
 let sofiaStats={friendship:0,romance:0,openness:0};
 let noahStats={friendship:0,romance:0,courage:0};
 let lisaStats={friendship:0,romance:0,honesty:0};
+valentinaStats={friendship:0,romance:0,boldness:0};
+let valentinaStats={friendship:0,romance:0,boldness:0};
 
 const characters={
 narrator:{name:'Narrator',title:'The Story Begins',emoji:'🌴',image:''},
@@ -124,7 +127,8 @@ isabella:{name:'Isabella Cruz',title:'The Social Butterfly',emoji:'🦋',image:'
 ethan:{name:'Ethan Brooks',title:'The CEO',emoji:'💼',image:'images/E607EF85-171E-4623-9D56-921695CE2F73.png'},
 sofia:{name:'Sofia Rossi',title:'The Heartbreaker',emoji:'🌹',image:'images/286EA103-FC31-41AF-BD1E-3E55D7B2115F.png'},
 noah:{name:'Noah Carter',title:'The Firefighter',emoji:'🚒',image:'images/3C17246B-AD38-420C-8767-F53B7F3FBDDE.png'},
-lisa:{name:'Lisa Morgan',title:'The Bombshell',emoji:'💖',image:'images/9DBF1984-9450-4DAF-94D3-04E305D0E5DF.png'}
+lisa:{name:'Lisa Morgan',title:'The Bombshell',emoji:'💖',image:'images/9DBF1984-9450-4DAF-94D3-04E305D0E5DF.png'},
+valentina:{name:'Valentina Reyes',title:'The New Bombshell',emoji:'💃',image:''}
 };
 
 const introDialogue=[
@@ -154,8 +158,8 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;
-relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0};
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;
+relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
 kaiStats={friendship:0,romance:0,competition:0};
@@ -681,6 +685,7 @@ if(person==='ethan')ethanStats[stat]++;
 if(person==='sofia')sofiaStats[stat]++;
 if(person==='noah')noahStats[stat]++;
 if(person==='lisa')lisaStats[stat]++;
+if(person==='valentina')valentinaStats[stat]++;
 completeAction();
 updateRelationships();
 showScene({speaker:person,background:menuBackground,text:text+'\n\n✅ Activity complete.'});
@@ -949,25 +954,149 @@ speaker:coupledWith,
 background:'afternoon',
 text:reactions[coupledWith]
 });
-choices('<button onclick="showVersionComplete()">✅ Finish Version 1.4.0</button>');
+choices('<button class="bombshellButton" onclick="startBombshellArrival()">💥 Continue to the Bombshell Arrival</button>');
+}
+
+function startBombshellArrival(){
+if(bombshellComplete){showVersionComplete();return}
+
+showScene({
+speaker:'host',
+background:'night',
+text:'Just as the challenge celebration begins, the villa lights flash red.\n\nA boat horn echoes from Arrival Beach.\n\n"Islanders... please welcome the first new Bombshell."'
+});
+choices('<button class="bombshellButton" onclick="revealBombshell()">💥 Meet the Bombshell</button>');
+}
+
+function revealBombshell(){
+showScene({
+speaker:'valentina',
+background:'arrival',
+text:'Valentina Reyes steps onto Flame Cay with a confident smile.\n\n"I did not come here to play safe."\n\n"I came here to find the strongest connection... even if someone is already coupled."'
+});
+choices('<button class="bombshellButton" onclick="showBombshellChoices()">🔥 Continue</button>');
+}
+
+function showBombshellChoices(){
+const partnerName=characters[coupledWith].name;
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina looks directly at you, then glances toward '+partnerName+'.\n\n"So... are you completely closed off, or should I get to know you?"'
+});
+
+choices(
+'<button class="bombshellButton" onclick="chooseBombshellReaction(\'flirt\')">😏 Flirt with Valentina</button>'+
+'<button onclick="chooseBombshellReaction(\'friendly\')">🙂 Welcome her as a friend</button>'+
+'<button onclick="chooseBombshellReaction(\'loyal\')">💚 Stay loyal to '+partnerName+'</button>'
+);
+}
+
+function chooseBombshellReaction(choice){
+if(bombshellChoice)return;
+bombshellChoice=choice;
+bombshellComplete=true;
+
+let sceneText='';
+
+if(choice==='flirt'){
+relationships.valentina+=5;
+valentinaStats.romance+=3;
+valentinaStats.boldness+=2;
+relationships[coupledWith]-=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+
+sceneText='You match Valentina’s confident energy.\n\nShe smiles slowly.\n\n"I knew you were interesting."\n\n💕 Valentina Romance +3\n🔥 Boldness +2\n❤️ Valentina Connection +5\n💔 Partner Connection -1\n💚 Couple Trust -1';
+}else if(choice==='friendly'){
+relationships.valentina+=3;
+valentinaStats.friendship+=3;
+
+sceneText='You welcome Valentina without crossing any lines.\n\nShe nods with respect.\n\n"Fair enough. Friends can still surprise each other."\n\n🤝 Valentina Friendship +3\n❤️ Valentina Connection +3';
+}else{
+relationships[coupledWith]+=3;
+couplingTrust+=2;
+relationships.valentina+=1;
+valentinaStats.boldness+=1;
+
+sceneText='You make it clear that you want to protect your current couple.\n\nYour partner looks relieved.\n\nValentina smiles anyway.\n\n"Loyalty is attractive. Let us see how long it lasts."\n\n❤️ Partner Connection +3\n💚 Couple Trust +2\n❤️ Valentina Connection +1\n🔥 Valentina Boldness +1';
+}
+
+updateRelationships();
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:sceneText
+});
+choices('<button class="bombshellButton" onclick="showPartnerBombshellReaction()">❤️ See Your Partner’s Reaction</button>');
+}
+
+function showPartnerBombshellReaction(){
+const reactions={
+flirt:{
+lucas:'Lucas looks disappointed but controlled.\n\n"I just hope you know what you are doing."',
+maya:'Maya watches you carefully.\n\n"The island tests people quickly."',
+kai:'Kai forces a smile.\n\n"Competition already? Fine. I can handle it."',
+isabella:'Isabella looks hurt for a moment.\n\n"I thought we were building something."',
+ethan:'Ethan’s expression hardens.\n\n"I pay attention to actions, not promises."',
+sofia:'Sofia looks away quietly.\n\n"I need honesty from you."',
+noah:'Noah speaks calmly.\n\n"I will not tell you what to do, but trust matters."',
+lisa:'Lisa raises an eyebrow.\n\n"So that is how this game is going to be."'
+},
+friendly:{
+lucas:'Lucas smiles.\n\n"That was respectful. I appreciate it."',
+maya:'Maya nods.\n\n"You handled that carefully."',
+kai:'Kai relaxes.\n\n"Friendly is fine. I am not worried."',
+isabella:'Isabella smiles again.\n\n"Good. We can welcome her without drama."',
+ethan:'Ethan nods once.\n\n"Smart choice."',
+sofia:'Sofia looks relieved.\n\n"Thank you for being clear."',
+noah:'Noah smiles warmly.\n\n"That is the kind of honesty I respect."',
+lisa:'Lisa gives you an approving look.\n\n"Balanced. I can work with that."'
+},
+loyal:{
+lucas:'Lucas smiles with real relief.\n\n"I will remember that."',
+maya:'Maya’s expression softens.\n\n"The Crystal Flame values loyalty."',
+kai:'Kai grins.\n\n"Now that is what I wanted to hear."',
+isabella:'Isabella reaches for your hand.\n\n"We are stronger after that."',
+ethan:'Ethan looks impressed.\n\n"Clear choice. Strong decision."',
+sofia:'Sofia smiles softly.\n\n"You made me feel safe."',
+noah:'Noah nods with pride.\n\n"That means a lot to me."',
+lisa:'Lisa gives you a surprised smile.\n\n"Loyal already? Interesting."'
+}
+};
+
+showScene({
+speaker:coupledWith,
+background:'night',
+text:reactions[bombshellChoice][coupledWith]
+});
+choices('<button onclick="showVersionComplete()">✅ Finish Version 1.5.0</button>');
 }
 
 function showVersionComplete(){
 const partnerName=characters[coupledWith].name;
+const reactionNames={
+flirt:'You flirted with Valentina',
+friendly:'You welcomed Valentina as a friend',
+loyal:'You stayed loyal to '+partnerName
+};
+
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 1.4.0 COMPLETE\n\nYou completed the First Challenge.\n\nPartner: '+partnerName+'\nChallenge Score: '+challengeScore+' / 9\n\nDay 4 Afternoon begins next in Version 1.4.1.'
+text:'✅ VERSION 1.5.0 COMPLETE\n\nThe first Bombshell has arrived.\n\nBombshell: Valentina Reyes\nYour choice: '+reactionNames[bombshellChoice]+'\n\nThe island has changed. New tension begins next in Version 1.5.1.'
 });
-choices('<button onclick="showChallengeSummary()">🏆 View Challenge Summary</button>');
+choices('<button onclick="showBombshellSummary()">💥 View Bombshell Summary</button>');
 }
 
-function showChallengeSummary(){
+function showBombshellSummary(){
 const partnerName=characters[coupledWith].name;
+
 showScene({
-speaker:coupledWith,
+speaker:'valentina',
 background:'night',
-text:'🏆 CRYSTAL CONNECTION SUMMARY\n\n'+playerName+' + '+partnerName+'\n\nChallenge Score: '+challengeScore+' / 9\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nYour challenge result will affect future scenes.'
+text:'💥 BOMBSHELL SUMMARY\n\nOfficial Partner: '+partnerName+'\nValentina Connection: '+relationships.valentina+'\nValentina Friendship: '+valentinaStats.friendship+'\nValentina Romance: '+valentinaStats.romance+'\nValentina Boldness: '+valentinaStats.boldness+'\n\nYour choice will affect future drama.'
 });
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
 }
@@ -1019,7 +1148,12 @@ q('relationshipBox').innerHTML=
 '<br><br>❤️ Lisa Connection: '+relationships.lisa+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+lisaStats.friendship+
 '<br>&nbsp;&nbsp;💕 Romance: '+lisaStats.romance+
-'<br>&nbsp;&nbsp;🎭 Honesty: '+lisaStats.honesty;
+'<br>&nbsp;&nbsp;🎭 Honesty: '+lisaStats.honesty+
+
+'<br><br>❤️ Valentina Connection: '+relationships.valentina+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+valentinaStats.friendship+
+'<br>&nbsp;&nbsp;💕 Romance: '+valentinaStats.romance+
+'<br>&nbsp;&nbsp;🔥 Boldness: '+valentinaStats.boldness;
 }
 </script>
 </body>
