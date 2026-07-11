@@ -100,6 +100,7 @@ let isabellaStats={friendship:0,romance:0,social:0};
 let ethanStats={friendship:0,romance:0,strategy:0};
 let sofiaStats={friendship:0,romance:0,openness:0};
 let noahStats={friendship:0,romance:0,courage:0};
+let lisaStats={friendship:0,romance:0,honesty:0};
 
 const characters={
 narrator:{name:'Narrator',title:'The Story Begins',emoji:'🌴',image:''},
@@ -150,6 +151,7 @@ isabellaStats={friendship:0,romance:0,social:0};
 ethanStats={friendship:0,romance:0,strategy:0};
 sofiaStats={friendship:0,romance:0,openness:0};
 noahStats={friendship:0,romance:0,courage:0};
+lisaStats={friendship:0,romance:0,honesty:0};
 q('continueButton').style.display='block';
 ['choices','islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
 showScene(introDialogue[0]);
@@ -279,7 +281,7 @@ if(currentTime==='Evening'){showEmpty('🏖 Arrival Beach','The beach is quiet. 
 
 if(currentDay===1&&currentTime==='Morning'){
 showScene({speaker:'narrator',background:'beach',text:'Morning sunlight shines across Arrival Beach.\n\nKai stands near the waves while Lisa relaxes in the sun.'});
-choices('<button onclick="openKaiMenu(\'beach\',\'visitBeach\')">🌊 Talk to Kai</button><button onclick="basicTalk(\'lisa\',\'beach\',\'Lisa gives you a playful smile.\\n\\n❤️ Lisa +1\\n\\n✅ Activity complete.\')">💖 Talk to Lisa</button>'+backMap());
+choices('<button onclick="openKaiMenu(\'beach\',\'visitBeach\')">🌊 Talk to Kai</button><button onclick="openLisaMenu(\'beach\',\'visitBeach\')">💖 Talk to Lisa</button>'+backMap());
 return;
 }
 if(currentDay===1&&currentTime==='Afternoon'){
@@ -378,7 +380,7 @@ return;
 }
 if(currentDay===2&&currentTime==='Morning'){
 showScene({speaker:'lisa',background:'villa',text:'Lisa is trying to figure out the pancake griddle.'});
-choices('<button onclick="basicTalk(\'lisa\',\'villa\',\'Lisa laughs and admits she does not cook.\\n\\n❤️ Lisa +1\\n\\n✅ Activity complete.\')">💖 Help Lisa</button>'+backMap());
+choices('<button onclick="openLisaMenu(\'villa\',\'visitKitchen\')">💖 Talk to Lisa</button>'+backMap());
 return;
 }
 showEmpty('🍳 Kitchen','Nobody is spending time in the kitchen right now.','villa');
@@ -405,7 +407,7 @@ if(currentTime==='Evening'){showEmpty('🌙 Moonlight Cove','The cove glows bene
 
 if(currentDay===1&&currentTime==='Afternoon'){
 showScene({speaker:'lisa',background:'afternoon',text:'Lisa stands beside the water at Moonlight Cove.'});
-choices('<button onclick="basicTalk(\'lisa\',\'afternoon\',\'Lisa looks toward the ocean and opens up to you.\\n\\n❤️ Lisa +1\\n\\n✅ Activity complete.\')">💖 Talk to Lisa</button>'+backMap());
+choices('<button onclick="openLisaMenu(\'afternoon\',\'visitCove\')">💖 Talk to Lisa</button>'+backMap());
 return;
 }
 if(currentDay===2&&currentTime==='Afternoon'){
@@ -521,6 +523,15 @@ showScene({speaker:'noah',background:bg,text:'Noah gives you a warm, steady smil
 choices('<button onclick="specialTalk(\'noah\',\'friendship\',\'You ask Noah what he is like outside the villa.\\n\\nHe tells you he values loyalty, family, and helping people when they need it most.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🚒 Get to know Noah</button><button onclick="specialTalk(\'noah\',\'romance\',\'You tell Noah that his calm confidence is hard to ignore.\\n\\nHe smiles and says the feeling might be mutual.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Flirt with Noah</button><button onclick="specialTalk(\'noah\',\'courage\',\'You ask Noah how he stays brave when things become dangerous.\\n\\nHe says courage means being scared and still choosing to help.\\n\\n💪 Courage +1\\n❤️ Connection +1\')">💪 Ask about courage</button><button onclick="'+back+'()">⬅ Back</button>');
 }
 
+
+function openLisaMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'lisa',background:bg,text:'Lisa gives you a confident, unreadable smile.\n\n"What do you want to know?"'});
+choices('<button onclick="specialTalk(\'lisa\',\'friendship\',\'You ask Lisa what she is like away from the cameras.\\n\\nShe says she is more loyal and private than people expect.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">💖 Get to know Lisa</button><button onclick="specialTalk(\'lisa\',\'romance\',\'You tell Lisa that her confidence is impossible to ignore.\\n\\nShe steps closer and smiles.\\n\\n💕 Romance +1\\n❤️ Connection +1\')">😘 Flirt with Lisa</button><button onclick="specialTalk(\'lisa\',\'honesty\',\'You ask Lisa whether she is truly looking for love or only playing the game.\\n\\nShe pauses before admitting that even she is not completely sure yet.\\n\\n🎭 Honesty +1\\n❤️ Connection +1\')">🎭 Ask about her real intentions</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
 function specialTalk(person,stat,text){
 if(actionAlreadyUsed())return;
 relationships[person]++;
@@ -531,6 +542,7 @@ if(person==='isabella')isabellaStats[stat]++;
 if(person==='ethan')ethanStats[stat]++;
 if(person==='sofia')sofiaStats[stat]++;
 if(person==='noah')noahStats[stat]++;
+if(person==='lisa')lisaStats[stat]++;
 completeAction();
 updateRelationships();
 showScene({speaker:person,background:menuBackground,text:text+'\n\n✅ Activity complete.'});
@@ -621,7 +633,10 @@ q('relationshipBox').innerHTML=
 '<br>&nbsp;&nbsp;❤️ Romance: '+noahStats.romance+
 '<br>&nbsp;&nbsp;💪 Courage: '+noahStats.courage+
 
-'<br><br>❤️ Lisa: '+relationships.lisa;
+'<br><br>❤️ Lisa Connection: '+relationships.lisa+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+lisaStats.friendship+
+'<br>&nbsp;&nbsp;💕 Romance: '+lisaStats.romance+
+'<br>&nbsp;&nbsp;🎭 Honesty: '+lisaStats.honesty;
 }
 </script>
 </body>
