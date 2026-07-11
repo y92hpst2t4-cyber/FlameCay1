@@ -96,6 +96,7 @@ let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0
 let lucasStats={friendship:0,romance:0,trust:0};
 let mayaStats={friendship:0,trust:0,mystery:0};
 let kaiStats={friendship:0,romance:0,competition:0};
+let isabellaStats={friendship:0,romance:0,social:0};
 
 const characters={
 narrator:{name:'Narrator',title:'The Story Begins',emoji:'🌴',image:''},
@@ -142,6 +143,7 @@ relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
 kaiStats={friendship:0,romance:0,competition:0};
+isabellaStats={friendship:0,romance:0,social:0};
 q('continueButton').style.display='block';
 ['choices','islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
 showScene(introDialogue[0]);
@@ -217,7 +219,6 @@ return true;
 function completeAction(){actionUsed=true;updateTimeDisplay()}
 
 function advanceTime(){
-
 if(currentTime==='Evening'){
 q('islandMap').classList.add('hidden');
 q('walkingScreen').classList.add('hidden');
@@ -227,35 +228,20 @@ visitFirePit();
 return;
 }
 
-if(currentTime==='Morning'){
-currentTime='Afternoon';
-}else{
-currentTime='Evening';
-}
+if(currentTime==='Morning'){currentTime='Afternoon'}else{currentTime='Evening'}
 
 actionUsed=false;
 eveningEventDone=false;
 updateTimeDisplay();
-
 q('islandMap').classList.add('hidden');
 q('dialogueCard').classList.remove('hidden');
 
 if(currentTime==='Afternoon'){
-showScene({
-speaker:'narrator',
-background:'afternoon',
-text:'The morning fades into afternoon.\n\nThe Islanders move to new locations.\n\n⭐ One new activity is available.'
-});
+showScene({speaker:'narrator',background:'afternoon',text:'The morning fades into afternoon.\n\nThe Islanders move to new locations.\n\n⭐ One new activity is available.'});
 }else{
-showScene({
-speaker:'narrator',
-background:'night',
-text:'The sun disappears beyond the ocean.\n\nThe Islanders gather at the Fire Pit tonight.'
-});
+showScene({speaker:'narrator',background:'night',text:'The sun disappears beyond the ocean.\n\nThe Islanders gather at the Fire Pit tonight.'});
 }
-
 choices('<button onclick="openIslandMap()">🗺️ Return to Map</button>');
-
 }
 
 function startWalking(loc){
@@ -302,7 +288,7 @@ return;
 }
 if(currentDay===2&&currentTime==='Afternoon'){
 showScene({speaker:'isabella',background:'afternoon',text:'Isabella and Lisa are setting up a beach volleyball net.'});
-choices('<button onclick="basicTalk(\'isabella\',\'afternoon\',\'Isabella waves you over to join the game.\\n\\n❤️ Isabella +1\\n\\n✅ Activity complete.\')">🦋 Talk to Isabella</button>'+backMap());
+choices('<button onclick="openIsabellaMenu(\'afternoon\',\'visitBeach\')">🦋 Talk to Isabella</button>'+backMap());
 return;
 }
 showEmpty('🏖 Arrival Beach','The beach is peaceful right now.','beach');
@@ -397,7 +383,7 @@ if(currentTime==='Evening'){showEmpty('🏊 Infinity Pool','The pool is empty fo
 
 if(currentDay===1&&currentTime==='Afternoon'){
 showScene({speaker:'narrator',background:'afternoon',text:'Kai and Isabella are enjoying the Infinity Pool.'});
-choices('<button onclick="openKaiMenu(\'afternoon\',\'visitPool\')">🌊 Talk to Kai</button><button onclick="basicTalk(\'isabella\',\'afternoon\',\'Isabella smiles from the edge of the pool.\\n\\n❤️ Isabella +1\\n\\n✅ Activity complete.\')">🦋 Talk to Isabella</button>'+backMap());
+choices('<button onclick="openKaiMenu(\'afternoon\',\'visitPool\')">🌊 Talk to Kai</button><button onclick="openIsabellaMenu(\'afternoon\',\'visitPool\')">🦋 Talk to Isabella</button>'+backMap());
 return;
 }
 if(currentDay===2&&currentTime==='Afternoon'){
@@ -418,7 +404,7 @@ return;
 }
 if(currentDay===2&&currentTime==='Afternoon'){
 showScene({speaker:'isabella',background:'afternoon',text:'Isabella is collecting unique shells in a small basket.'});
-choices('<button onclick="basicTalk(\'isabella\',\'afternoon\',\'Isabella shows you a piece of glowing sea glass.\\n\\n❤️ Isabella +1\\n\\n✅ Activity complete.\')">🦋 Help Isabella</button>'+backMap());
+choices('<button onclick="openIsabellaMenu(\'afternoon\',\'visitCove\')">🦋 Talk to Isabella</button>'+backMap());
 return;
 }
 showEmpty('🌙 Moonlight Cove','The cove is peaceful right now.','beach');
@@ -441,6 +427,7 @@ showEmpty('🌋 Volcano Peak','The view stretches across all of Flame Cay.','vol
 
 function visitFirePit(){
 if(currentTime==='Morning'){showEmpty('🔥 Fire Pit','The Fire Pit is empty this morning.','villa');return}
+
 if(currentTime==='Afternoon'){
 if(currentDay===1){
 showScene({speaker:'lucas',background:'afternoon',text:'Lucas sits beside the unlit Fire Pit, lost in thought.'});
@@ -453,6 +440,7 @@ choices('<button onclick="openMayaMenuFrom(\'afternoon\',\'visitFirePit\')">🌿
 return;
 }
 }
+
 showScene({speaker:'host',background:'night',text:'Every Islander gathers around the glowing Fire Pit.\n\n"Tonight, the Crystal Flame will begin its test."'});
 choices('<button onclick="firePitEvent()">🔥 Begin the Evening Event</button>'+backMap());
 }
@@ -492,12 +480,21 @@ showScene({speaker:'kai',background:bg,text:'Kai gives you a confident grin.\n\n
 choices('<button onclick="specialTalk(\'kai\',\'friendship\',\'Kai tells you surfing makes him feel free.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🌊 Get to know Kai</button><button onclick="specialTalk(\'kai\',\'romance\',\'You flirt with Kai. He looks impressed.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">😏 Flirt with Kai</button><button onclick="specialTalk(\'kai\',\'competition\',\'You challenge Kai and his competitive smile appears.\\n\\n🏆 Competition +1\\n❤️ Connection +1\')">🏄 Challenge Kai</button><button onclick="'+back+'()">⬅ Back</button>');
 }
 
+function openIsabellaMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'isabella',background:bg,text:'Isabella smiles brightly when you walk over.\n\n"What do you want to know?"'});
+choices('<button onclick="specialTalk(\'isabella\',\'friendship\',\'You ask Isabella what she is like outside the villa.\\n\\nShe tells you she loves bringing people together.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🦋 Get to know Isabella</button><button onclick="specialTalk(\'isabella\',\'romance\',\'You tell Isabella her energy is impossible to ignore.\\n\\nShe gives you a playful smile.\\n\\n💕 Romance +1\\n❤️ Connection +1\')">💕 Flirt with Isabella</button><button onclick="specialTalk(\'isabella\',\'social\',\'You ask Isabella what she has noticed around the villa.\\n\\nShe lowers her voice and shares a little drama.\\n\\n🎭 Social +1\\n❤️ Connection +1\')">🎉 Ask about villa drama</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
 function specialTalk(person,stat,text){
 if(actionAlreadyUsed())return;
 relationships[person]++;
 if(person==='lucas')lucasStats[stat]++;
 if(person==='maya')mayaStats[stat]++;
 if(person==='kai')kaiStats[stat]++;
+if(person==='isabella')isabellaStats[stat]++;
 completeAction();
 updateRelationships();
 showScene({speaker:person,background:menuBackground,text:text+'\n\n✅ Activity complete.'});
@@ -568,8 +565,12 @@ q('relationshipBox').innerHTML=
 '<br>&nbsp;&nbsp;❤️ Romance: '+kaiStats.romance+
 '<br>&nbsp;&nbsp;🏆 Competition: '+kaiStats.competition+
 
-'<br><br>❤️ Isabella: '+relationships.isabella+
-'<br>❤️ Ethan: '+relationships.ethan+
+'<br><br>❤️ Isabella Connection: '+relationships.isabella+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+isabellaStats.friendship+
+'<br>&nbsp;&nbsp;💕 Romance: '+isabellaStats.romance+
+'<br>&nbsp;&nbsp;🎭 Social: '+isabellaStats.social+
+
+'<br><br>❤️ Ethan: '+relationships.ethan+
 '<br>❤️ Sofia: '+relationships.sofia+
 '<br>❤️ Noah: '+relationships.noah+
 '<br>❤️ Lisa: '+relationships.lisa;
