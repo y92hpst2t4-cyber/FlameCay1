@@ -24,7 +24,13 @@ input{width:100%;padding:12px;border:2px solid #ccc;border-radius:8px;margin-bot
 #portraitBox{display:flex;align-items:center;gap:15px;background:rgba(255,255,255,.92);padding:12px;border-radius:14px;margin-bottom:15px}
 #portrait,#portraitImage{width:64px;height:64px;border-radius:50%}
 #portrait{display:flex;align-items:center;justify-content:center;background:#fff;font-size:34px}
-#portraitImage{object-fit:cover}
+#portraitImage{
+object-fit:cover;
+opacity:0;
+transition:opacity .18s ease;
+background:#fff;
+}
+#portraitImage.loaded{opacity:1}
 #relationshipBox{font-size:14px;line-height:1.55;background:rgba(0,0,0,.78);color:white;border-left-color:#ffd400}
 .couplingTitle{text-align:center;color:#8b2500;font-size:22px;margin-bottom:12px}
 .couplingChoice{background:linear-gradient(90deg,#ff5f6d,#d7265e)}
@@ -40,7 +46,7 @@ input{width:100%;padding:12px;border:2px solid #ccc;border-radius:8px;margin-bot
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 1.5.0 — First Bombshell Arrival</strong></p>
+<p><strong>Version 1.5.0b — Portrait Loading Fix</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 </section>
@@ -130,6 +136,18 @@ lisa:{name:'Lisa Morgan',title:'The Bombshell',emoji:'💖',image:'images/9DBF19
 valentina:{name:'Valentina Reyes',title:'The New Bombshell',emoji:'💃',image:''}
 };
 
+
+const portraitCache={};
+
+function preloadPortraits(){
+Object.entries(characters).forEach(([key,character])=>{
+if(!character.image)return;
+const img=new Image();
+img.src=character.image;
+portraitCache[key]=img;
+});
+}
+
 const introDialogue=[
 {speaker:'narrator',background:'arrival',text:'🔥 THE ISLAND OF FLAMES\n\nSeason 1\nEpisode 1 — The Arrival'},
 {speaker:'narrator',background:'arrival',text:'The sun rises over the ocean.\n\nYour boat moves toward Flame Cay.'},
@@ -153,6 +171,7 @@ function choices(html){q('choices').innerHTML=html;q('choices').classList.remove
 function backMap(){return '<button onclick="openIslandMap()">⬅ Back to Map</button>'}
 
 function startGame(){
+preloadPortraits();
 playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
@@ -190,12 +209,38 @@ q('portraitBox').offsetHeight;
 q('portraitBox').style.animation='characterEnter .6s ease';
 q('speakerName').textContent=c.name;
 q('speakerTitle').textContent=c.title;
+const portraitImg=q('portraitImage');
+portraitImg.classList.remove('loaded');
+
 if(c.image){
-q('portraitImage').src=c.image;
-q('portraitImage').style.display='block';
+q('portrait').style.display='flex';
+q('portrait').textContent=c.emoji;
+portraitImg.style.display='none';
+
+const cached=portraitCache[s.speaker];
+
+const revealPortrait=()=>{
+portraitImg.src=c.image;
+portraitImg.style.display='block';
 q('portrait').style.display='none';
+requestAnimationFrame(()=>portraitImg.classList.add('loaded'));
+};
+
+if(cached&&cached.complete){
+revealPortrait();
 }else{
-q('portraitImage').style.display='none';
+const loader=cached||new Image();
+loader.onload=revealPortrait;
+loader.onerror=()=>{
+portraitImg.style.display='none';
+q('portrait').style.display='flex';
+q('portrait').textContent=c.emoji;
+};
+loader.src=c.image;
+portraitCache[s.speaker]=loader;
+}
+}else{
+portraitImg.style.display='none';
 q('portrait').style.display='flex';
 q('portrait').textContent=c.emoji;
 }
@@ -1154,6 +1199,8 @@ q('relationshipBox').innerHTML=
 '<br>&nbsp;&nbsp;💕 Romance: '+valentinaStats.romance+
 '<br>&nbsp;&nbsp;🔥 Boldness: '+valentinaStats.boldness;
 }
+
+window.addEventListener('load',preloadPortraits);
 </script>
 </body>
 </html>
