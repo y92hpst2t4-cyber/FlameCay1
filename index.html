@@ -97,6 +97,7 @@ let lucasStats={friendship:0,romance:0,trust:0};
 let mayaStats={friendship:0,trust:0,mystery:0};
 let kaiStats={friendship:0,romance:0,competition:0};
 let isabellaStats={friendship:0,romance:0,social:0};
+let ethanStats={friendship:0,romance:0,strategy:0};
 
 const characters={
 narrator:{name:'Narrator',title:'The Story Begins',emoji:'🌴',image:''},
@@ -144,6 +145,7 @@ lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
 kaiStats={friendship:0,romance:0,competition:0};
 isabellaStats={friendship:0,romance:0,social:0};
+ethanStats={friendship:0,romance:0,strategy:0};
 q('continueButton').style.display='block';
 ['choices','islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
 showScene(introDialogue[0]);
@@ -299,12 +301,12 @@ if(currentTime==='Evening'){showEmpty('🏡 Main Villa','The villa is quiet. Eve
 
 if(currentDay===1&&currentTime==='Morning'){
 showScene({speaker:'narrator',background:'villa',text:'Lucas and Ethan are talking in the lounge.'});
-choices('<button onclick="openLucasMenu()">🏊 Talk to Lucas</button><button onclick="basicTalk(\'ethan\',\'villa\',\'Ethan studies you with a calm smile.\\n\\n❤️ Ethan +1\\n\\n✅ Activity complete.\')">💼 Talk to Ethan</button>'+backMap());
+choices('<button onclick="openLucasMenu()">🏊 Talk to Lucas</button><button onclick="openEthanMenu(\'villa\',\'visitVilla\')">💼 Talk to Ethan</button>'+backMap());
 return;
 }
 if(currentDay===1&&currentTime==='Afternoon'){
 showScene({speaker:'ethan',background:'afternoon',text:'Ethan is sitting alone near the lounge windows.'});
-choices('<button onclick="basicTalk(\'ethan\',\'afternoon\',\'Ethan says you seem like someone who actually listens.\\n\\n❤️ Ethan +1\\n\\n✅ Activity complete.\')">💼 Talk to Ethan</button>'+backMap());
+choices('<button onclick="openEthanMenu(\'afternoon\',\'visitVilla\')">💼 Talk to Ethan</button>'+backMap());
 return;
 }
 if(currentDay===2&&currentTime==='Morning'){
@@ -356,7 +358,7 @@ return;
 }
 if(currentDay===2){
 showScene({speaker:'ethan',background:currentTime==='Afternoon'?'afternoon':'villa',text:'Ethan is wrapping his wrists for a lifting session.'});
-choices('<button onclick="basicTalk(\'ethan\',\''+(currentTime==='Afternoon'?'afternoon':'villa')+'\',\'Ethan says consistency beats intensity.\\n\\n❤️ Ethan +1\\n\\n✅ Activity complete.\')">💼 Talk to Ethan</button>'+backMap());
+choices('<button onclick="openEthanMenu(\''+(currentTime==='Afternoon'?'afternoon':'villa')+'\',\'visitGym\')">💼 Talk to Ethan</button>'+backMap());
 return;
 }
 showEmpty('💪 Gym','The gym is quiet right now.','villa');
@@ -419,7 +421,7 @@ return;
 }
 if(currentDay===2){
 showScene({speaker:'ethan',background:'volcano',text:'Ethan stands near an observation ledge looking over Flame Cay.'});
-choices('<button onclick="basicTalk(\'ethan\',\'volcano\',\'Ethan says the view helps him see who is real and who is playing a game.\\n\\n❤️ Ethan +1\\n\\n✅ Activity complete.\')">💼 Talk to Ethan</button>'+backMap());
+choices('<button onclick="openEthanMenu(\'volcano\',\'visitVolcano\')">💼 Talk to Ethan</button>'+backMap());
 return;
 }
 showEmpty('🌋 Volcano Peak','The view stretches across all of Flame Cay.','volcano');
@@ -488,6 +490,15 @@ showScene({speaker:'isabella',background:bg,text:'Isabella smiles brightly when 
 choices('<button onclick="specialTalk(\'isabella\',\'friendship\',\'You ask Isabella what she is like outside the villa.\\n\\nShe tells you she loves bringing people together.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🦋 Get to know Isabella</button><button onclick="specialTalk(\'isabella\',\'romance\',\'You tell Isabella her energy is impossible to ignore.\\n\\nShe gives you a playful smile.\\n\\n💕 Romance +1\\n❤️ Connection +1\')">💕 Flirt with Isabella</button><button onclick="specialTalk(\'isabella\',\'social\',\'You ask Isabella what she has noticed around the villa.\\n\\nShe lowers her voice and shares a little drama.\\n\\n🎭 Social +1\\n❤️ Connection +1\')">🎉 Ask about villa drama</button><button onclick="'+back+'()">⬅ Back</button>');
 }
 
+
+function openEthanMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'ethan',background:bg,text:'Ethan looks up with a calm, confident expression.\n\n"What would you like to know?"'});
+choices('<button onclick="specialTalk(\'ethan\',\'friendship\',\'You ask Ethan what he is like when he is not working.\\n\\nHe admits that slowing down does not come naturally to him.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">💼 Get to know Ethan</button><button onclick="specialTalk(\'ethan\',\'romance\',\'You tell Ethan that confidence looks good on him.\\n\\nA small smile appears on his face.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Flirt with Ethan</button><button onclick="specialTalk(\'ethan\',\'strategy\',\'You ask Ethan how he plans to survive the competition.\\n\\nHe says every strong decision begins with watching people carefully.\\n\\n🧠 Strategy +1\\n❤️ Connection +1\')">🧠 Ask about his strategy</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
 function specialTalk(person,stat,text){
 if(actionAlreadyUsed())return;
 relationships[person]++;
@@ -495,6 +506,7 @@ if(person==='lucas')lucasStats[stat]++;
 if(person==='maya')mayaStats[stat]++;
 if(person==='kai')kaiStats[stat]++;
 if(person==='isabella')isabellaStats[stat]++;
+if(person==='ethan')ethanStats[stat]++;
 completeAction();
 updateRelationships();
 showScene({speaker:person,background:menuBackground,text:text+'\n\n✅ Activity complete.'});
@@ -570,8 +582,12 @@ q('relationshipBox').innerHTML=
 '<br>&nbsp;&nbsp;💕 Romance: '+isabellaStats.romance+
 '<br>&nbsp;&nbsp;🎭 Social: '+isabellaStats.social+
 
-'<br><br>❤️ Ethan: '+relationships.ethan+
-'<br>❤️ Sofia: '+relationships.sofia+
+'<br><br>❤️ Ethan Connection: '+relationships.ethan+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+ethanStats.friendship+
+'<br>&nbsp;&nbsp;❤️ Romance: '+ethanStats.romance+
+'<br>&nbsp;&nbsp;🧠 Strategy: '+ethanStats.strategy+
+
+'<br><br>❤️ Sofia: '+relationships.sofia+
 '<br>❤️ Noah: '+relationships.noah+
 '<br>❤️ Lisa: '+relationships.lisa;
 }
