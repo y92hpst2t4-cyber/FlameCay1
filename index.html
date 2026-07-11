@@ -41,6 +41,7 @@ background:#fff;
 .eliminationButton{background:linear-gradient(90deg,#b00020,#5a0010)}
 .safeButton{background:linear-gradient(90deg,#2e9d58,#176b3a)}
 .dangerCard{border-left-color:#b00020;background:rgba(255,245,245,.97)}
+.dayFiveButton{background:linear-gradient(90deg,#5d3fd3,#9c4dcc)}
 @keyframes characterEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
@@ -49,7 +50,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 1.6.0 — First Elimination</strong></p>
+<p><strong>Version 1.6.1 — Morning After the Elimination</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 </section>
@@ -270,7 +271,7 @@ q('actionStatus').textContent=actionUsed?'✅ Activity complete':'⭐ One activi
 }
 
 function getTimeIcon(){return currentTime==='Morning'?'☀️':currentTime==='Afternoon'?'🌤️':'🌙'}
-function getAdvanceButtonText(){if(currentDay===3&&currentTime==='Morning')return '🔥 Begin First Coupling Ceremony';if(currentDay===4&&currentTime==='Morning')return '🏆 Begin First Challenge';return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit'}
+function getAdvanceButtonText(){if(currentDay===3&&currentTime==='Morning')return '🔥 Begin First Coupling Ceremony';if(currentDay===4&&currentTime==='Morning')return '🏆 Begin First Challenge';if(currentDay===5&&currentTime==='Morning')return '✅ Finish Version 1.6.1';return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit'}
 
 function openIslandMap(){
 ['choices','walkingScreen','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
@@ -297,6 +298,11 @@ return;
 
 if(currentDay===4&&currentTime==='Morning'){
 startFirstChallenge();
+return;
+}
+
+if(currentDay===5&&currentTime==='Morning'){
+showVersionComplete();
 return;
 }
 
@@ -344,6 +350,12 @@ function visitLocation(loc){
 q('islandMap').classList.add('hidden');
 q('dialogueCard').classList.remove('hidden');
 q('choices').classList.remove('hidden');
+
+if(currentDay===5&&currentTime==='Morning'){
+visitDayFiveLocation(loc);
+return;
+}
+
 ({beach:visitBeach,villa:visitVilla,shrine:visitShrine,jungle:visitJungle,gym:visitGym,kitchen:visitKitchen,pool:visitPool,firepit:visitFirePit,cove:visitCove,volcano:visitVolcano}[loc]||visitVilla)();
 }
 
@@ -1237,29 +1249,288 @@ background:'crystal',
 text:'The villa falls silent as '+eliminatedName+' leaves Flame Cay.\n\n"'+savedName+' is safe because of your choice."\n\n"The Crystal Flame remembers who you protected... and who you allowed to leave."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 1.6.0</button>');
+choices('<button class="dayFiveButton" onclick="beginDayFive()">☀️ Begin Day 5</button>');
 }
 
-function showVersionComplete(){
-const savedName=savedPerson?characters[savedPerson].name:'No one';
-const eliminatedName=eliminatedPerson?characters[eliminatedPerson].name:'No one';
+function beginDayFive(){
+currentDay=5;
+currentTime='Morning';
+actionUsed=false;
+eveningEventDone=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+
+const partnerName=characters[coupledWith].name;
+const savedName=characters[savedPerson].name;
+const eliminatedName=characters[eliminatedPerson].name;
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'Morning arrives after a difficult night.\n\n📅 Day 5\n☀️ Morning\n\n'+eliminatedName+' is gone.\n'+savedName+' is still in the villa because of your choice.\n\nYou wake up beside '+partnerName+', but the villa feels different.\n\n⭐ One new activity is available.'
+});
+
+choices('<button class="dayFiveButton" onclick="openIslandMap()">🗺️ Begin Day 5</button>');
+}
+
+function getUpsetIslander(){
+const order=['isabella','sofia','noah','maya','kai','lucas','ethan','lisa'];
+
+return order.find(person=>
+person!==coupledWith &&
+person!==savedPerson &&
+person!==eliminatedPerson
+) || savedPerson;
+}
+
+function addFriendshipPoint(person){
+if(person==='lucas')lucasStats.friendship++;
+if(person==='maya')mayaStats.friendship++;
+if(person==='kai')kaiStats.friendship++;
+if(person==='isabella')isabellaStats.friendship++;
+if(person==='ethan')ethanStats.friendship++;
+if(person==='sofia')sofiaStats.friendship++;
+if(person==='noah')noahStats.friendship++;
+if(person==='lisa')lisaStats.friendship++;
+if(person==='valentina')valentinaStats.friendship++;
+}
+
+function visitDayFiveLocation(loc){
+const partnerName=characters[coupledWith].name;
+const savedName=characters[savedPerson].name;
+const eliminatedName=characters[eliminatedPerson].name;
+const upsetPerson=getUpsetIslander();
+
+if(loc==='villa'){
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:partnerName+' is sitting quietly in the lounge.\n\n"Last night changed everything," your partner says.\n\n"I want to know how you are feeling."'
+});
+choices('<button class="dayFiveButton" onclick="dayFivePartnerTalk()">❤️ Talk to Your Partner</button>'+backMap());
+return;
+}
+
+if(loc==='beach'){
+showScene({
+speaker:savedPerson,
+background:'beach',
+text:savedName+' is standing near the water.\n\n"I am still here because you saved me."\n\n"I wanted to thank you before the day gets busy."'
+});
+choices('<button class="dayFiveButton" onclick="dayFiveSavedTalk()">🛡️ Talk to '+savedName+'</button>'+backMap());
+return;
+}
+
+if(loc==='pool'){
+showScene({
+speaker:'valentina',
+background:'beach',
+text:'Valentina is relaxing beside the Infinity Pool.\n\n"One person leaves, and suddenly everyone starts acting honest."\n\nShe looks directly at you.\n\n"Are you ready for the truth?"'
+});
+choices(
+'<button class="dayFiveButton" onclick="dayFiveValentinaTalk(\'boundaries\')">💚 Set clear boundaries</button>'+
+'<button onclick="dayFiveValentinaTalk(\'friendly\')">🙂 Hear her out calmly</button>'+
+'<button onclick="dayFiveValentinaTalk(\'open\')">🔥 Keep your options open</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='firepit'){
+showScene({
+speaker:upsetPerson,
+background:'villa',
+text:characters[upsetPerson].name+' stands near the cold Fire Pit.\n\n"I understand why you saved '+savedName+'."\n\n"But '+eliminatedName+' deserved another chance too."'
+});
+choices(
+'<button class="dayFiveButton" onclick="dayFiveUpsetTalk(\'apologize\')">🤝 Apologize and explain</button>'+
+'<button onclick="dayFiveUpsetTalk(\'stand\')">🔥 Stand by your decision</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='shrine'){
+if(eliminatedPerson!=='maya'){
+showScene({
+speaker:'maya',
+background:'crystal',
+text:'Maya studies the Crystal Flame in silence.\n\n"The Flame changed after the elimination."\n\n"It remembers every person who leaves."'
+});
+choices('<button class="dayFiveButton" onclick="dayFiveShrineTalk()">💎 Examine the new mark</button>'+backMap());
+}else{
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The Shrine is empty without Maya.\n\nA new dark mark has appeared beneath the Crystal Flame.'
+});
+choices('<button class="dayFiveButton" onclick="dayFiveShrineTalk()">💎 Examine the new mark</button>'+backMap());
+}
+return;
+}
+
+if(loc==='cove'){
+showEmpty('🌙 Moonlight Cove','The cove is quiet. A single set of footprints disappears into the water.','beach');
+return;
+}
+
+if(loc==='jungle'){
+showEmpty('🌿 Whispering Jungle','The glowing-stone trail has faded since the elimination.','jungle');
+return;
+}
+
+if(loc==='gym'){
+showEmpty('💪 Gym','The gym is unusually quiet this morning.','villa');
+return;
+}
+
+if(loc==='kitchen'){
+showEmpty('🍳 Kitchen','Breakfast has been prepared, but one seat remains empty.','villa');
+return;
+}
+
+if(loc==='volcano'){
+showEmpty('🌋 Volcano Peak','The message on the gate now reads: "Every choice requires a sacrifice."','volcano');
+return;
+}
+
+showEmpty('Flame Cay','The island feels different after the elimination.','villa');
+}
+
+function dayFivePartnerTalk(){
+if(actionAlreadyUsed())return;
+
+relationships[coupledWith]+=2;
+couplingRomance++;
+couplingTrust++;
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:'You tell your partner the truth about how difficult the elimination felt.\n\nYour partner listens without interrupting.\n\n"Thank you for trusting me."\n\n❤️ Partner Connection +2\n💕 Couple Romance +1\n💚 Couple Trust +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveSavedTalk(){
+if(actionAlreadyUsed())return;
+
+relationships[savedPerson]+=3;
+addFriendshipPoint(savedPerson);
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:savedPerson,
+background:'beach',
+text:'You tell '+characters[savedPerson].name+' that saving them was not an easy decision.\n\n"I will prove that you made the right choice."\n\n❤️ Connection +3\n🤝 Friendship +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveValentinaTalk(choice){
+if(actionAlreadyUsed())return;
+
+let result='';
+
+if(choice==='boundaries'){
+relationships[coupledWith]+=2;
+couplingTrust++;
+relationships.valentina+=1;
+valentinaStats.boldness++;
+result='You tell Valentina that your current couple deserves respect.\n\nShe smiles, but does not look discouraged.\n\n❤️ Partner Connection +2\n💚 Couple Trust +1\n❤️ Valentina Connection +1\n🔥 Valentina Boldness +1';
+}else if(choice==='friendly'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+result='You listen without making any promises.\n\nValentina appreciates your honesty.\n\n❤️ Valentina Connection +2\n🤝 Valentina Friendship +2';
+}else{
+relationships.valentina+=3;
+valentinaStats.romance+=2;
+couplingTrust=Math.max(0,couplingTrust-1);
+result='You admit that you are still curious about her.\n\nValentina moves closer with a confident smile.\n\n❤️ Valentina Connection +3\n💕 Valentina Romance +2\n💚 Couple Trust -1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'valentina',
+background:'beach',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveUpsetTalk(choice){
+if(actionAlreadyUsed())return;
+
+const upsetPerson=getUpsetIslander();
+let result='';
+
+if(choice==='apologize'){
+relationships[upsetPerson]+=2;
+addFriendshipPoint(upsetPerson);
+result='You explain that the elimination decision was painful and that you never wanted anyone to feel forgotten.\n\n'+characters[upsetPerson].name+' slowly nods.\n\n❤️ Connection +2\n🤝 Friendship +1';
+}else{
+relationships[upsetPerson]+=1;
+result='You explain that you made the decision you believed was right.\n\n'+characters[upsetPerson].name+' respects your honesty, even if they disagree.\n\n❤️ Connection +1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:upsetPerson,
+background:'villa',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveShrineTalk(){
+if(actionAlreadyUsed())return;
+
+mayaStats.mystery++;
+completeAction();
+updateRelationships();
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 1.6.0 COMPLETE\n\nYou completed the First Elimination.\n\nSaved: '+savedName+'\nEliminated: '+eliminatedName+'\n\nThe next morning begins in Version 1.6.1.'
+text:'The dark mark forms the shape of a broken circle.\n\nA whisper moves through the Shrine:\n\n"Those who leave are never fully forgotten."\n\n🔥 Mystery +1\n\n✅ Activity complete.'
 });
 
-choices('<button onclick="showEliminationSummary()">🔥 View Elimination Summary</button>');
+showCompletedButtons();
 }
 
-function showEliminationSummary(){
-const riskNames=atRisk.map(person=>characters[person].name).join(', ');
+function showVersionComplete(){
+const partnerName=characters[coupledWith].name;
+const savedName=characters[savedPerson].name;
+const eliminatedName=characters[eliminatedPerson].name;
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'✅ VERSION 1.6.1 COMPLETE\n\nYou finished the morning after the elimination.\n\nPartner: '+partnerName+'\nSaved Islander: '+savedName+'\nEliminated Islander: '+eliminatedName+'\n\nValentina’s first date choice begins next in Version 1.7.0.'
+});
+
+choices('<button onclick="showDayFiveSummary()">☀️ View Day 5 Summary</button><button onclick="openIslandMap()">🗺️ Return to Day 5 Morning</button>');
+}
+
+function showDayFiveSummary(){
+const upsetPerson=getUpsetIslander();
 
 showScene({
 speaker:'host',
 background:'night',
-text:'🔥 ELIMINATION SUMMARY\n\nBottom Three: '+riskNames+'\n\nSaved by You: '+characters[savedPerson].name+'\nEliminated: '+characters[eliminatedPerson].name+'\n\nYour decision will affect future friendships, trust, and drama.'
+text:'☀️ DAY 5 MORNING SUMMARY\n\nOfficial Partner: '+characters[coupledWith].name+'\nSaved Islander: '+characters[savedPerson].name+'\nEliminated Islander: '+characters[eliminatedPerson].name+'\nVilla tension: '+characters[upsetPerson].name+'\nValentina Connection: '+relationships.valentina+'\n\nYour choices will shape Valentina’s first date.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
