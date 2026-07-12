@@ -55,6 +55,10 @@ background:#fff;
 .stayButton{background:linear-gradient(90deg,#11998e,#38ef7d)}
 .singleButton{background:linear-gradient(90deg,#555,#222)}
 .recouplingCard{border-left-color:#d7265e;background:rgba(255,247,252,.98)}
+.falloutButton{background:linear-gradient(90deg,#f7971e,#ffd200)}
+.argumentButton{background:linear-gradient(90deg,#c31432,#240b36)}
+.peaceButton{background:linear-gradient(90deg,#56ab2f,#a8e063)}
+.falloutCard{border-left-color:#f7971e;background:rgba(255,251,240,.98)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -68,7 +72,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.4.0 — Casa Recoupling Ceremony</strong></p>
+<p><strong>Version 2.5.0 — Fallout Day</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -151,7 +155,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.4.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='';
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.5.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -256,7 +260,10 @@ casaComplete,
 recouplingChoice,
 recouplingPartnerChoice,
 recouplingComplete,
-previousPartner
+previousPartner,
+falloutStarted,
+falloutChoice,
+falloutComplete
 };
 }
 
@@ -308,6 +315,9 @@ recouplingChoice=data.recouplingChoice||'';
 recouplingPartnerChoice=data.recouplingPartnerChoice||'';
 recouplingComplete=Boolean(data.recouplingComplete);
 previousPartner=data.previousPartner||'';
+falloutStarted=Boolean(data.falloutStarted);
+falloutChoice=data.falloutChoice||'';
+falloutComplete=Boolean(data.falloutComplete);
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -476,13 +486,23 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(falloutComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nFallout Day is complete.'
+});
+choices('<button onclick="showVersionComplete()">🔥 View Fallout Results</button>');
+return;
+}
+
 if(recouplingComplete){
 showScene({
 speaker:'narrator',
 background:'night',
 text:'💾 SAVE LOADED\n\nThe Casa Recoupling Ceremony is complete.'
 });
-choices('<button onclick="showVersionComplete()">🔥 View Recoupling Results</button>');
+choices('<button onclick="startFalloutDay()">☀️ Continue to Fallout Day</button>');
 return;
 }
 
@@ -584,7 +604,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -2730,7 +2750,287 @@ background:'crystal',
 text:text+'\n\n"The Casa Recoupling is complete."\n\n"Tomorrow, every decision will have consequences."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 2.4.0</button>');
+choices('<button class="falloutButton" onclick="startFalloutDay()">☀️ Continue to Fallout Day</button>');
+}
+
+function startFalloutDay(){
+if(falloutComplete){
+showVersionComplete();
+return;
+}
+
+falloutStarted=true;
+currentDay=6;
+currentTime='Morning';
+actionUsed=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+let opening='';
+
+if(recouplingChoice==='stay'&&recouplingPartnerChoice==='stay'){
+opening='You and '+characters[previousPartner].name+' survived Casa together.\n\nBut the rest of the villa is full of broken couples.';
+}else if(coupledWith){
+opening='You wake up beside '+characters[coupledWith].name+'.\n\nYour former partner is only a few rooms away.';
+}else{
+opening='You wake up single after the Casa Recoupling.\n\nEvery conversation feels more important now.';
+}
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'📅 Day 6\n☀️ Fallout Morning\n\n'+opening+'\n\n⭐ Choose one major conversation.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutChoices()">🔥 Begin Fallout Day</button>');
+}
+
+function showFalloutChoices(){
+const formerName=characters[previousPartner].name;
+const currentName=coupledWith&&characters[coupledWith]?characters[coupledWith].name:'No current partner';
+
+let html='<div class="card falloutCard"><h3>🔥 Fallout Conversations</h3>';
+
+if(previousPartner&&previousPartner!==coupledWith){
+html+='<button class="argumentButton" onclick="chooseFalloutScene(\'former\')">💔 Talk to Former Partner: '+formerName+'</button>';
+}
+
+if(coupledWith){
+html+='<button class="peaceButton" onclick="chooseFalloutScene(\'current\')">❤️ Talk to Current Partner: '+currentName+'</button>';
+}
+
+html+='<button class="falloutButton" onclick="chooseFalloutScene(\'valentina\')">💃 Confront Valentina</button>';
+html+='<button onclick="chooseFalloutScene(\'friends\')">🤝 Talk to the Villa</button>';
+html+='</div>';
+
+showScene({
+speaker:'host',
+background:'villa',
+text:'"Casa is over, but the consequences are just beginning."\n\n"Choose who you need to face first."'
+});
+
+choices(html);
+}
+
+function chooseFalloutScene(choice){
+if(falloutChoice)return;
+falloutChoice=choice;
+
+if(choice==='former'){
+showFormerPartnerFallout();
+return;
+}
+
+if(choice==='current'){
+showCurrentPartnerFallout();
+return;
+}
+
+if(choice==='valentina'){
+showValentinaFallout();
+return;
+}
+
+showFriendshipFallout();
+}
+
+function showFormerPartnerFallout(){
+const formerName=characters[previousPartner].name;
+
+showScene({
+speaker:previousPartner,
+background:'villa',
+text:formerName+' waits near the Fire Pit.\n\n"Was any of our relationship real to you?"'
+});
+
+choices(
+'<button class="peaceButton" onclick="finishFormerFallout(\'apologize\')">🤝 Apologize honestly</button>'+
+'<button class="argumentButton" onclick="finishFormerFallout(\'defend\')">🔥 Defend your choice</button>'+
+'<button onclick="finishFormerFallout(\'closure\')">🌙 Ask for peaceful closure</button>'
+);
+}
+
+function finishFormerFallout(choice){
+let result='';
+
+if(choice==='apologize'){
+relationships[previousPartner]+=3;
+result='You admit that your decision hurt them and that they deserved honesty.\n\n❤️ Former Partner Connection +3';
+}else if(choice==='defend'){
+relationships[previousPartner]-=1;
+result='You explain that Casa changed your feelings and that you refuse to pretend otherwise.\n\n💔 Former Partner Connection -1';
+}else{
+relationships[previousPartner]+=2;
+result='You both agree that the relationship mattered, even if it is over.\n\n❤️ Former Partner Connection +2';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:previousPartner,
+background:'villa',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showCurrentPartnerFallout(){
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:characters[coupledWith].name+' looks nervous.\n\n"Everyone thinks our new couple will fail."\n\n"Do you believe in us?"'
+});
+
+choices(
+'<button class="peaceButton" onclick="finishCurrentFallout(\'commit\')">❤️ Commit to the new couple</button>'+
+'<button class="falloutButton" onclick="finishCurrentFallout(\'slow\')">💬 Say you need time</button>'+
+'<button class="argumentButton" onclick="finishCurrentFallout(\'doubt\')">💔 Admit you have doubts</button>'
+);
+}
+
+function finishCurrentFallout(choice){
+let result='';
+
+if(choice==='commit'){
+relationships[coupledWith]+=4;
+couplingRomance+=3;
+couplingTrust+=2;
+result='You promise to give the new relationship a real chance.\n\n❤️ Partner Connection +4\n💕 Couple Romance +3\n💚 Couple Trust +2';
+}else if(choice==='slow'){
+relationships[coupledWith]+=2;
+couplingTrust+=1;
+result='You ask to move carefully instead of forcing something too quickly.\n\n❤️ Partner Connection +2\n💚 Couple Trust +1';
+}else{
+relationships[coupledWith]-=1;
+couplingTrust=Math.max(0,couplingTrust-2);
+result='You admit that the recoupling may have been an emotional decision.\n\n💔 Partner Connection -1\n💚 Couple Trust -2';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showValentinaFallout(){
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:'Valentina waits beside the pool.\n\n"Everyone is blaming me for couples breaking apart."\n\n"But nobody forced anyone to make a choice."'
+});
+
+choices(
+'<button class="argumentButton" onclick="finishValentinaFallout(\'blame\')">🔥 Blame her for the chaos</button>'+
+'<button class="peaceButton" onclick="finishValentinaFallout(\'fair\')">🤝 Admit everyone made their own choices</button>'+
+'<button class="falloutButton" onclick="finishValentinaFallout(\'flirt\')">😏 Say the drama was worth it</button>'
+);
+}
+
+function finishValentinaFallout(choice){
+let result='';
+
+if(choice==='blame'){
+relationships.valentina-=2;
+valentinaStats.boldness+=1;
+result='You tell Valentina that she enjoyed creating chaos.\n\nShe refuses to apologize.\n\n💔 Valentina Connection -2\n🔥 Boldness +1';
+}else if(choice==='fair'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+result='You admit that everyone made their own decisions.\n\nValentina respects your fairness.\n\n❤️ Valentina Connection +2\n🤝 Friendship +2';
+}else{
+relationships.valentina+=4;
+valentinaStats.romance+=3;
+if(coupledWith)couplingTrust=Math.max(0,couplingTrust-1);
+result='You tell Valentina that the tension made everything more exciting.\n\nShe smiles.\n\n❤️ Valentina Connection +4\n💕 Valentina Romance +3\n💚 Couple Trust -1';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showFriendshipFallout(){
+const friend=getFalloutFriend();
+
+showScene({
+speaker:friend,
+background:'villa',
+text:characters[friend].name+' pulls you aside.\n\n"The villa is splitting into sides."\n\n"If we do not calm things down, the next challenge will destroy someone."'
+});
+
+choices(
+'<button class="peaceButton" onclick="finishFriendshipFallout(\'peace\')">🤝 Help calm the villa</button>'+
+'<button class="falloutButton" onclick="finishFriendshipFallout(\'observe\')">👀 Stay out of the drama</button>'
+);
+}
+
+function getFalloutFriend(){
+const order=['maya','noah','sofia','isabella','lucas','kai','ethan','lisa'];
+return order.find(person=>person!==eliminatedPerson&&person!==coupledWith&&person!==previousPartner)||'valentina';
+}
+
+function finishFriendshipFallout(choice){
+const friend=getFalloutFriend();
+let result='';
+
+if(choice==='peace'){
+relationships[friend]+=3;
+addFriendshipPoint(friend);
+result='You agree to help stop the villa from turning against itself.\n\n❤️ Connection +3\n🤝 Friendship +1';
+}else{
+relationships[friend]+=1;
+result='You decide to watch carefully before choosing a side.\n\n❤️ Connection +1';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:friend,
+background:'villa',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showFalloutAftermath(){
+let status='';
+
+if(coupledWith){
+status='Current Partner: '+characters[coupledWith].name;
+}else{
+status='Current Status: Single';
+}
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Crystal Flame glows above the villa.\n\n"Fallout reveals the truth faster than romance."\n\n'+status+'\n\n"Tomorrow, every couple will face a Compatibility Challenge."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 2.5.0</button>');
 }
 
 function showVersionComplete(){
@@ -2743,29 +3043,24 @@ autoSaveGame();
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.4.0 COMPLETE\n\nThe Casa Recoupling Ceremony is complete.\n\nPrevious Partner: '+characters[previousPartner].name+'\nCurrent Partner: '+currentPartner+'\nYour Choice: '+formatRecouplingChoice(recouplingChoice)+'\nFormer Partner Choice: '+formatPartnerRecouplingChoice(recouplingPartnerChoice)+'\n\nThe Fallout Day begins next in Version 2.5.0.'
+text:'✅ VERSION 2.5.0 COMPLETE\n\nFallout Day is complete.\n\nCurrent Partner: '+currentPartner+'\nFallout Choice: '+formatFalloutChoice(falloutChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe Compatibility Challenge begins next in Version 2.6.0.'
 });
 
 choices(
-'<button onclick="showRecouplingSummary()">🔥 View Recoupling Summary</button>'+
+'<button onclick="showFalloutSummary()">🔥 View Fallout Summary</button>'+
 '<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function formatRecouplingChoice(choice){
-if(choice==='stay')return 'Stayed loyal';
-if(choice==='single')return 'Returned single';
-if(choice&&characters[choice])return 'Recoupled with '+characters[choice].name;
-return 'Not decided';
+function formatFalloutChoice(choice){
+if(choice==='former')return 'Faced former partner';
+if(choice==='current')return 'Strengthened current couple';
+if(choice==='valentina')return 'Confronted Valentina';
+if(choice==='friends')return 'Handled villa friendships';
+return 'Not chosen';
 }
 
-function formatPartnerRecouplingChoice(choice){
-if(choice==='stay')return 'Stayed loyal';
-if(choice==='new')return 'Chose a new connection';
-return 'Unknown';
-}
-
-function showRecouplingSummary(){
+function showFalloutSummary(){
 const currentPartner=coupledWith&&characters[coupledWith]
 ?characters[coupledWith].name
 :'Single';
@@ -2773,7 +3068,7 @@ const currentPartner=coupledWith&&characters[coupledWith]
 showScene({
 speaker:'host',
 background:'night',
-text:'🔥 CASA RECOUPLING SUMMARY\n\nPrevious Partner: '+characters[previousPartner].name+'\nCurrent Partner: '+currentPartner+'\nYour Choice: '+formatRecouplingChoice(recouplingChoice)+'\nFormer Partner Choice: '+formatPartnerRecouplingChoice(recouplingPartnerChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe villa will react tomorrow.'
+text:'🔥 FALLOUT DAY SUMMARY\n\nCurrent Partner: '+currentPartner+'\nFormer Partner: '+characters[previousPartner].name+'\nMain Conversation: '+formatFalloutChoice(falloutChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nValentina Connection: '+relationships.valentina+'\n\nThe villa is ready for its next test.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
