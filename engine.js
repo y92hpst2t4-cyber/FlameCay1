@@ -1,35 +1,5338 @@
-function goBeach(){
-  relationships.kai++;
+'use strict';
 
-  showScene({
-    speaker:"kai",
-    background:"beach",
-    text:"You walk down to the beach.\n\nKai is standing near the shoreline, watching the waves.\n\n\"Good choice,\" he says with a grin.\n\n\"The ocean always tells the truth.\""
-  });
+// The Island of Flames
+// Version 3.5.0c — Engine refactor
+// This file currently contains the complete game engine, story flow,
+// save system, challenges, UI functions, and event logic.
+// Later refactor steps will split those systems into smaller modules.
 
-  updateRelationships();
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='3.5.0c',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false,secondEliminationStarted=false,secondEliminationSaved='',secondEliminatedPerson='',secondEliminationComplete=false,finalWeekStarted=false,familyMessageChoice='',finalWeekChoice='',finalWeekComplete=false,finalDateStarted=false,finalDatePartner='',finalDateChoice='',finalDatePromise='',finalDateComplete=false,finaleStarted=false,finalSpeechChoice='',finaleScore=0,finaleEnding='',finaleWinner=false,keeperChosen=false,finaleComplete=false,villaLifeVisits=0,villaLifeEventIndex=0,villaLifeLastLocation='',villaLifeGossip=[],villaLifeMemories={},attractionStats={},jealousyStats={},characterMoods={},playerReputation=0,reputationHistory=[],relationshipHistory=[],storyFlags={},choiceHistory=[],pendingConsequences=[],resolvedConsequences=[];
+let menuBackground='villa',menuBack='openIslandMap';
+
+// Character data loaded from characters.js
+
+
+
+
+const portraitCache={};
+
+function preloadPortraits(){
+Object.entries(characters).forEach(([key,character])=>{
+if(!character.image)return;
+const img=new Image();
+img.src=character.image;
+portraitCache[key]=img;
+});
 }
 
-function goVilla(){
-  relationships.lucas++;
+const introDialogue=[
+{speaker:'narrator',background:'arrival',text:'🔥 THE ISLAND OF FLAMES\n\nSeason 1\nEpisode 1 — The Arrival'},
+{speaker:'narrator',background:'arrival',text:'The sun rises over the ocean.\n\nYour boat moves toward Flame Cay.'},
+{speaker:'host',background:'arrival',text:'Welcome... to The Island of Flames.\n\nTwenty singles. One island. One unforgettable summer.'},
+{speaker:'lucas',background:'villa',text:"Hey!\n\nI'm Lucas. Welcome to Flame Cay."},
+{speaker:'kai',background:'villa',text:'Kai flashes a confident smile.\n\n"I came here to win... and maybe fall in love along the way."'},
+{speaker:'isabella',background:'villa',text:'Isabella walks in with a bright smile.\n\n"I came here for good vibes... and maybe something real."'},
+{speaker:'ethan',background:'villa',text:"I'm Ethan Brooks.\n\nI don't chase attention. I earn respect."},
+{speaker:'sofia',background:'villa',text:"Hi... I'm Sofia.\n\nI'm here to find something real."},
+{speaker:'noah',background:'villa',text:'Noah gives you a warm smile.\n\n"Finding love might be my toughest challenge yet."'},
+{speaker:'lisa',background:'villa',text:'Lisa enters with a confident smile.\n\n"I might steal a few hearts."'},
+{speaker:'maya',background:'villa',text:"I'm Maya.\n\nThere's something strange about this island..."},
+{speaker:'narrator',background:'crystal',text:'Deep inside the jungle...\n\nThe Crystal Flame begins to glow.'},
+{speaker:'narrator',background:'villa',text:'Your first day begins now.\n\nChoose one main activity during each part of the day.'}
+];
 
-  showScene({
-    speaker:"lucas",
-    background:"villa",
-    text:"You step into the villa lounge.\n\nLucas looks up and smiles.\n\n\"I was hoping you'd come in here,\" he says.\n\nThe villa suddenly feels a little warmer."
-  });
+const locationNames={volcano:'Volcano Peak',jungle:'Whispering Jungle',shrine:'Crystal Shrine',beach:'Arrival Beach',villa:'Main Villa',gym:'Gym',kitchen:'Kitchen',pool:'Infinity Pool',firepit:'Fire Pit',cove:'Moonlight Cove'};
 
-  updateRelationships();
+const SAVE_PREFIX='islandOfFlames_slot_';
+const AUTO_SAVE_KEY='islandOfFlames_autoSave';
+
+function getSaveData(){
+return{
+saveVersion,
+savedAt:new Date().toISOString(),
+playerName,
+dialogueIndex,
+currentLocation,
+currentDay,
+currentTime,
+actionUsed,
+eveningEventDone,
+relationships,
+lucasStats,
+mayaStats,
+kaiStats,
+isabellaStats,
+ethanStats,
+sofiaStats,
+noahStats,
+lisaStats,
+valentinaStats,
+coupledWith,
+couplingRomance,
+couplingTrust,
+ceremonyComplete,
+challengeScore,
+challengeQuestion,
+challengeComplete,
+bombshellChoice,
+bombshellComplete,
+eliminationComplete,
+eliminatedPerson,
+savedPerson,
+atRisk,
+dateInvitee,
+dateChoice,
+dateComplete,
+casaStarted,
+casaChoice,
+casaPartnerReaction,
+casaComplete,
+recouplingChoice,
+recouplingPartnerChoice,
+recouplingComplete,
+previousPartner,
+falloutStarted,
+falloutChoice,
+falloutComplete,
+compatibilityStarted,
+compatibilityScore,
+compatibilityQuestion,
+compatibilityPartner,
+compatibilityComplete,
+luxuryDateStarted,
+luxuryDateChoice,
+luxuryDateResult,
+luxuryDateComplete,
+secretVoteStarted,
+secretVoteChoice,
+secretVoteResult,
+secretVoteComplete,
+secondEliminationStarted,
+secondEliminationSaved,
+secondEliminatedPerson,
+secondEliminationComplete,
+finalWeekStarted,
+familyMessageChoice,
+finalWeekChoice,
+finalWeekComplete,
+finalDateStarted,
+finalDatePartner,
+finalDateChoice,
+finalDatePromise,
+finalDateComplete,
+finaleStarted,
+finalSpeechChoice,
+finaleScore,
+finaleEnding,
+finaleWinner,
+keeperChosen,
+finaleComplete,
+villaLifeVisits,
+villaLifeEventIndex,
+villaLifeLastLocation,
+villaLifeGossip,
+villaLifeMemories,
+attractionStats,
+jealousyStats,
+characterMoods,
+playerReputation,
+reputationHistory,
+relationshipHistory,
+storyFlags,
+choiceHistory,
+pendingConsequences,
+resolvedConsequences
+};
 }
 
-function goShrine(){
-  relationships.maya++;
+function applySaveData(data){
+playerName=data.playerName||'Player';
+dialogueIndex=Number(data.dialogueIndex||0);
+currentLocation=data.currentLocation||'villa';
+currentDay=Number(data.currentDay||1);
+currentTime=data.currentTime||'Morning';
+actionUsed=Boolean(data.actionUsed);
+eveningEventDone=Boolean(data.eveningEventDone);
 
-  showScene({
-    speaker:"maya",
-    background:"crystal",
-    text:"You follow Maya toward the Crystal Shrine.\n\nShe studies the glowing symbols carefully.\n\n\"These markings are older than the villa,\" she whispers.\n\n\"And I think they were waiting for you.\""
-  });
+relationships=Object.assign(
+{lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0},
+data.relationships||{}
+);
 
-  updateRelationships();
+lucasStats=Object.assign({friendship:0,romance:0,trust:0},data.lucasStats||{});
+mayaStats=Object.assign({friendship:0,trust:0,mystery:0},data.mayaStats||{});
+kaiStats=Object.assign({friendship:0,romance:0,competition:0},data.kaiStats||{});
+isabellaStats=Object.assign({friendship:0,romance:0,social:0},data.isabellaStats||{});
+ethanStats=Object.assign({friendship:0,romance:0,strategy:0},data.ethanStats||{});
+sofiaStats=Object.assign({friendship:0,romance:0,openness:0},data.sofiaStats||{});
+noahStats=Object.assign({friendship:0,romance:0,courage:0},data.noahStats||{});
+lisaStats=Object.assign({friendship:0,romance:0,honesty:0},data.lisaStats||{});
+valentinaStats=Object.assign({friendship:0,romance:0,boldness:0},data.valentinaStats||{});
+
+coupledWith=data.coupledWith||'';
+couplingRomance=Number(data.couplingRomance||0);
+couplingTrust=Number(data.couplingTrust||0);
+ceremonyComplete=Boolean(data.ceremonyComplete);
+challengeScore=Number(data.challengeScore||0);
+challengeQuestion=Number(data.challengeQuestion||0);
+challengeComplete=Boolean(data.challengeComplete);
+bombshellChoice=data.bombshellChoice||'';
+bombshellComplete=Boolean(data.bombshellComplete);
+eliminationComplete=Boolean(data.eliminationComplete);
+eliminatedPerson=data.eliminatedPerson||'';
+savedPerson=data.savedPerson||'';
+atRisk=Array.isArray(data.atRisk)?data.atRisk:[];
+dateInvitee=data.dateInvitee||'';
+dateChoice=data.dateChoice||'';
+dateComplete=Boolean(data.dateComplete);
+casaStarted=Boolean(data.casaStarted);
+casaChoice=data.casaChoice||'';
+casaPartnerReaction=data.casaPartnerReaction||'';
+casaComplete=Boolean(data.casaComplete);
+recouplingChoice=data.recouplingChoice||'';
+recouplingPartnerChoice=data.recouplingPartnerChoice||'';
+recouplingComplete=Boolean(data.recouplingComplete);
+previousPartner=data.previousPartner||'';
+falloutStarted=Boolean(data.falloutStarted);
+falloutChoice=data.falloutChoice||'';
+falloutComplete=Boolean(data.falloutComplete);
+compatibilityStarted=Boolean(data.compatibilityStarted);
+compatibilityScore=Number(data.compatibilityScore||0);
+compatibilityQuestion=Number(data.compatibilityQuestion||0);
+compatibilityPartner=data.compatibilityPartner||'';
+compatibilityComplete=Boolean(data.compatibilityComplete);
+luxuryDateStarted=Boolean(data.luxuryDateStarted);
+luxuryDateChoice=data.luxuryDateChoice||'';
+luxuryDateResult=data.luxuryDateResult||'';
+luxuryDateComplete=Boolean(data.luxuryDateComplete);
+secretVoteStarted=Boolean(data.secretVoteStarted);
+secretVoteChoice=data.secretVoteChoice||'';
+secretVoteResult=data.secretVoteResult||'';
+secretVoteComplete=Boolean(data.secretVoteComplete);
+secondEliminationStarted=Boolean(data.secondEliminationStarted);
+secondEliminationSaved=data.secondEliminationSaved||'';
+secondEliminatedPerson=data.secondEliminatedPerson||'';
+secondEliminationComplete=Boolean(data.secondEliminationComplete);
+finalWeekStarted=Boolean(data.finalWeekStarted);
+familyMessageChoice=data.familyMessageChoice||'';
+finalWeekChoice=data.finalWeekChoice||'';
+finalWeekComplete=Boolean(data.finalWeekComplete);
+finalDateStarted=Boolean(data.finalDateStarted);
+finalDatePartner=data.finalDatePartner||'';
+finalDateChoice=data.finalDateChoice||'';
+finalDatePromise=data.finalDatePromise||'';
+finalDateComplete=Boolean(data.finalDateComplete);
+finaleStarted=Boolean(data.finaleStarted);
+finalSpeechChoice=data.finalSpeechChoice||'';
+finaleScore=Number(data.finaleScore||0);
+finaleEnding=data.finaleEnding||'';
+finaleWinner=Boolean(data.finaleWinner);
+keeperChosen=Boolean(data.keeperChosen);
+finaleComplete=Boolean(data.finaleComplete);
+villaLifeVisits=Number(data.villaLifeVisits||0);
+villaLifeEventIndex=Number(data.villaLifeEventIndex||0);
+villaLifeLastLocation=data.villaLifeLastLocation||'';
+villaLifeGossip=Array.isArray(data.villaLifeGossip)?data.villaLifeGossip:[];
+villaLifeMemories=(data.villaLifeMemories&&typeof data.villaLifeMemories==='object')?data.villaLifeMemories:{};
+attractionStats=(data.attractionStats&&typeof data.attractionStats==='object')?data.attractionStats:{};
+jealousyStats=(data.jealousyStats&&typeof data.jealousyStats==='object')?data.jealousyStats:{};
+characterMoods=(data.characterMoods&&typeof data.characterMoods==='object')?data.characterMoods:{};
+playerReputation=Number(data.playerReputation||0);
+reputationHistory=Array.isArray(data.reputationHistory)?data.reputationHistory:[];
+relationshipHistory=Array.isArray(data.relationshipHistory)?data.relationshipHistory:[];
+storyFlags=(data.storyFlags&&typeof data.storyFlags==='object')?data.storyFlags:{};
+choiceHistory=Array.isArray(data.choiceHistory)?data.choiceHistory:[];
+pendingConsequences=Array.isArray(data.pendingConsequences)?data.pendingConsequences:[];
+resolvedConsequences=Array.isArray(data.resolvedConsequences)?data.resolvedConsequences:[];
+initializeRelationshipSystem();
+initializeChoiceConsequences();
+lastSaveTime=data.savedAt||'';
+
+q('playerName').value=playerName;
+q('menu').classList.add('hidden');
+q('game').classList.remove('hidden');
+q('welcome').textContent='Welcome back to Flame Cay, '+playerName+'!';
+q('continueButton').style.display='none';
+
+updateTimeDisplay();
+updateRelationships();
+updateVillaLifeStatus();
+resumeSavedProgress();
 }
+
+function saveGame(slot,showMessage=true){
+try{
+const data=getSaveData();
+localStorage.setItem(SAVE_PREFIX+slot,JSON.stringify(data));
+localStorage.setItem(AUTO_SAVE_KEY,JSON.stringify(data));
+currentSaveSlot=slot;
+lastSaveTime=data.savedAt;
+
+if(showMessage&&q('saveStatus')){
+q('saveStatus').textContent='✅ Saved to Slot '+slot+' — '+formatSaveDate(data.savedAt);
+}
+
+refreshSaveMenus();
+}catch(error){
+if(q('saveStatus')){
+q('saveStatus').textContent='❌ Save failed. Your browser may have storage disabled.';
+}
+}
+}
+
+function autoSaveGame(){
+try{
+const data=getSaveData();
+localStorage.setItem(AUTO_SAVE_KEY,JSON.stringify(data));
+lastSaveTime=data.savedAt;
+refreshContinueButton();
+}catch(error){}
+}
+
+function loadGame(slot){
+try{
+const raw=localStorage.getItem(SAVE_PREFIX+slot);
+if(!raw)return;
+currentSaveSlot=slot;
+closeLoadMenu();
+closeInGameLoadMenu();
+applySaveData(JSON.parse(raw));
+}catch(error){
+alert('This save file could not be loaded.');
+}
+}
+
+function continueLatestSave(){
+try{
+const raw=localStorage.getItem(AUTO_SAVE_KEY);
+if(!raw)return;
+currentSaveSlot=0;
+applySaveData(JSON.parse(raw));
+}catch(error){
+alert('The latest save could not be loaded.');
+}
+}
+
+function deleteSave(slot){
+try{
+localStorage.removeItem(SAVE_PREFIX+slot);
+refreshSaveMenus();
+refreshContinueButton();
+}catch(error){}
+}
+
+function formatSaveDate(iso){
+if(!iso)return 'Unknown time';
+const date=new Date(iso);
+if(Number.isNaN(date.getTime()))return 'Unknown time';
+return date.toLocaleString();
+}
+
+function getSaveSummary(data){
+const partner=data.coupledWith&&characters[data.coupledWith]
+?characters[data.coupledWith].name
+:'Not chosen';
+
+const eliminated=data.eliminatedPerson&&characters[data.eliminatedPerson]
+?characters[data.eliminatedPerson].name
+:'None';
+
+return{
+player:data.playerName||'Player',
+day:data.currentDay||1,
+time:data.currentTime||'Morning',
+partner,
+eliminated,
+savedAt:formatSaveDate(data.savedAt)
+};
+}
+
+function buildSaveSlotHtml(slot,inGame=false){
+const raw=localStorage.getItem(SAVE_PREFIX+slot);
+
+if(!raw){
+return '<div class="slotCard"><h3>Save Slot '+slot+'</h3><p>Empty slot</p>'+
+(inGame?'<button class="saveButton" onclick="saveGame('+slot+')">💾 Save Here</button>':'')+
+'</div>';
+}
+
+try{
+const data=JSON.parse(raw);
+const summary=getSaveSummary(data);
+
+return '<div class="slotCard">'+
+'<h3>Save Slot '+slot+'</h3>'+
+'<p><strong>'+summary.player+'</strong></p>'+
+'<p>📅 Day '+summary.day+' — '+summary.time+'</p>'+
+'<p>❤️ Partner: '+summary.partner+'</p>'+
+'<p>❌ Eliminated: '+summary.eliminated+'</p>'+
+'<p>🕒 '+summary.savedAt+'</p>'+
+'<button class="loadButton" onclick="loadGame('+slot+')">▶ Load Slot '+slot+'</button>'+
+(inGame?'<button class="saveButton" onclick="saveGame('+slot+')">💾 Overwrite Slot '+slot+'</button>':'')+
+'<button class="deleteButton" onclick="deleteSave('+slot+')">🗑️ Delete Slot '+slot+'</button>'+
+'</div>';
+}catch(error){
+return '<div class="slotCard"><h3>Save Slot '+slot+'</h3><p>Save data is damaged.</p>'+
+'<button class="deleteButton" onclick="deleteSave('+slot+')">🗑️ Delete Slot</button></div>';
+}
+}
+
+function refreshSaveMenus(){
+if(q('loadSlotList')){
+q('loadSlotList').innerHTML=[1,2,3].map(slot=>buildSaveSlotHtml(slot,false)).join('');
+}
+if(q('inGameLoadSlotList')){
+q('inGameLoadSlotList').innerHTML=[1,2,3].map(slot=>buildSaveSlotHtml(slot,true)).join('');
+}
+refreshContinueButton();
+}
+
+function refreshContinueButton(){
+const hasAutoSave=Boolean(localStorage.getItem(AUTO_SAVE_KEY));
+if(q('continueGameButton')){
+q('continueGameButton').classList.toggle('hidden',!hasAutoSave);
+}
+}
+
+function openLoadMenu(){
+refreshSaveMenus();
+q('loadMenu').classList.remove('hidden');
+}
+
+function closeLoadMenu(){
+q('loadMenu').classList.add('hidden');
+}
+
+function openInGameLoadMenu(){
+refreshSaveMenus();
+q('inGameLoadMenu').classList.remove('hidden');
+}
+
+function closeInGameLoadMenu(){
+q('inGameLoadMenu').classList.add('hidden');
+}
+
+function resumeSavedProgress(){
+['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
+
+if(finaleComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nSeason 1 is complete.'
+});
+choices('<button onclick="showVersionComplete()">🏆 View Grand Finale Ending</button>');
+return;
+}
+
+if(finalDateComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Final Date is complete.'
+});
+choices('<button onclick="startGrandFinale()">🏆 Continue to Grand Finale</button>');
+return;
+}
+
+if(finalWeekComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nFinal Week has begun.'
+});
+choices('<button onclick="startFinalDates()">🌅 Continue to Final Dates</button>');
+return;
+}
+
+if(secondEliminationComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Second Elimination is complete.'
+});
+choices('<button onclick="startFinalWeek()">🌅 Continue to Final Week</button>');
+return;
+}
+
+if(secretVoteComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Secret Vote is complete.'
+});
+choices('<button onclick="startSecondElimination()">🔥 Continue to Second Elimination</button>');
+return;
+}
+
+if(luxuryDateComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Luxury Date is complete.'
+});
+choices('<button onclick="startSecretVote()">🗳️ Continue to Secret Vote</button>');
+return;
+}
+
+if(compatibilityComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Compatibility Challenge is complete.'
+});
+choices('<button onclick="startLuxuryDate()">🌅 Continue to Luxury Date</button>');
+return;
+}
+
+if(falloutComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nFallout Day is complete.'
+});
+choices('<button onclick="startCompatibilityChallenge()">🏆 Continue to Compatibility Challenge</button>');
+return;
+}
+
+if(recouplingComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Casa Recoupling Ceremony is complete.'
+});
+choices('<button onclick="startFalloutDay()">☀️ Continue to Fallout Day</button>');
+return;
+}
+
+if(casaComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Casa-style loyalty test is complete.'
+});
+choices('<button onclick="startCasaRecoupling()">🔥 Continue to Casa Recoupling</button>');
+return;
+}
+
+if(dateComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nValentina’s first date is complete.'
+});
+choices('<button onclick="startCasaDrama()">🏝️ Continue to the Casa Twist</button>');
+return;
+}
+
+if(currentDay>=5&&eliminationComplete){
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+'\n\nYour progress has been restored.'
+});
+choices('<button onclick="openIslandMap()">🗺️ Continue Day '+currentDay+'</button>');
+return;
+}
+
+if(eliminationComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe first elimination is complete.'
+});
+choices('<button onclick="beginDayFive()">☀️ Continue to Day 5</button>');
+return;
+}
+
+if(bombshellComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nValentina has arrived on Flame Cay.'
+});
+choices('<button onclick="startFirstElimination()">🔥 Continue to the Elimination</button>');
+return;
+}
+
+if(challengeComplete){
+showScene({
+speaker:'narrator',
+background:'afternoon',
+text:'💾 SAVE LOADED\n\nThe First Challenge is complete.'
+});
+choices('<button onclick="startBombshellArrival()">💥 Continue to the Bombshell Arrival</button>');
+return;
+}
+
+if(ceremonyComplete){
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nYou are officially coupled with '+characters[coupledWith].name+'.'
+});
+choices('<button onclick="beginDayFour()">☀️ Continue to Day 4</button>');
+return;
+}
+
+if(currentDay===3){
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nDay 3 Morning has been restored.'
+});
+choices('<button onclick="openIslandMap()">🗺️ Continue Day 3</button>');
+return;
+}
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+' has been restored.'
+});
+choices('<button onclick="openIslandMap()">🗺️ Continue Game</button>');
+}
+
+
+
+
+function initializeChoiceConsequences(){
+const defaults={
+flirtedOutsideCouple:false,
+stayedLoyalToPartner:false,
+sharedPrize:false,
+keptPrize:false,
+savedSomeoneTwice:false,
+choseCrystalMystery:false,
+followedHeart:false,
+gaveInToTemptation:false,
+returnedSingle:false,
+repairedFriendship:false,
+choseFutureTogether:false
+};
+
+Object.keys(defaults).forEach(key=>{
+if(storyFlags[key]===undefined)storyFlags[key]=defaults[key];
+});
+
+updateConsequenceSummary();
+}
+
+function setStoryFlag(flag,value=true,reason=''){
+initializeChoiceConsequences();
+storyFlags[flag]=value;
+
+if(reason){
+choiceHistory.push({
+flag,
+value,
+reason,
+day:currentDay,
+time:currentTime,
+at:new Date().toISOString()
+});
+if(choiceHistory.length>80)choiceHistory.shift();
+}
+
+updateConsequenceSummary();
+}
+
+function hasStoryFlag(flag){
+initializeChoiceConsequences();
+return Boolean(storyFlags[flag]);
+}
+
+function recordChoice(id,label,details='',effects={}){
+initializeChoiceConsequences();
+
+choiceHistory.push({
+id,
+label,
+details,
+effects,
+day:currentDay,
+time:currentTime,
+at:new Date().toISOString()
+});
+
+if(choiceHistory.length>80)choiceHistory.shift();
+updateConsequenceSummary();
+}
+
+function scheduleConsequence(id,title,text,conditionFlag='',delayVisits=1,effects={}){
+initializeChoiceConsequences();
+
+if(pendingConsequences.some(item=>item.id===id)||
+resolvedConsequences.some(item=>item.id===id)){
+return;
+}
+
+pendingConsequences.push({
+id,
+title,
+text,
+conditionFlag,
+delayVisits,
+createdAtVisit:villaLifeVisits,
+effects
+});
+
+updateConsequenceSummary();
+}
+
+function applyConsequenceEffects(effects={}){
+if(effects.reputation)changeReputation(effects.reputation,'Delayed consequence');
+
+if(effects.connection){
+Object.entries(effects.connection).forEach(([person,amount])=>{
+if(relationships[person]!==undefined){
+relationships[person]+=amount;
+recordRelationshipChange(person,'Connection',amount,'Delayed consequence');
+}
+});
+}
+
+if(effects.attraction){
+Object.entries(effects.attraction).forEach(([person,amount])=>{
+changeAttraction(person,amount,'Delayed consequence');
+});
+}
+
+if(effects.jealousy){
+Object.entries(effects.jealousy).forEach(([person,amount])=>{
+changeJealousy(person,amount,'Delayed consequence');
+});
+}
+}
+
+function getReadyConsequences(){
+initializeChoiceConsequences();
+
+return pendingConsequences.filter(item=>{
+const enoughVisits=villaLifeVisits-item.createdAtVisit>=item.delayVisits;
+const flagReady=!item.conditionFlag||hasStoryFlag(item.conditionFlag);
+return enoughVisits&&flagReady;
+});
+}
+
+function triggerNextConsequence(){
+const ready=getReadyConsequences();
+if(ready.length===0)return false;
+
+const item=ready[0];
+pendingConsequences=pendingConsequences.filter(entry=>entry.id!==item.id);
+resolvedConsequences.push({
+...item,
+resolvedDay:currentDay,
+resolvedTime:currentTime,
+resolvedAt:new Date().toISOString()
+});
+
+applyConsequenceEffects(item.effects);
+updateRelationships();
+updateConsequenceSummary();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:currentTime==='Evening'?'night':currentTime==='Afternoon'?'afternoon':'villa',
+text:'🧭 CONSEQUENCE\n\n'+item.title+'\n\n'+item.text
+});
+
+choices(
+'<button class="consequenceButton" onclick="openChoiceConsequencesDashboard()">📜 View Choice History</button>'+
+'<button onclick="returnToMainStory()">⬅ Continue Story</button>'
+);
+
+return true;
+}
+
+function getConsequenceTitle(){
+const total=choiceHistory.length;
+const unresolved=pendingConsequences.length;
+
+if(total>=20)return 'Choices Shape Everything';
+if(total>=10)return 'Your Story Is Changing';
+if(total>=4)return 'The Villa Remembers';
+return 'Your Journey Is Beginning';
+}
+
+function updateConsequenceSummary(){
+if(!q('consequenceSummary'))return;
+
+q('consequenceSummary').textContent=
+getConsequenceTitle()+
+' • Choices: '+choiceHistory.length+
+' • Pending: '+pendingConsequences.length+
+' • Resolved: '+resolvedConsequences.length;
+}
+
+function formatChoiceEffects(effects){
+const parts=[];
+
+if(effects.reputation)parts.push('Reputation '+(effects.reputation>0?'+':'')+effects.reputation);
+if(effects.connection){
+Object.entries(effects.connection).forEach(([person,amount])=>{
+parts.push(characters[person]?.name?.split(' ')[0]+' Connection '+(amount>0?'+':'')+amount);
+});
+}
+if(effects.jealousy){
+Object.entries(effects.jealousy).forEach(([person,amount])=>{
+parts.push(characters[person]?.name?.split(' ')[0]+' Jealousy '+(amount>0?'+':'')+amount);
+});
+}
+
+return parts.length?parts.join(' • '):'Story flag updated';
+}
+
+function openChoiceConsequencesDashboard(){
+initializeChoiceConsequences();
+
+['islandMap','walkingScreen','dialogueCard','portraitBox','choices'].forEach(id=>q(id).classList.add('hidden'));
+
+const activeFlags=Object.entries(storyFlags).filter(([,value])=>value);
+const recentChoices=choiceHistory.slice(-12).reverse();
+const recentConsequences=resolvedConsequences.slice(-8).reverse();
+
+let html='<div class="card consequenceCard"><h2>🧭 Choice Consequences</h2>'+
+'<p><strong>'+getConsequenceTitle()+'</strong></p>'+
+'<p>Important choices can unlock scenes, change dialogue, raise jealousy, or return later as delayed consequences.</p>';
+
+html+='<h3>🚩 Active Story Flags</h3>';
+
+if(activeFlags.length===0){
+html+='<p>No major flags unlocked yet.</p>';
+}else{
+activeFlags.forEach(([flag])=>{
+html+='<span class="flagTag">'+formatFlagName(flag)+'</span>';
+});
+}
+
+html+='<h3>📜 Recent Choices</h3>';
+
+if(recentChoices.length===0){
+html+='<p>No important choices recorded yet.</p>';
+}else{
+recentChoices.forEach(choice=>{
+html+='<div class="consequenceLog"><strong>Day '+choice.day+' — '+choice.label+'</strong><br>'+
+(choice.details||choice.reason||'Choice remembered')+
+(choice.effects?'<br><em>'+formatChoiceEffects(choice.effects)+'</em>':'')+
+'</div>';
+});
+}
+
+html+='<h3>⏳ Pending Consequences: '+pendingConsequences.length+'</h3>';
+
+if(pendingConsequences.length===0){
+html+='<p>No unresolved consequences.</p>';
+}else{
+pendingConsequences.forEach(item=>{
+html+='<div class="consequenceLog"><strong>'+item.title+'</strong><br>This may return later.</div>';
+});
+}
+
+html+='<h3>✅ Resolved Consequences</h3>';
+
+if(recentConsequences.length===0){
+html+='<p>No delayed consequences have happened yet.</p>';
+}else{
+recentConsequences.forEach(item=>{
+html+='<div class="consequenceLog"><strong>'+item.title+'</strong><br>'+item.text+'</div>';
+});
+}
+
+html+='<button class="consequenceButton" onclick="triggerNextConsequence()">⚡ Check for Consequences</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button></div>';
+
+q('choices').innerHTML=html;
+q('choices').classList.remove('hidden');
+}
+
+function formatFlagName(flag){
+return flag
+.replace(/([A-Z])/g,' $1')
+.replace(/^./,letter=>letter.toUpperCase());
+}
+
+function getChoiceConsequenceDialogue(person){
+initializeChoiceConsequences();
+
+if(person===coupledWith&&hasStoryFlag('flirtedOutsideCouple')){
+return '"I remember what happened with someone else," '+characters[person].name.split(' ')[0]+' says. "Trust takes time to rebuild."';
+}
+
+if(person===coupledWith&&hasStoryFlag('stayedLoyalToPartner')){
+return '"You stayed loyal when it mattered," '+characters[person].name.split(' ')[0]+' says. "I have not forgotten that."';
+}
+
+if(person==='valentina'&&hasStoryFlag('gaveInToTemptation')){
+return '"You made your choice once," Valentina says. "I wonder if you would make it again."';
+}
+
+if(person==='maya'&&hasStoryFlag('choseCrystalMystery')){
+return '"The Crystal Flame reacted because you chose to investigate it," Maya whispers.';
+}
+
+if(hasStoryFlag('returnedSingle')){
+return '"You chose to stand alone before," '+characters[person].name.split(' ')[0]+' says. "That took courage."';
+}
+
+return '';
+}
+
+const relationshipPeople=['lucas','maya','kai','isabella','ethan','sofia','noah','lisa','valentina'];
+
+function initializeRelationshipSystem(){
+relationshipPeople.forEach(person=>{
+if(attractionStats[person]===undefined)attractionStats[person]=0;
+if(jealousyStats[person]===undefined)jealousyStats[person]=0;
+if(!characterMoods[person])characterMoods[person]='Neutral';
+});
+updateAllCharacterMoods();
+updateReputationSummary();
+}
+
+function clampStat(value,min=0,max=100){
+return Math.max(min,Math.min(max,Number(value)||0));
+}
+
+function changeAttraction(person,amount,reason=''){
+initializeRelationshipSystem();
+attractionStats[person]=clampStat(attractionStats[person]+amount);
+recordRelationshipChange(person,'Attraction',amount,reason);
+}
+
+function changeJealousy(person,amount,reason=''){
+initializeRelationshipSystem();
+jealousyStats[person]=clampStat(jealousyStats[person]+amount);
+recordRelationshipChange(person,'Jealousy',amount,reason);
+}
+
+function changeReputation(amount,reason=''){
+playerReputation=clampStat(playerReputation+amount,-100,100);
+reputationHistory.push({
+amount,
+reason,
+day:currentDay,
+time:currentTime,
+at:new Date().toISOString()
+});
+if(reputationHistory.length>30)reputationHistory.shift();
+updateReputationSummary();
+}
+
+function recordRelationshipChange(person,stat,amount,reason=''){
+relationshipHistory.push({
+person,
+stat,
+amount,
+reason,
+day:currentDay,
+time:currentTime,
+at:new Date().toISOString()
+});
+if(relationshipHistory.length>60)relationshipHistory.shift();
+}
+
+function getConnectionScore(person){
+return Number(relationships[person]||0);
+}
+
+function getRomanceScore(person){
+if(person==='lucas')return lucasStats.romance||0;
+if(person==='kai')return kaiStats.romance||0;
+if(person==='isabella')return isabellaStats.romance||0;
+if(person==='ethan')return ethanStats.romance||0;
+if(person==='sofia')return sofiaStats.romance||0;
+if(person==='noah')return noahStats.romance||0;
+if(person==='lisa')return lisaStats.romance||0;
+if(person==='valentina')return valentinaStats.romance||0;
+return 0;
+}
+
+function getFriendshipScore(person){
+if(person==='lucas')return lucasStats.friendship||0;
+if(person==='maya')return mayaStats.friendship||0;
+if(person==='kai')return kaiStats.friendship||0;
+if(person==='isabella')return isabellaStats.friendship||0;
+if(person==='ethan')return ethanStats.friendship||0;
+if(person==='sofia')return sofiaStats.friendship||0;
+if(person==='noah')return noahStats.friendship||0;
+if(person==='lisa')return lisaStats.friendship||0;
+if(person==='valentina')return valentinaStats.friendship||0;
+return 0;
+}
+
+function getTrustScore(person){
+if(person===coupledWith)return couplingTrust;
+if(person==='lucas')return lucasStats.trust||0;
+if(person==='maya')return mayaStats.trust||0;
+return Math.max(0,Math.floor(getConnectionScore(person)/3));
+}
+
+function getRelationshipLevel(person){
+const total=
+getConnectionScore(person)*2+
+getRomanceScore(person)*4+
+getFriendshipScore(person)*2+
+getTrustScore(person)*3+
+attractionStats[person]*0.4-
+jealousyStats[person]*0.3;
+
+if(total>=90)return 'Soulmate';
+if(total>=65)return 'Strong Connection';
+if(total>=42)return 'Growing Romance';
+if(total>=25)return 'Close Friend';
+if(total>=10)return 'Friendly';
+if(total<=-5)return 'Rival';
+return 'Stranger';
+}
+
+function updateCharacterMood(person){
+const jealousy=jealousyStats[person]||0;
+const connection=getConnectionScore(person);
+const attraction=attractionStats[person]||0;
+const trust=getTrustScore(person);
+
+let mood='Neutral';
+
+if(person===eliminatedPerson||person===secondEliminatedPerson){
+mood='Eliminated';
+}else if(jealousy>=70){
+mood='Very Jealous';
+}else if(jealousy>=40){
+mood='Jealous';
+}else if(trust>=10&&connection>=12){
+mood='Secure';
+}else if(attraction>=60){
+mood='Flirty';
+}else if(connection>=10){
+mood='Happy';
+}else if(connection<0){
+mood='Upset';
+}
+
+characterMoods[person]=mood;
+return mood;
+}
+
+function updateAllCharacterMoods(){
+relationshipPeople.forEach(updateCharacterMood);
+}
+
+function getReputationTitle(){
+if(playerReputation>=70)return 'Villa Favorite';
+if(playerReputation>=40)return 'Trusted Islander';
+if(playerReputation>=15)return 'Well Liked';
+if(playerReputation<=-50)return 'Villa Villain';
+if(playerReputation<=-20)return 'Drama Magnet';
+return 'New Arrival';
+}
+
+function updateReputationSummary(){
+if(!q('reputationSummary'))return;
+q('reputationSummary').textContent=
+'🔥 Reputation: '+getReputationTitle()+' ('+playerReputation+')';
+}
+
+function getStatPercent(value,max=20){
+return clampStat((Number(value)||0)/max*100);
+}
+
+function relationshipBar(label,value,max=20){
+return '<p><strong>'+label+': '+value+'</strong></p>'+
+'<div class="statBar"><div class="statFill" style="width:'+getStatPercent(value,max)+'%"></div></div>';
+}
+
+function openRelationshipDashboard(){
+initializeRelationshipSystem();
+
+['islandMap','walkingScreen','dialogueCard','portraitBox','choices'].forEach(id=>q(id).classList.add('hidden'));
+
+let html='<div class="card relationshipCard"><h2>❤️ Relationship Dashboard</h2>'+
+'<div class="reputationBox">🔥 Reputation: '+getReputationTitle()+' ('+playerReputation+')</div>';
+
+relationshipPeople.forEach(person=>{
+const eliminated=[eliminatedPerson,secondEliminatedPerson].includes(person);
+const level=getRelationshipLevel(person);
+const mood=updateCharacterMood(person);
+
+html+='<div class="card">'+
+'<h3>'+characters[person].emoji+' '+characters[person].name+(eliminated?' — Eliminated':'')+'</h3>'+
+'<span class="relationshipLevel">'+level+'</span>'+
+'<span class="moodBadge">Mood: '+mood+'</span>'+
+relationshipBar('Connection',getConnectionScore(person),20)+
+relationshipBar('Romance',getRomanceScore(person),12)+
+relationshipBar('Friendship',getFriendshipScore(person),12)+
+relationshipBar('Trust',getTrustScore(person),15)+
+relationshipBar('Attraction',attractionStats[person],100)+
+relationshipBar('Jealousy',jealousyStats[person],100)+
+'<button class="relationshipButton" onclick="showRelationshipMemory(\''+person+'\')">🧠 View Memories</button>'+
+'</div>';
+});
+
+html+='<button onclick="returnToMainStory()">⬅ Return to Main Story</button></div>';
+
+q('choices').innerHTML=html;
+q('choices').classList.remove('hidden');
+}
+
+function showRelationshipMemory(person){
+initializeRelationshipSystem();
+
+const memories=relationshipHistory
+.filter(item=>item.person===person)
+.slice(-8);
+
+let text='🧠 '+characters[person].name.toUpperCase()+' MEMORIES\n\n';
+text+='Relationship Level: '+getRelationshipLevel(person)+'\n';
+text+='Current Mood: '+updateCharacterMood(person)+'\n\n';
+
+if(memories.length===0){
+text+='No special relationship memories yet.';
+}else{
+memories.forEach(memory=>{
+const sign=memory.amount>=0?'+':'';
+text+='Day '+memory.day+' '+memory.time+': '+memory.stat+' '+sign+memory.amount;
+if(memory.reason)text+=' — '+memory.reason;
+text+='\n\n';
+});
+}
+
+showScene({
+speaker:person,
+background:'villa',
+text:text
+});
+
+choices(
+'<button class="relationshipButton" onclick="openRelationshipDashboard()">📊 Back to Dashboard</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button>'
+);
+}
+
+function getReactiveDialogue(person){
+initializeRelationshipSystem();
+initializeChoiceConsequences();
+
+const consequenceLine=getChoiceConsequenceDialogue(person);
+if(consequenceLine)return consequenceLine;
+
+const mood=updateCharacterMood(person);
+const level=getRelationshipLevel(person);
+const memory=villaLifeMemories[person]||{};
+
+if(mood==='Very Jealous'){
+return '"You have been spending a lot of time with other people," '+characters[person].name.split(' ')[0]+' says. "I noticed."';
+}
+if(mood==='Jealous'){
+return characters[person].name.split(' ')[0]+' gives you a careful look. "Should I be worried about someone else?"';
+}
+if(level==='Soulmate'){
+return '"After everything we survived, I trust you more than anyone here."';
+}
+if(level==='Strong Connection'){
+return '"I feel like we understand each other now."';
+}
+if((memory.ignored||0)>=2){
+return '"You walked away from me before," '+characters[person].name.split(' ')[0]+' says. "Are you actually staying this time?"';
+}
+if((memory.gossip||0)>=2){
+return '"You always want the real story," '+characters[person].name.split(' ')[0]+' says with a smile.';
+}
+if(attractionStats[person]>=60){
+return characters[person].name.split(' ')[0]+' holds your gaze longer than usual. "You are making this difficult."';
+}
+return '"It is good to see you," '+characters[person].name.split(' ')[0]+' says.';
+}
+
+function applyRelationshipChoiceEffects(person,choice){
+initializeRelationshipSystem();
+
+if(choice==='listen'){
+changeReputation(1,'Listened respectfully');
+changeAttraction(person,1,'Calm confidence');
+changeJealousy(person,-2,'Felt included');
+}else if(choice==='join'){
+changeReputation(2,'Joined a villa conversation');
+changeAttraction(person,3,'Positive interaction');
+changeJealousy(person,-1,'Received attention');
+}else if(choice==='gossip'){
+changeReputation(-1,'Asked for villa gossip');
+changeAttraction(person,1,'Shared a secret');
+changeJealousy(person,3,'Drama increased');
+}else if(choice==='leave'){
+changeReputation(-1,'Walked away from a conversation');
+changeJealousy(person,2,'Felt ignored');
+}
+
+if(coupledWith&&person!==coupledWith&&(choice==='join'||choice==='gossip')){
+changeJealousy(coupledWith,choice==='gossip'?6:3,'Player bonded with another Islander');
+}
+
+if(person===coupledWith&&(choice==='listen'||choice==='join')){
+changeJealousy(person,-4,'Partner received attention');
+changeAttraction(person,2,'Couple time');
+}
+
+updateAllCharacterMoods();
+updateReputationSummary();
+}
+
+const villaLifeSchedules={
+Morning:[
+{loc:'kitchen',label:'🍳 Kitchen',people:['lucas','sofia'],activity:'making breakfast and arguing over the coffee machine'},
+{loc:'beach',label:'🏖 Arrival Beach',people:['kai','noah'],activity:'training beside the waves'},
+{loc:'shrine',label:'💎 Crystal Shrine',people:['maya','valentina'],activity:'studying a new symbol'},
+{loc:'pool',label:'🏊 Infinity Pool',people:['isabella','lisa'],activity:'sharing villa gossip'},
+{loc:'gym',label:'💪 Gym',people:['ethan','lucas'],activity:'competing during a workout'}
+],
+Afternoon:[
+{loc:'pool',label:'🏊 Infinity Pool',people:['kai','isabella'],activity:'planning a pool game'},
+{loc:'villa',label:'🏡 Main Villa',people:['sofia','noah'],activity:'talking quietly in the lounge'},
+{loc:'beach',label:'🏖 Arrival Beach',people:['valentina','lisa'],activity:'discussing who is playing the game'},
+{loc:'jungle',label:'🌿 Whispering Jungle',people:['maya','ethan'],activity:'following a hidden trail'},
+{loc:'firepit',label:'🔥 Fire Pit',people:['lucas','kai'],activity:'debating loyalty after Casa'}
+],
+Evening:[
+{loc:'firepit',label:'🔥 Fire Pit',people:['lucas','sofia'],activity:'talking about the strongest couples'},
+{loc:'cove',label:'🌙 Moonlight Cove',people:['valentina','kai'],activity:'having a secret conversation'},
+{loc:'villa',label:'🏡 Main Villa',people:['isabella','noah'],activity:'trying to calm the villa'},
+{loc:'kitchen',label:'🍳 Kitchen',people:['lisa','ethan'],activity:'making a late-night snack'},
+{loc:'shrine',label:'💎 Crystal Shrine',people:['maya','lucas'],activity:'watching the Flame change color'}
+]
+};
+
+const villaLifeDialogue={
+kitchen:[
+'"You always use too much sugar," one Islander says.',
+'"At least I know how to make coffee," the other answers.'
+],
+beach:[
+'"The villa feels different when nobody is watching," one of them says.',
+'"Somebody is always watching," the other replies.'
+],
+shrine:[
+'"This symbol was not here yesterday," Maya whispers.',
+'"Maybe the island changes when we make choices," the other Islander says.'
+],
+pool:[
+'"I heard someone wants to switch couples again," one Islander says.',
+'"That rumor better not be about me," the other answers.'
+],
+gym:[
+'"You train like every challenge is the finale," one Islander jokes.',
+'"That is because every challenge matters," the other replies.'
+],
+villa:[
+'"Nobody says what they really think at the Fire Pit," one Islander says.',
+'"Then maybe we should start now," the other answers.'
+],
+jungle:[
+'"There are footprints here," one Islander says.',
+'"They lead away from the villa," the other replies.'
+],
+firepit:[
+'"Loyalty is easy until a Bombshell walks in," one Islander says.',
+'"Real loyalty survives the test," the other answers.'
+],
+cove:[
+'"This place is perfect for secrets," one Islander says.',
+'"Secrets never stay secret on Flame Cay," the other replies.'
+]
+};
+
+function getActiveVillaLifeSchedule(){
+const period=villaLifeSchedules[currentTime]?currentTime:'Morning';
+return villaLifeSchedules[period].filter(event=>{
+return ![eliminatedPerson,secondEliminatedPerson].includes(event.people[0]) &&
+![eliminatedPerson,secondEliminatedPerson].includes(event.people[1]);
+});
+}
+
+function openVillaLifeHub(){
+if(triggerNextConsequence())return;
+
+['islandMap','walkingScreen','dialogueCard','portraitBox','choices'].forEach(id=>q(id).classList.add('hidden'));
+
+const schedule=getActiveVillaLifeSchedule();
+let html='<div class="card villaLifeCard"><h2>🏡 Living Villa</h2>'+
+'<p>'+getTimeIcon()+' Day '+currentDay+' — '+currentTime+'</p>'+
+'<p>Islanders move, talk, and create drama even when you are not part of the conversation.</p>';
+
+schedule.forEach((event,index)=>{
+html+='<button class="villaLifeButton" onclick="visitVillaLifeEvent('+index+')">'+
+event.label+' — '+characters[event.people[0]].name.split(' ')[0]+' & '+characters[event.people[1]].name.split(' ')[0]+
+'</button>';
+});
+
+html+='<button onclick="showVillaLifeGossip()">🗣️ Review Gossip</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button></div>';
+
+q('choices').innerHTML=html;
+q('choices').classList.remove('hidden');
+}
+
+function visitVillaLifeEvent(index){
+const schedule=getActiveVillaLifeSchedule();
+const event=schedule[index];
+if(!event){
+openVillaLifeHub();
+return;
+}
+
+villaLifeEventIndex=index;
+villaLifeLastLocation=event.loc;
+villaLifeVisits++;
+
+const first=event.people[0];
+const second=event.people[1];
+const dialogue=(villaLifeDialogue[event.loc]||villaLifeDialogue.villa)[villaLifeVisits%2];
+
+showScene({
+speaker:first,
+background:getVillaLifeBackground(event.loc),
+text:characters[first].name+' and '+characters[second].name+' are '+event.activity+'.\n\n'+dialogue+'\n\n'+getReactiveDialogue(first)
+});
+
+choices(
+'<button class="listenButton" onclick="handleVillaLifeChoice(\'listen\')">👂 Listen quietly</button>'+
+'<button class="joinButton" onclick="handleVillaLifeChoice(\'join\')">💬 Join the conversation</button>'+
+'<button class="gossipButton" onclick="handleVillaLifeChoice(\'gossip\')">🗣️ Ask for the real gossip</button>'+
+'<button class="leaveButton" onclick="handleVillaLifeChoice(\'leave\')">🚶 Walk away</button>'
+);
+}
+
+function getVillaLifeBackground(loc){
+if(loc==='shrine')return 'crystal';
+if(loc==='jungle')return 'jungle';
+if(loc==='beach'||loc==='pool'||loc==='cove')return currentTime==='Evening'?'night':'beach';
+if(loc==='firepit')return currentTime==='Evening'?'night':'afternoon';
+return currentTime==='Evening'?'night':currentTime==='Afternoon'?'afternoon':'villa';
+}
+
+function rememberVillaLife(person,key){
+if(!villaLifeMemories[person]){
+villaLifeMemories[person]={talked:0,listened:0,gossip:0,ignored:0};
+}
+villaLifeMemories[person][key]=(villaLifeMemories[person][key]||0)+1;
+}
+
+function addVillaLifeConnection(person,amount){
+if(relationships[person]===undefined)return;
+relationships[person]+=amount;
+}
+
+function handleVillaLifeChoice(choice){
+const event=getActiveVillaLifeSchedule()[villaLifeEventIndex];
+if(!event){
+openVillaLifeHub();
+return;
+}
+
+const first=event.people[0];
+const second=event.people[1];
+let result='';
+
+applyRelationshipChoiceEffects(first,choice);
+applyRelationshipChoiceEffects(second,choice==='gossip'?'listen':choice);
+recordChoice(
+'villa_'+choice+'_'+villaLifeVisits,
+'Villa interaction: '+choice,
+'You chose to '+choice+' during a conversation between '+characters[first].name+' and '+characters[second].name+'.',
+{}
+);
+
+if(choice==='listen'){
+addVillaLifeConnection(first,1);
+addVillaLifeConnection(second,1);
+rememberVillaLife(first,'listened');
+rememberVillaLife(second,'listened');
+result='You stay nearby and listen without interrupting.\n\nBoth Islanders notice that you respected their space.\n\n❤️ '+characters[first].name.split(' ')[0]+' Connection +1\n❤️ '+characters[second].name.split(' ')[0]+' Connection +1';
+}else if(choice==='join'){
+addVillaLifeConnection(first,2);
+addVillaLifeConnection(second,1);
+rememberVillaLife(first,'talked');
+rememberVillaLife(second,'talked');
+result='You join naturally instead of taking over the conversation.\n\n'+characters[first].name+' welcomes you into the discussion.\n\n❤️ '+characters[first].name.split(' ')[0]+' Connection +2\n❤️ '+characters[second].name.split(' ')[0]+' Connection +1';
+}else if(choice==='gossip'){
+addVillaLifeConnection(first,1);
+rememberVillaLife(first,'gossip');
+const gossip=createVillaLifeGossip(first,second,event.loc);
+if(!villaLifeGossip.includes(gossip)){
+villaLifeGossip.push(gossip);
+}
+result='You ask what is really happening in the villa.\n\n'+characters[first].name+' lowers their voice.\n\n"'+gossip+'"\n\n🗣️ New gossip saved\n❤️ '+characters[first].name.split(' ')[0]+' Connection +1';
+}else{
+rememberVillaLife(first,'ignored');
+rememberVillaLife(second,'ignored');
+result='You decide not to interrupt.\n\nThe Islanders continue their conversation without you.';
+}
+
+updateRelationships();
+updateVillaLifeStatus();
+autoSaveGame();
+
+showScene({
+speaker:choice==='leave'?'narrator':first,
+background:getVillaLifeBackground(event.loc),
+text:result+'\n\nMemory updated: these Islanders can remember this interaction.'
+});
+
+choices(
+'<button class="villaLifeButton" onclick="openVillaLifeHub()">🏡 Keep Exploring</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button>'
+);
+}
+
+function createVillaLifeGossip(first,second,loc){
+const options=[
+characters[second].name.split(' ')[0]+' may be questioning their current connection.',
+'Someone plans to confront Valentina before the next Fire Pit.',
+'The Crystal Flame reacted during a private conversation.',
+'One Islander thinks the strongest couple is only pretending.',
+'A secret chat happened near '+(locationNames[loc]||'the villa')+'.'
+];
+return options[(villaLifeVisits+villaLifeGossip.length)%options.length];
+}
+
+function showVillaLifeGossip(){
+let text='🗣️ VILLA GOSSIP\n\n';
+
+if(villaLifeGossip.length===0){
+text+='You have not discovered any gossip yet.\n\nExplore the villa and ask Islanders what is happening.';
+}else{
+villaLifeGossip.slice(-6).forEach((item,index)=>{
+text+=(index+1)+'. '+item+'\n\n';
+});
+}
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:text
+});
+
+choices(
+'<button class="villaLifeButton" onclick="openVillaLifeHub()">🏡 Return to Living Villa</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button>'
+);
+}
+
+function getVillaLifeMemoryTotal(){
+return Object.values(villaLifeMemories).reduce((total,memory)=>{
+return total+(memory.talked||0)+(memory.listened||0)+(memory.gossip||0)+(memory.ignored||0);
+},0);
+}
+
+function updateVillaLifeStatus(){
+if(!q('villaLifeStatus'))return;
+q('villaLifeStatus').textContent=
+'Villa visits: '+villaLifeVisits+
+' • Gossip found: '+villaLifeGossip.length+
+' • Remembered interactions: '+getVillaLifeMemoryTotal();
+}
+
+function returnToMainStory(){
+updateVillaLifeStatus();
+resumeSavedProgress();
+}
+
+function q(id){return document.getElementById(id)}
+function choices(html){q('choices').innerHTML=html;q('choices').classList.remove('hidden')}
+function backMap(){return '<button onclick="openIslandMap()">⬅ Back to Map</button>'}
+
+function startGame(){
+preloadPortraits();
+playerName=q('playerName').value.trim()||'Player';
+q('menu').classList.add('hidden');
+q('game').classList.remove('hidden');
+q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;secretVoteStarted=false;secretVoteChoice='';secretVoteResult='';secretVoteComplete=false;secondEliminationStarted=false;secondEliminationSaved='';secondEliminatedPerson='';secondEliminationComplete=false;finalWeekStarted=false;familyMessageChoice='';finalWeekChoice='';finalWeekComplete=false;finalDateStarted=false;finalDatePartner='';finalDateChoice='';finalDatePromise='';finalDateComplete=false;finaleStarted=false;finalSpeechChoice='';finaleScore=0;finaleEnding='';finaleWinner=false;keeperChosen=false;finaleComplete=false;villaLifeVisits=0;villaLifeEventIndex=0;villaLifeLastLocation='';villaLifeGossip=[];villaLifeMemories={};attractionStats={};jealousyStats={};characterMoods={};playerReputation=0;reputationHistory=[];relationshipHistory=[];storyFlags={};choiceHistory=[];pendingConsequences=[];resolvedConsequences=[];
+relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
+lucasStats={friendship:0,romance:0,trust:0};
+mayaStats={friendship:0,trust:0,mystery:0};
+kaiStats={friendship:0,romance:0,competition:0};
+isabellaStats={friendship:0,romance:0,social:0};
+ethanStats={friendship:0,romance:0,strategy:0};
+sofiaStats={friendship:0,romance:0,openness:0};
+noahStats={friendship:0,romance:0,courage:0};
+lisaStats={friendship:0,romance:0,honesty:0};
+q('continueButton').style.display='block';
+['choices','islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
+showScene(introDialogue[0]);
+initializeRelationshipSystem();
+initializeChoiceConsequences();
+updateTimeDisplay();
+updateRelationships();
+updateVillaLifeStatus();
+updateReputationSummary();
+updateConsequenceSummary();
+}
+
+function nextDialogue(){
+dialogueIndex++;
+if(dialogueIndex<introDialogue.length)showScene(introDialogue[dialogueIndex]);
+else{q('continueButton').style.display='none';openIslandMap()}
+}
+
+function showScene(s){
+const c=characters[s.speaker];
+changeBackground(s.background);
+q('dialogueCard').classList.remove('hidden');
+q('portraitBox').classList.remove('hidden');
+q('portraitBox').style.animation='none';
+q('portraitBox').offsetHeight;
+q('portraitBox').style.animation='characterEnter .6s ease';
+q('speakerName').textContent=c.name;
+q('speakerTitle').textContent=c.title;
+const portraitImg=q('portraitImage');
+portraitImg.classList.remove('loaded');
+
+if(c.image){
+q('portrait').style.display='flex';
+q('portrait').textContent=c.emoji;
+portraitImg.style.display='none';
+
+const cached=portraitCache[s.speaker];
+
+const revealPortrait=()=>{
+portraitImg.src=c.image;
+portraitImg.style.display='block';
+q('portrait').style.display='none';
+requestAnimationFrame(()=>portraitImg.classList.add('loaded'));
+};
+
+if(cached&&cached.complete){
+revealPortrait();
+}else{
+const loader=cached||new Image();
+loader.onload=revealPortrait;
+loader.onerror=()=>{
+portraitImg.style.display='none';
+q('portrait').style.display='flex';
+q('portrait').textContent=c.emoji;
+};
+loader.src=c.image;
+portraitCache[s.speaker]=loader;
+}
+}else{
+portraitImg.style.display='none';
+q('portrait').style.display='flex';
+q('portrait').textContent=c.emoji;
+}
+typeText(s.text);
+}
+
+function changeBackground(s){
+const b={arrival:'linear-gradient(180deg,#70d8ff,#08657e)',villa:'linear-gradient(180deg,#58c7e8,#0b718c)',beach:'linear-gradient(180deg,#7ee8ff,#167c99)',crystal:'linear-gradient(180deg,#1b335f,#061322)',jungle:'linear-gradient(180deg,#3d8b55,#153f2b)',volcano:'linear-gradient(180deg,#7f3b2f,#25100d)',afternoon:'linear-gradient(180deg,#ffbf69,#267b91)',night:'linear-gradient(180deg,#182650,#050812)'};
+document.body.style.background=b[s]||b.villa;
+}
+
+function typeText(t){
+if(typingTimer)clearTimeout(typingTimer);
+q('story').innerHTML='';
+let i=0;
+(function go(){if(i<t.length){q('story').innerHTML+=t[i]==='\n'?'<br>':t[i];i++;typingTimer=setTimeout(go,20)}})();
+}
+
+function updateTimeDisplay(){
+q('dayNumber').textContent=currentDay;
+q('timePeriod').textContent=currentTime;
+q('timeIcon').textContent=getTimeIcon();
+q('actionStatus').textContent=actionUsed?'✅ Activity complete':'⭐ One activity available';
+}
+
+function getTimeIcon(){return currentTime==='Morning'?'☀️':currentTime==='Afternoon'?'🌤️':'🌙'}
+function getAdvanceButtonText(){
+if(currentDay===3&&currentTime==='Morning')return '🔥 Begin First Coupling Ceremony';
+if(currentDay===4&&currentTime==='Morning')return '🏆 Begin First Challenge';
+if(currentDay===5&&currentTime==='Morning')return '🌤️ Continue to Day 5 Afternoon';
+if(currentDay===5&&currentTime==='Afternoon')return '💖 Begin Valentina’s First Date';
+return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit';
+}
+
+function openIslandMap(){
+['choices','walkingScreen','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
+q('islandMap').classList.remove('hidden');
+q('mapTimeText').textContent=getTimeIcon()+' Day '+currentDay+' — '+currentTime;
+q('mapActionText').textContent=actionUsed?'✅ Your activity for this time period is complete.':'Choose one main activity for this time period.';
+q('advanceTimeButton').textContent=actionUsed?getAdvanceButtonText():'⏰ Skip This Time Period';
+}
+
+function actionAlreadyUsed(){
+if(!actionUsed)return false;
+showScene({speaker:'narrator',background:currentTime==='Evening'?'night':currentTime==='Afternoon'?'afternoon':'villa',text:'You already completed your main activity for this time period.\n\nReturn to the map and advance time to continue.'});
+choices('<button onclick="openIslandMap()">🗺️ Return to Map</button>');
+return true;
+}
+
+function completeAction(){actionUsed=true;updateTimeDisplay();autoSaveGame()}
+
+function advanceTime(){
+if(currentDay===3&&currentTime==='Morning'){
+startCouplingCeremony();
+return;
+}
+
+if(currentDay===4&&currentTime==='Morning'){
+startFirstChallenge();
+return;
+}
+
+if(currentDay===5&&currentTime==='Morning'){
+beginDayFiveAfternoon();
+return;
+}
+
+if(currentDay===5&&currentTime==='Afternoon'){
+startValentinaDate();
+return;
+}
+
+if(currentTime==='Evening'){
+q('islandMap').classList.add('hidden');
+q('walkingScreen').classList.add('hidden');
+q('dialogueCard').classList.remove('hidden');
+q('choices').classList.remove('hidden');
+visitFirePit();
+return;
+}
+
+if(currentTime==='Morning'){currentTime='Afternoon'}else{currentTime='Evening'}
+
+actionUsed=false;
+eveningEventDone=false;
+updateTimeDisplay();
+q('islandMap').classList.add('hidden');
+q('dialogueCard').classList.remove('hidden');
+
+if(currentTime==='Afternoon'){
+showScene({speaker:'narrator',background:'afternoon',text:'The morning fades into afternoon.\n\nThe Islanders move to new locations.\n\n⭐ One new activity is available.'});
+}else{
+showScene({speaker:'narrator',background:'night',text:'The sun disappears beyond the ocean.\n\nThe Islanders gather at the Fire Pit tonight.'});
+}
+choices('<button onclick="openIslandMap()">🗺️ Return to Map</button>');
+}
+
+function startWalking(loc){
+pendingLocation=loc;
+['islandMap','choices','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
+q('walkingScreen').classList.remove('hidden');
+q('walkingTitle').textContent='🚶 Walking to '+locationNames[loc];
+q('walkingText').innerHTML='You leave '+(locationNames[currentLocation]||'your current location')+' and follow the island path toward '+locationNames[loc]+'.<br><br>The scenery slowly changes around you.';
+}
+
+function finishWalking(){
+q('walkingScreen').classList.add('hidden');
+currentLocation=pendingLocation;
+visitLocation(pendingLocation);
+pendingLocation='';
+}
+
+function visitLocation(loc){
+q('islandMap').classList.add('hidden');
+q('dialogueCard').classList.remove('hidden');
+q('choices').classList.remove('hidden');
+
+if(currentDay===5&&currentTime==='Morning'){
+visitDayFiveLocation(loc);
+return;
+}
+
+if(currentDay===5&&currentTime==='Afternoon'){
+visitDayFiveAfternoonLocation(loc);
+return;
+}
+
+({beach:visitBeach,villa:visitVilla,shrine:visitShrine,jungle:visitJungle,gym:visitGym,kitchen:visitKitchen,pool:visitPool,firepit:visitFirePit,cove:visitCove,volcano:visitVolcano}[loc]||visitVilla)();
+}
+
+/* DAY 1 + DAY 2 + DAY 3 MORNING + DAY 4 MORNING SCHEDULES */
+
+function partnerMorningScene(person,locationText,bg,back){
+const isPartner=coupledWith===person;
+const opening=isPartner
+?locationText+'\n\n'+characters[person].name+' smiles when you arrive.\n\n"Morning, partner."'
+:locationText+'\n\n'+characters[person].name+' gives you a friendly wave.';
+showScene({speaker:person,background:bg,text:opening});
+choices('<button onclick="'+getPartnerMenuFunction(person,bg,back)+'">❤️ Talk to '+characters[person].name.split(' ')[0]+'</button>'+backMap());
+}
+
+function getPartnerMenuFunction(person,bg,back){
+const map={
+lucas:'openLucasMenu()',
+maya:'openMayaMenuFrom(\''+bg+'\',\''+back+'\')',
+kai:'openKaiMenu(\''+bg+'\',\''+back+'\')',
+isabella:'openIsabellaMenu(\''+bg+'\',\''+back+'\')',
+ethan:'openEthanMenu(\''+bg+'\',\''+back+'\')',
+sofia:'openSofiaMenu(\''+bg+'\',\''+back+'\')',
+noah:'openNoahMenu(\''+bg+'\',\''+back+'\')',
+lisa:'openLisaMenu(\''+bg+'\',\''+back+'\')'
+};
+return map[person];
+}
+
+function visitBeach(){
+if(currentTime==='Evening'){showEmpty('🏖 Arrival Beach','The beach is quiet. Everyone has gone to the Fire Pit.','night');return}
+
+if(currentDay===1&&currentTime==='Morning'){
+showScene({speaker:'narrator',background:'beach',text:'Morning sunlight shines across Arrival Beach.\n\nKai stands near the waves while Lisa relaxes in the sun.'});
+choices('<button onclick="openKaiMenu(\'beach\',\'visitBeach\')">🌊 Talk to Kai</button><button onclick="openLisaMenu(\'beach\',\'visitBeach\')">💖 Talk to Lisa</button>'+backMap());
+return;
+}
+if(currentDay===1&&currentTime==='Afternoon'){
+showScene({speaker:'sofia',background:'afternoon',text:'Sofia is walking alone near the shoreline.'});
+choices('<button onclick="openSofiaMenu(\'afternoon\',\'visitBeach\')">🌹 Talk to Sofia</button>'+backMap());
+return;
+}
+if(currentDay===2&&currentTime==='Morning'){
+showScene({speaker:'noah',background:'beach',text:'Noah is jogging along the shoreline, pulling a heavy training rope.'});
+choices('<button onclick="openNoahMenu(\'beach\',\'visitBeach\')">🚒 Talk to Noah</button>'+backMap());
+return;
+}
+if(currentDay===2&&currentTime==='Afternoon'){
+showScene({speaker:'isabella',background:'afternoon',text:'Isabella and Lisa are setting up a beach volleyball net.'});
+choices('<button onclick="openIsabellaMenu(\'afternoon\',\'visitBeach\')">🦋 Talk to Isabella</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'kai',background:'beach',text:'Kai stands at the edge of the water, watching the waves.\n\n"Today feels different," he says. "Like the island is waiting for something."'});
+choices('<button onclick="openKaiMenu(\'beach\',\'visitBeach\')">🌊 Talk to Kai</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('kai','Kai is stretching beside the waves after an early surf.','beach','visitBeach');
+return;
+}
+showEmpty('🏖 Arrival Beach','The beach is peaceful right now.','beach');
+}
+
+function visitVilla(){
+if(currentTime==='Evening'){showEmpty('🏡 Main Villa','The villa is quiet. Everyone is gathering at the Fire Pit.','night');return}
+
+if(currentDay===1&&currentTime==='Morning'){
+showScene({speaker:'narrator',background:'villa',text:'Lucas and Ethan are talking in the lounge.'});
+choices('<button onclick="openLucasMenu()">🏊 Talk to Lucas</button><button onclick="openEthanMenu(\'villa\',\'visitVilla\')">💼 Talk to Ethan</button>'+backMap());
+return;
+}
+if(currentDay===1&&currentTime==='Afternoon'){
+showScene({speaker:'ethan',background:'afternoon',text:'Ethan is sitting alone near the lounge windows.'});
+choices('<button onclick="openEthanMenu(\'afternoon\',\'visitVilla\')">💼 Talk to Ethan</button>'+backMap());
+return;
+}
+if(currentDay===2&&currentTime==='Morning'){
+showScene({speaker:'sofia',background:'villa',text:'Sofia is sipping tea in the lounge while reading an island brochure.'});
+choices('<button onclick="openSofiaMenu(\'villa\',\'visitVilla\')">🌹 Talk to Sofia</button>'+backMap());
+return;
+}
+if(currentDay===2&&currentTime==='Afternoon'){
+showScene({speaker:'lucas',background:'afternoon',text:'Lucas is setting up a gaming console in the recreation area.'});
+choices('<button onclick="openLucasMenu()">🏊 Talk to Lucas</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'lucas',background:'villa',text:'Lucas is making breakfast in the villa kitchen.\n\nHe looks nervous about the first coupling.'});
+choices('<button onclick="openLucasMenu()">🏊 Talk to Lucas</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('lucas','Lucas is making breakfast in the villa kitchen.','villa','visitVilla');
+return;
+}
+showEmpty('🏡 Main Villa','The villa is quiet right now.','villa');
+}
+
+function visitShrine(){
+if(currentTime==='Evening'){
+showScene({speaker:'maya',background:'crystal',text:'Maya stands inside the glowing shrine.\n\n"The Flame is stronger tonight," she whispers.'});
+choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the Crystal Flame</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'maya',background:'crystal',text:'Maya has uncovered a new symbol inside the shrine.\n\nIt looks like two flames joining together.'});
+choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the new symbol</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('maya','Maya is comparing the new symbol with an old carving.','crystal','visitShrine');
+return;
+}
+showScene({speaker:'maya',background:'crystal',text:'Maya studies the glowing symbols carved into the shrine.'});
+choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the Crystal Flame</button>'+backMap());
+}
+
+function visitJungle(){
+if(currentTime==='Evening'){showEmpty('🌿 Whispering Jungle','The jungle is too dark to explore safely tonight.','night');return}
+
+if(currentDay===1){
+showScene({speaker:'maya',background:'jungle',text:'Maya follows a narrow trail through the jungle.'});
+choices('<button onclick="openMayaMenuFrom(\'jungle\',\'visitJungle\')">🌿 Talk to Maya</button>'+backMap());
+return;
+}
+if(currentDay===2){
+showScene({speaker:'kai',background:'jungle',text:'Kai is practicing balance on a fallen tree.'});
+choices('<button onclick="openKaiMenu(\'jungle\',\'visitJungle\')">🌊 Talk to Kai</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'noah',background:'jungle',text:'Noah is following a trail of glowing stones through the jungle.'});
+choices('<button onclick="openNoahMenu(\'jungle\',\'visitJungle\')">🚒 Talk to Noah</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('noah','Noah is checking the glowing-stone trail from yesterday.','jungle','visitJungle');
+return;
+}
+showEmpty('🌿 Whispering Jungle','You hear leaves moving deeper in the trees.','jungle');
+}
+
+function visitGym(){
+if(currentTime==='Evening'){showEmpty('💪 Gym','The gym is empty for the evening.','night');return}
+
+if(currentDay===1){
+showScene({speaker:'noah',background:currentTime==='Afternoon'?'afternoon':'villa',text:'Noah is finishing a workout in the gym.'});
+choices('<button onclick="openNoahMenu(\''+(currentTime==='Afternoon'?'afternoon':'villa')+'\',\'visitGym\')">🚒 Talk to Noah</button>'+backMap());
+return;
+}
+if(currentDay===2){
+showScene({speaker:'ethan',background:currentTime==='Afternoon'?'afternoon':'villa',text:'Ethan is wrapping his wrists for a lifting session.'});
+choices('<button onclick="openEthanMenu(\''+(currentTime==='Afternoon'?'afternoon':'villa')+'\',\'visitGym\')">💼 Talk to Ethan</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'ethan',background:'villa',text:'Ethan is training alone, but he keeps checking the villa entrance.'});
+choices('<button onclick="openEthanMenu(\'villa\',\'visitGym\')">💼 Talk to Ethan</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('ethan','Ethan is finishing an early training session.','villa','visitGym');
+return;
+}
+showEmpty('💪 Gym','The gym is quiet right now.','villa');
+}
+
+function visitKitchen(){
+if(currentTime==='Evening'){showEmpty('🍳 Kitchen','The kitchen is empty for the evening.','night');return}
+
+if(currentDay===1&&currentTime==='Morning'){
+showScene({speaker:'sofia',background:'villa',text:'Sofia is preparing fruit and coffee in the kitchen.'});
+choices('<button onclick="openSofiaMenu(\'villa\',\'visitKitchen\')">🌹 Talk to Sofia</button>'+backMap());
+return;
+}
+if(currentDay===2&&currentTime==='Morning'){
+showScene({speaker:'lisa',background:'villa',text:'Lisa is trying to figure out the pancake griddle.'});
+choices('<button onclick="openLisaMenu(\'villa\',\'visitKitchen\')">💖 Talk to Lisa</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'sofia',background:'villa',text:'Sofia is preparing fruit for everyone.\n\nShe seems quieter than usual.'});
+choices('<button onclick="openSofiaMenu(\'villa\',\'visitKitchen\')">🌹 Talk to Sofia</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('sofia','Sofia is preparing fruit and coffee for the villa.','villa','visitKitchen');
+return;
+}
+showEmpty('🍳 Kitchen','Nobody is spending time in the kitchen right now.','villa');
+}
+
+function visitPool(){
+if(currentTime==='Evening'){showEmpty('🏊 Infinity Pool','The pool is empty for the evening.','night');return}
+
+if(currentDay===1&&currentTime==='Afternoon'){
+showScene({speaker:'narrator',background:'afternoon',text:'Kai and Isabella are enjoying the Infinity Pool.'});
+choices('<button onclick="openKaiMenu(\'afternoon\',\'visitPool\')">🌊 Talk to Kai</button><button onclick="openIsabellaMenu(\'afternoon\',\'visitPool\')">🦋 Talk to Isabella</button>'+backMap());
+return;
+}
+if(currentDay===2&&currentTime==='Afternoon'){
+showScene({speaker:'noah',background:'afternoon',text:'Noah and Sofia are splashing each other in the pool.'});
+choices('<button onclick="openNoahMenu(\'afternoon\',\'visitPool\')">🚒 Talk to Noah</button><button onclick="openSofiaMenu(\'afternoon\',\'visitPool\')">🌹 Talk to Sofia</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'isabella',background:'beach',text:'Isabella is sitting beside the pool, quietly watching everyone.'});
+choices('<button onclick="openIsabellaMenu(\'beach\',\'visitPool\')">🦋 Talk to Isabella</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('isabella','Isabella is sitting beside the pool with her feet in the water.','beach','visitPool');
+return;
+}
+showEmpty('🏊 Infinity Pool','The pool is quiet right now.','beach');
+}
+
+function visitCove(){
+if(currentTime==='Evening'){showEmpty('🌙 Moonlight Cove','The cove glows beneath the moon, but everyone is at the Fire Pit.','night');return}
+
+if(currentDay===1&&currentTime==='Afternoon'){
+showScene({speaker:'lisa',background:'afternoon',text:'Lisa stands beside the water at Moonlight Cove.'});
+choices('<button onclick="openLisaMenu(\'afternoon\',\'visitCove\')">💖 Talk to Lisa</button>'+backMap());
+return;
+}
+if(currentDay===2&&currentTime==='Afternoon'){
+showScene({speaker:'isabella',background:'afternoon',text:'Isabella is collecting unique shells in a small basket.'});
+choices('<button onclick="openIsabellaMenu(\'afternoon\',\'visitCove\')">🦋 Talk to Isabella</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showScene({speaker:'lisa',background:'beach',text:'Lisa is standing alone at Moonlight Cove with a sealed note in her hand.'});
+choices('<button onclick="openLisaMenu(\'beach\',\'visitCove\')">💖 Talk to Lisa</button>'+backMap());
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene('lisa','Lisa is reading the sealed note she received before the coupling.','beach','visitCove');
+return;
+}
+showEmpty('🌙 Moonlight Cove','The cove is peaceful right now.','beach');
+}
+
+function visitVolcano(){
+if(currentTime==='Evening'){showEmpty('🌋 Volcano Peak','The path is closed after dark.','night');return}
+
+if(currentDay===1){
+showEmpty('🌋 Volcano Peak','The upper path is locked on Day 1.','volcano');
+return;
+}
+if(currentDay===2){
+showScene({speaker:'ethan',background:'volcano',text:'Ethan stands near an observation ledge looking over Flame Cay.'});
+choices('<button onclick="openEthanMenu(\'volcano\',\'visitVolcano\')">💼 Talk to Ethan</button>'+backMap());
+return;
+}
+if(currentDay===3&&currentTime==='Morning'){
+showEmpty('🌋 Volcano Peak','A new gate blocks the upper trail. A Crystal Flame symbol glows on the lock.','volcano');
+return;
+}
+if(currentDay===4&&currentTime==='Morning'){
+showEmpty('🌋 Volcano Peak','The Crystal Flame lock is gone. A message is carved into the gate: "Only a true pair may pass."','volcano');
+return;
+}
+showEmpty('🌋 Volcano Peak','The view stretches across all of Flame Cay.','volcano');
+}
+
+function visitFirePit(){
+if(currentTime==='Morning'){
+if(currentDay===4){
+showEmpty('🔥 Fire Pit','The ashes from the coupling still glow. Two matching symbols remain in the stone.','villa');
+return;
+}
+showEmpty('🔥 Fire Pit','The Fire Pit is empty this morning.','villa');
+return;
+}
+
+if(currentTime==='Afternoon'){
+if(currentDay===1){
+showScene({speaker:'lucas',background:'afternoon',text:'Lucas sits beside the unlit Fire Pit, lost in thought.'});
+choices('<button onclick="basicTalk(\'lucas\',\'afternoon\',\'Lucas says something big is going to happen tonight.\\n\\n❤️ Lucas +1\\n\\n✅ Activity complete.\')">🏊 Talk to Lucas</button>'+backMap());
+return;
+}
+if(currentDay===2){
+showScene({speaker:'maya',background:'afternoon',text:'Maya is examining charcoal residue around the Fire Pit.'});
+choices('<button onclick="openMayaMenuFrom(\'afternoon\',\'visitFirePit\')">🌿 Talk to Maya</button>'+backMap());
+return;
+}
+}
+
+showScene({speaker:'host',background:'night',text:'Every Islander gathers around the glowing Fire Pit.\n\n"Tonight, the Crystal Flame will begin its test."'});
+choices('<button onclick="firePitEvent()">🔥 Begin the Evening Event</button>'+backMap());
+}
+
+function showEmpty(title,text,bg){
+showScene({speaker:'narrator',background:bg,text:title+'\n\n'+text});
+choices(backMap());
+}
+
+/* CONVERSATION MENUS */
+
+function openLucasMenu(){
+if(actionAlreadyUsed())return;
+menuBackground=currentTime==='Afternoon'?'afternoon':'villa';
+menuBack='visitVilla';
+showScene({speaker:'lucas',background:menuBackground,text:'"What do you want to talk about?"'});
+choices('<button onclick="specialTalk(\'lucas\',\'friendship\',\'You ask Lucas about life outside Flame Cay.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">😊 Get to know Lucas</button><button onclick="specialTalk(\'lucas\',\'romance\',\'You flirt with Lucas and he smiles.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Flirt with Lucas</button><button onclick="specialTalk(\'lucas\',\'trust\',\'Lucas tells you about a strange light in the jungle.\\n\\n💚 Trust +1\\n❤️ Connection +1\')">❓ Ask about Flame Cay</button><button onclick="visitVilla()">⬅ Back</button>');
+}
+
+function openMayaMenu(){
+openMayaMenuFrom('crystal','visitShrine');
+}
+
+function openMayaMenuFrom(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'maya',background:bg,text:'"What do you want to know?"'});
+choices('<button onclick="specialTalk(\'maya\',\'friendship\',\'Maya tells you why she became an explorer.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">😊 Get to know Maya</button><button onclick="specialTalk(\'maya\',\'trust\',\'Maya decides to trust you with a secret.\\n\\n💚 Trust +1\\n❤️ Connection +1\')">💚 Earn Maya\'s trust</button><button onclick="specialTalk(\'maya\',\'mystery\',\'The Crystal Flame reacts while Maya watches.\\n\\n🔥 Mystery +1\\n❤️ Connection +1\')">🔥 Ask about the Crystal Flame</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
+function openKaiMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'kai',background:bg,text:'Kai gives you a confident grin.\n\n"So, what did you come over here for?"'});
+choices('<button onclick="specialTalk(\'kai\',\'friendship\',\'Kai tells you surfing makes him feel free.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🌊 Get to know Kai</button><button onclick="specialTalk(\'kai\',\'romance\',\'You flirt with Kai. He looks impressed.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">😏 Flirt with Kai</button><button onclick="specialTalk(\'kai\',\'competition\',\'You challenge Kai and his competitive smile appears.\\n\\n🏆 Competition +1\\n❤️ Connection +1\')">🏄 Challenge Kai</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
+function openIsabellaMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'isabella',background:bg,text:'Isabella smiles brightly when you walk over.\n\n"What do you want to know?"'});
+choices('<button onclick="specialTalk(\'isabella\',\'friendship\',\'You ask Isabella what she is like outside the villa.\\n\\nShe tells you she loves bringing people together.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🦋 Get to know Isabella</button><button onclick="specialTalk(\'isabella\',\'romance\',\'You tell Isabella her energy is impossible to ignore.\\n\\nShe gives you a playful smile.\\n\\n💕 Romance +1\\n❤️ Connection +1\')">💕 Flirt with Isabella</button><button onclick="specialTalk(\'isabella\',\'social\',\'You ask Isabella what she has noticed around the villa.\\n\\nShe lowers her voice and shares a little drama.\\n\\n🎭 Social +1\\n❤️ Connection +1\')">🎉 Ask about villa drama</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
+
+function openEthanMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'ethan',background:bg,text:'Ethan looks up with a calm, confident expression.\n\n"What would you like to know?"'});
+choices('<button onclick="specialTalk(\'ethan\',\'friendship\',\'You ask Ethan what he is like when he is not working.\\n\\nHe admits that slowing down does not come naturally to him.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">💼 Get to know Ethan</button><button onclick="specialTalk(\'ethan\',\'romance\',\'You tell Ethan that confidence looks good on him.\\n\\nA small smile appears on his face.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Flirt with Ethan</button><button onclick="specialTalk(\'ethan\',\'strategy\',\'You ask Ethan how he plans to survive the competition.\\n\\nHe says every strong decision begins with watching people carefully.\\n\\n🧠 Strategy +1\\n❤️ Connection +1\')">🧠 Ask about his strategy</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
+
+function openSofiaMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'sofia',background:bg,text:'Sofia gives you a thoughtful smile.\n\n"What would you like to talk about?"'});
+choices('<button onclick="specialTalk(\'sofia\',\'friendship\',\'You ask Sofia what she enjoys outside the villa.\\n\\nShe tells you she loves quiet mornings, music, and discovering new places.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🌹 Get to know Sofia</button><button onclick="specialTalk(\'sofia\',\'romance\',\'You tell Sofia that her calm energy makes her stand out.\\n\\nShe smiles and looks away for a moment.\\n\\n💕 Romance +1\\n❤️ Connection +1\')">💕 Flirt with Sofia</button><button onclick="specialTalk(\'sofia\',\'openness\',\'You gently ask Sofia about what made her guard her heart.\\n\\nShe admits that trusting people has not always been easy.\\n\\n💬 Openness +1\\n❤️ Connection +1\')">💬 Ask about her past</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
+
+function openNoahMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'noah',background:bg,text:'Noah gives you a warm, steady smile.\n\n"What would you like to talk about?"'});
+choices('<button onclick="specialTalk(\'noah\',\'friendship\',\'You ask Noah what he is like outside the villa.\\n\\nHe tells you he values loyalty, family, and helping people when they need it most.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🚒 Get to know Noah</button><button onclick="specialTalk(\'noah\',\'romance\',\'You tell Noah that his calm confidence is hard to ignore.\\n\\nHe smiles and says the feeling might be mutual.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Flirt with Noah</button><button onclick="specialTalk(\'noah\',\'courage\',\'You ask Noah how he stays brave when things become dangerous.\\n\\nHe says courage means being scared and still choosing to help.\\n\\n💪 Courage +1\\n❤️ Connection +1\')">💪 Ask about courage</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
+
+function openLisaMenu(bg,back){
+if(actionAlreadyUsed())return;
+menuBackground=bg;
+menuBack=back;
+showScene({speaker:'lisa',background:bg,text:'Lisa gives you a confident, unreadable smile.\n\n"What do you want to know?"'});
+choices('<button onclick="specialTalk(\'lisa\',\'friendship\',\'You ask Lisa what she is like away from the cameras.\\n\\nShe says she is more loyal and private than people expect.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">💖 Get to know Lisa</button><button onclick="specialTalk(\'lisa\',\'romance\',\'You tell Lisa that her confidence is impossible to ignore.\\n\\nShe steps closer and smiles.\\n\\n💕 Romance +1\\n❤️ Connection +1\')">😘 Flirt with Lisa</button><button onclick="specialTalk(\'lisa\',\'honesty\',\'You ask Lisa whether she is truly looking for love or only playing the game.\\n\\nShe pauses before admitting that even she is not completely sure yet.\\n\\n🎭 Honesty +1\\n❤️ Connection +1\')">🎭 Ask about her real intentions</button><button onclick="'+back+'()">⬅ Back</button>');
+}
+
+function specialTalk(person,stat,text){
+if(actionAlreadyUsed())return;
+relationships[person]++;
+initializeRelationshipSystem();
+
+if(stat==='romance'){
+recordChoice('romance_'+person+'_'+currentDay+'_'+currentTime,'Romantic choice with '+characters[person].name,'You chose a romantic conversation.',{connection:{[person]:1}});
+changeAttraction(person,8,'Romantic conversation');
+changeJealousy(person,-3,'Received romantic attention');
+changeReputation(1,'Made a romantic connection');
+}else if(stat==='friendship'){
+changeAttraction(person,2,'Friendly conversation');
+changeJealousy(person,-2,'Received friendly attention');
+changeReputation(1,'Built a friendship');
+}else if(stat==='trust'||stat==='honesty'||stat==='openness'){
+changeJealousy(person,-5,'Trust increased');
+changeReputation(2,'Handled a serious conversation honestly');
+}else{
+changeAttraction(person,1,'Interesting conversation');
+}
+
+if(coupledWith&&person!==coupledWith&&stat==='romance'){
+setStoryFlag('flirtedOutsideCouple',true,'Flirted with '+characters[person].name+' outside the current couple');
+changeJealousy(coupledWith,10,'Player flirted with another Islander');
+changeReputation(-2,'Flirted outside current couple');
+scheduleConsequence(
+'partner_confrontation_'+currentDay+'_'+person,
+'Your Partner Heard About the Flirting',
+characters[coupledWith].name+' heard that you were flirting with '+characters[person].name+'. Their jealousy has increased.',
+'flirtedOutsideCouple',
+1,
+{jealousy:{[coupledWith]:8},connection:{[coupledWith]:-1}}
+);
+}
+
+if(currentDay===4&&currentTime==='Morning'&&person===coupledWith){
+relationships[person]+=2;
+couplingRomance++;
+couplingTrust++;
+text+='\n\n❤️ Partner bonus +2\n💕 Couple Romance +1\n💚 Couple Trust +1';
+}
+if(person==='lucas')lucasStats[stat]++;
+if(person==='maya')mayaStats[stat]++;
+if(person==='kai')kaiStats[stat]++;
+if(person==='isabella')isabellaStats[stat]++;
+if(person==='ethan')ethanStats[stat]++;
+if(person==='sofia')sofiaStats[stat]++;
+if(person==='noah')noahStats[stat]++;
+if(person==='lisa')lisaStats[stat]++;
+if(person==='valentina')valentinaStats[stat]++;
+completeAction();
+updateRelationships();
+showScene({speaker:person,background:menuBackground,text:text+'\n\n✅ Activity complete.'});
+showCompletedButtons();
+}
+
+function basicTalk(person,bg,text){
+if(actionAlreadyUsed())return;
+relationships[person]++;
+completeAction();
+updateRelationships();
+showScene({speaker:person,background:bg,text});
+showCompletedButtons();
+}
+
+function showCompletedButtons(){
+choices('<button onclick="openIslandMap()">🗺️ Return to Map</button><button onclick="advanceTime()">'+getAdvanceButtonText()+'</button>');
+}
+
+function examineCrystal(){
+if(actionAlreadyUsed())return;
+completeAction();
+let crystalText=currentDay===1?'The Crystal Flame pulses.\n\nA whisper moves through the air: "Keeper..."\n\n✅ Activity complete.':currentDay===2?'The Crystal Flame shows you a brief image of Volcano Peak.\n\n✅ Activity complete.':'The new symbol glows and shows two silhouettes standing together at the Fire Pit.\n\nA whisper says: "Choose with your heart."\n\n✅ Activity complete.';
+showScene({speaker:'narrator',background:'crystal',text:crystalText});
+showCompletedButtons();
+}
+
+function firePitEvent(){
+if(eveningEventDone)return;
+eveningEventDone=true;
+actionUsed=true;
+updateTimeDisplay();
+showScene({
+speaker:'host',
+background:'night',
+text:currentDay===1
+?'"Every choice you made today has been seen."\n\n"Rest now. Tomorrow, your next test begins."'
+:'"Day 2 draws to a close."\n\n"The island is beginning to remember your strongest connections."'
+});
+choices('<button onclick="endNight()">🌙 End the Night</button>');
+}
+
+function endNight(){
+currentDay++;
+currentTime='Morning';
+actionUsed=false;
+eveningEventDone=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+showScene({speaker:'narrator',background:'arrival',text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+'\n☀️ Morning\n\n⭐ One new activity is available.'});
+choices('<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>');
+}
+
+function startCouplingCeremony(){
+if(ceremonyComplete){showVersionComplete();return}
+['islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
+showScene({
+speaker:'host',
+background:'night',
+text:'The sky darkens as every Islander gathers around the Fire Pit.\n\nThe Crystal Flame rises higher than before.\n\n"Islanders... tonight, you will make your first choice."'
+});
+choices('<button class="ceremonyButton" onclick="showCouplingChoices()">🔥 Continue to the Ceremony</button>');
+}
+
+function showCouplingChoices(){
+showScene({
+speaker:'host',
+background:'night',
+text:'"Choose the person you want to couple with."\n\n"Your decision will change your relationships and the future of Flame Cay."'
+});
+choices(
+'<div class="card"><h3 class="couplingTitle">❤️ Choose Your First Partner</h3>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'lucas\')">🏊 Couple with Lucas</button>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'maya\')">🌿 Couple with Maya</button>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'kai\')">🌊 Couple with Kai</button>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'isabella\')">🦋 Couple with Isabella</button>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'ethan\')">💼 Couple with Ethan</button>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'sofia\')">🌹 Couple with Sofia</button>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'noah\')">🚒 Couple with Noah</button>'+
+'<button class="couplingChoice" onclick="chooseCouple(\'lisa\')">💖 Couple with Lisa</button></div>'
+);
+}
+
+function chooseCouple(person){
+if(coupledWith)return;
+coupledWith=person;
+relationships[person]+=10;
+couplingRomance=5;
+couplingTrust=2;
+ceremonyComplete=true;
+updateRelationships();
+autoSaveGame();
+
+const reactions={
+lucas:'Lucas looks surprised, then smiles warmly.\n\n"I will not take this choice for granted."',
+maya:'Maya looks toward the Crystal Flame before meeting your eyes.\n\n"Maybe the island wanted us to find each other."',
+kai:'Kai gives you a confident smile, but his voice becomes softer.\n\n"I was hoping you would choose me."',
+isabella:'Isabella lights up and reaches for your hand.\n\n"Let us make this unforgettable."',
+ethan:'Ethan nods with quiet confidence.\n\n"You made a strong choice. I will prove it."',
+sofia:'Sofia smiles with visible relief.\n\n"I want to see where this can go."',
+noah:'Noah gives you a steady, sincere smile.\n\n"I will always be honest with you."',
+lisa:'Lisa looks genuinely surprised for the first time.\n\n"Interesting choice... I think you might understand me."'
+};
+
+showScene({
+speaker:person,
+background:'night',
+text:reactions[person]+'\n\n❤️ Connection +10\n💕 Couple Romance +5\n💚 Couple Trust +2'
+});
+choices('<button class="ceremonyButton" onclick="finishCouplingCeremony()">🔥 Complete the Ceremony</button>');
+}
+
+function finishCouplingCeremony(){
+const partnerName=characters[coupledWith].name;
+showScene({
+speaker:'host',
+background:'night',
+text:'The Crystal Flame flashes across the Fire Pit.\n\n"'+playerName+' and '+partnerName+' are now officially coupled."\n\n"Remember: love, loyalty, and courage will all be tested on Flame Cay."'
+});
+choices('<button onclick="beginDayFour()">☀️ Begin Day 4</button>');
+}
+
+function beginDayFour(){
+currentDay=4;
+currentTime='Morning';
+actionUsed=false;
+eveningEventDone=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+const partnerName=characters[coupledWith].name;
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day 4\n☀️ Morning\n\nYou wake up officially coupled with '+partnerName+'.\n\n⭐ One new activity is available.'
+});
+choices('<button onclick="openIslandMap()">🗺️ Begin Day 4</button>');
+}
+
+function startFirstChallenge(){
+if(challengeComplete){showVersionComplete();return}
+challengeScore=0;
+challengeQuestion=0;
+['islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'A horn sounds across Flame Cay.\n\nEvery couple gathers beside the Infinity Pool.\n\n"Islanders, welcome to your first challenge: THE CRYSTAL CONNECTION."'
+});
+choices('<button class="challengeButton" onclick="showChallengeRules()">🏆 Hear the Rules</button>');
+}
+
+function showChallengeRules(){
+const partnerName=characters[coupledWith].name;
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'"You and '+partnerName+' will face three choices."\n\n"Honest and loyal answers strengthen your bond. Selfish choices weaken it."\n\n"Earn at least 5 points to pass the challenge."'
+});
+choices('<button class="challengeButton" onclick="challengeOne()">🔥 Start Challenge</button>');
+}
+
+function challengeOne(){
+challengeQuestion=1;
+showScene({
+speaker:coupledWith,
+background:'afternoon',
+text:'CHALLENGE 1 OF 3\n\nYour partner is nervous before an important speech.\n\nWhat do you do?'
+});
+choices(
+'<button class="challengeButton" onclick="answerChallenge(3,2)">💚 Encourage them and stay beside them</button>'+
+'<button onclick="answerChallenge(1,2)">🙂 Tell them they will probably be fine</button>'+
+'<button onclick="answerChallenge(0,2)">😏 Focus on impressing everyone yourself</button>'
+);
+}
+
+function challengeTwo(){
+challengeQuestion=2;
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'CHALLENGE 2 OF 3\n\nYou find a clue that could help your couple win, but Maya asks you to share it.\n\nWhat do you do?'
+});
+choices(
+'<button class="challengeButton" onclick="answerChallenge(3,3)">🤝 Share the clue and work together</button>'+
+'<button onclick="answerChallenge(1,3)">🤫 Keep part of the clue secret</button>'+
+'<button onclick="answerChallenge(0,3)">🏆 Hide everything to protect your advantage</button>'
+);
+}
+
+function challengeThree(){
+challengeQuestion=3;
+showScene({
+speaker:coupledWith,
+background:'afternoon',
+text:'CHALLENGE 3 OF 3\n\nThe Crystal Flame asks what matters most in a strong couple.\n\nChoose your answer.'
+});
+choices(
+'<button class="challengeButton" onclick="finishChallengeAnswer(3)">💚 Trust and honesty</button>'+
+'<button onclick="finishChallengeAnswer(2)">❤️ Attraction and excitement</button>'+
+'<button onclick="finishChallengeAnswer(1)">🏆 Winning at any cost</button>'
+);
+}
+
+function answerChallenge(points,nextQuestion){
+challengeScore+=points;
+if(nextQuestion===2){
+challengeTwo();
+return;
+}
+challengeThree();
+}
+
+function finishChallengeAnswer(points){
+challengeScore+=points;
+challengeComplete=true;
+autoSaveGame();
+
+let resultText='';
+let rewardText='';
+
+if(challengeScore>=8){
+relationships[coupledWith]+=5;
+couplingRomance+=3;
+couplingTrust+=3;
+resultText='OUTSTANDING CONNECTION';
+rewardText='❤️ Partner Connection +5\n💕 Couple Romance +3\n💚 Couple Trust +3';
+}else if(challengeScore>=5){
+relationships[coupledWith]+=3;
+couplingRomance+=2;
+couplingTrust+=2;
+resultText='CHALLENGE PASSED';
+rewardText='❤️ Partner Connection +3\n💕 Couple Romance +2\n💚 Couple Trust +2';
+}else{
+relationships[coupledWith]+=1;
+couplingTrust+=1;
+resultText='CHALLENGE INCOMPLETE';
+rewardText='❤️ Partner Connection +1\n💚 Couple Trust +1';
+}
+
+updateRelationships();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'🏆 '+resultText+'\n\nFinal Score: '+challengeScore+' / 9\n\n'+rewardText
+});
+choices('<button class="challengeButton" onclick="showChallengeReaction()">❤️ See Your Partner’s Reaction</button>');
+}
+
+function showChallengeReaction(){
+const reactions={
+lucas:'Lucas smiles with quiet pride.\n\n"We handled that like a real team."',
+maya:'Maya watches the Crystal Flame glow.\n\n"It reacted to us. That means something."',
+kai:'Kai grins and bumps your shoulder.\n\n"Not bad, partner. We make a strong team."',
+isabella:'Isabella lights up with excitement.\n\n"I knew we could do this together."',
+ethan:'Ethan nods approvingly.\n\n"Good decisions. Strong result."',
+sofia:'Sofia smiles softly.\n\n"I feel like I understand you better now."',
+noah:'Noah looks relieved and happy.\n\n"Trust matters. I am glad we chose it."',
+lisa:'Lisa gives you a surprised smile.\n\n"Maybe this couple is more real than I expected."'
+};
+
+showScene({
+speaker:coupledWith,
+background:'afternoon',
+text:reactions[coupledWith]
+});
+choices('<button class="bombshellButton" onclick="startBombshellArrival()">💥 Continue to the Bombshell Arrival</button>');
+}
+
+function startBombshellArrival(){
+if(bombshellComplete){showVersionComplete();return}
+
+showScene({
+speaker:'host',
+background:'night',
+text:'Just as the challenge celebration begins, the villa lights flash red.\n\nA boat horn echoes from Arrival Beach.\n\n"Islanders... please welcome the first new Bombshell."'
+});
+choices('<button class="bombshellButton" onclick="revealBombshell()">💥 Meet the Bombshell</button>');
+}
+
+function revealBombshell(){
+showScene({
+speaker:'valentina',
+background:'arrival',
+text:'Valentina Reyes steps onto Flame Cay with a confident smile.\n\n"I did not come here to play safe."\n\n"I came here to find the strongest connection... even if someone is already coupled."'
+});
+choices('<button class="bombshellButton" onclick="showBombshellChoices()">🔥 Continue</button>');
+}
+
+function showBombshellChoices(){
+const partnerName=characters[coupledWith].name;
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina looks directly at you, then glances toward '+partnerName+'.\n\n"So... are you completely closed off, or should I get to know you?"'
+});
+
+choices(
+'<button class="bombshellButton" onclick="chooseBombshellReaction(\'flirt\')">😏 Flirt with Valentina</button>'+
+'<button onclick="chooseBombshellReaction(\'friendly\')">🙂 Welcome her as a friend</button>'+
+'<button onclick="chooseBombshellReaction(\'loyal\')">💚 Stay loyal to '+partnerName+'</button>'
+);
+}
+
+function chooseBombshellReaction(choice){
+if(bombshellChoice)return;
+bombshellChoice=choice;
+bombshellComplete=true;
+autoSaveGame();
+
+let sceneText='';
+
+if(choice==='flirt'){
+relationships.valentina+=5;
+valentinaStats.romance+=3;
+valentinaStats.boldness+=2;
+relationships[coupledWith]-=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+
+sceneText='You match Valentina’s confident energy.\n\nShe smiles slowly.\n\n"I knew you were interesting."\n\n💕 Valentina Romance +3\n🔥 Boldness +2\n❤️ Valentina Connection +5\n💔 Partner Connection -1\n💚 Couple Trust -1';
+}else if(choice==='friendly'){
+relationships.valentina+=3;
+valentinaStats.friendship+=3;
+
+sceneText='You welcome Valentina without crossing any lines.\n\nShe nods with respect.\n\n"Fair enough. Friends can still surprise each other."\n\n🤝 Valentina Friendship +3\n❤️ Valentina Connection +3';
+}else{
+relationships[coupledWith]+=3;
+couplingTrust+=2;
+relationships.valentina+=1;
+valentinaStats.boldness+=1;
+
+sceneText='You make it clear that you want to protect your current couple.\n\nYour partner looks relieved.\n\nValentina smiles anyway.\n\n"Loyalty is attractive. Let us see how long it lasts."\n\n❤️ Partner Connection +3\n💚 Couple Trust +2\n❤️ Valentina Connection +1\n🔥 Valentina Boldness +1';
+}
+
+updateRelationships();
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:sceneText
+});
+choices('<button class="bombshellButton" onclick="showPartnerBombshellReaction()">❤️ See Your Partner’s Reaction</button>');
+}
+
+function showPartnerBombshellReaction(){
+const reactions={
+flirt:{
+lucas:'Lucas looks disappointed but controlled.\n\n"I just hope you know what you are doing."',
+maya:'Maya watches you carefully.\n\n"The island tests people quickly."',
+kai:'Kai forces a smile.\n\n"Competition already? Fine. I can handle it."',
+isabella:'Isabella looks hurt for a moment.\n\n"I thought we were building something."',
+ethan:'Ethan’s expression hardens.\n\n"I pay attention to actions, not promises."',
+sofia:'Sofia looks away quietly.\n\n"I need honesty from you."',
+noah:'Noah speaks calmly.\n\n"I will not tell you what to do, but trust matters."',
+lisa:'Lisa raises an eyebrow.\n\n"So that is how this game is going to be."'
+},
+friendly:{
+lucas:'Lucas smiles.\n\n"That was respectful. I appreciate it."',
+maya:'Maya nods.\n\n"You handled that carefully."',
+kai:'Kai relaxes.\n\n"Friendly is fine. I am not worried."',
+isabella:'Isabella smiles again.\n\n"Good. We can welcome her without drama."',
+ethan:'Ethan nods once.\n\n"Smart choice."',
+sofia:'Sofia looks relieved.\n\n"Thank you for being clear."',
+noah:'Noah smiles warmly.\n\n"That is the kind of honesty I respect."',
+lisa:'Lisa gives you an approving look.\n\n"Balanced. I can work with that."'
+},
+loyal:{
+lucas:'Lucas smiles with real relief.\n\n"I will remember that."',
+maya:'Maya’s expression softens.\n\n"The Crystal Flame values loyalty."',
+kai:'Kai grins.\n\n"Now that is what I wanted to hear."',
+isabella:'Isabella reaches for your hand.\n\n"We are stronger after that."',
+ethan:'Ethan looks impressed.\n\n"Clear choice. Strong decision."',
+sofia:'Sofia smiles softly.\n\n"You made me feel safe."',
+noah:'Noah nods with pride.\n\n"That means a lot to me."',
+lisa:'Lisa gives you a surprised smile.\n\n"Loyal already? Interesting."'
+}
+};
+
+showScene({
+speaker:coupledWith,
+background:'night',
+text:reactions[bombshellChoice][coupledWith]
+});
+choices('<button class="eliminationButton" onclick="startFirstElimination()">🔥 Continue to the First Elimination</button>');
+}
+
+function getEligibleEliminationPool(){
+return ['lucas','maya','kai','isabella','ethan','sofia','noah','lisa']
+.filter(person=>person!==coupledWith);
+}
+
+function calculateAtRisk(){
+const tieOrder=['lisa','ethan','kai','isabella','sofia','noah','maya','lucas'];
+
+atRisk=getEligibleEliminationPool()
+.sort((a,b)=>{
+if(relationships[a]!==relationships[b]){
+return relationships[a]-relationships[b];
+}
+return tieOrder.indexOf(a)-tieOrder.indexOf(b);
+})
+.slice(0,3);
+}
+
+function startFirstElimination(){
+if(eliminationComplete){
+showVersionComplete();
+return;
+}
+
+calculateAtRisk();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The celebration suddenly stops.\n\nThe Crystal Flame turns red.\n\n"Islanders... tonight, one person will leave Flame Cay."\n\n"The three weakest connections are now at risk."'
+});
+
+choices('<button class="eliminationButton" onclick="revealAtRiskIslanders()">🔥 Reveal the Bottom Three</button>');
+}
+
+function revealAtRiskIslanders(){
+const first=characters[atRisk[0]].name;
+const second=characters[atRisk[1]].name;
+const third=characters[atRisk[2]].name;
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The Islanders at risk are:\n\n⚠️ '+first+'\n⚠️ '+second+'\n⚠️ '+third+'\n\n"'+playerName+', you must save one of them."'
+});
+
+choices(
+'<div class="card dangerCard"><h3>🛡️ Save One Islander</h3>'+
+'<button class="safeButton" onclick="saveAtRiskIslander(\''+atRisk[0]+'\')">Save '+characters[atRisk[0]].name+'</button>'+
+'<button class="safeButton" onclick="saveAtRiskIslander(\''+atRisk[1]+'\')">Save '+characters[atRisk[1]].name+'</button>'+
+'<button class="safeButton" onclick="saveAtRiskIslander(\''+atRisk[2]+'\')">Save '+characters[atRisk[2]].name+'</button></div>'
+);
+}
+
+function saveAtRiskIslander(person){
+if(savedPerson)return;
+
+savedPerson=person;
+relationships[person]+=2;
+
+const remaining=atRisk.filter(name=>name!==person);
+
+if(relationships[remaining[0]]<relationships[remaining[1]]){
+eliminatedPerson=remaining[0];
+}else if(relationships[remaining[1]]<relationships[remaining[0]]){
+eliminatedPerson=remaining[1];
+}else{
+const tieOrder=['lisa','ethan','kai','isabella','sofia','noah','maya','lucas'];
+eliminatedPerson=tieOrder.indexOf(remaining[0])<tieOrder.indexOf(remaining[1])
+?remaining[0]
+:remaining[1];
+}
+
+eliminationComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:person,
+background:'night',
+text:'You choose to save '+characters[person].name+'.\n\n❤️ Connection +2\n\nThe Crystal Flame now decides between '+characters[remaining[0]].name+' and '+characters[remaining[1]].name+'.'
+});
+
+choices('<button class="eliminationButton" onclick="revealEliminatedIslander()">🔥 Reveal Who Is Leaving</button>');
+}
+
+function revealEliminatedIslander(){
+const farewells={
+lucas:'Lucas takes a breath and nods.\n\n"I wish I had more time, but I respect the decision."',
+maya:'Maya looks toward the jungle one last time.\n\n"The island still has secrets. Be careful."',
+kai:'Kai gives a disappointed smile.\n\n"I hate losing, but I will leave with my head high."',
+isabella:'Isabella wipes away a tear.\n\n"Keep bringing good energy, even when things get hard."',
+ethan:'Ethan stays composed.\n\n"Every decision has a consequence. This one is mine."',
+sofia:'Sofia speaks softly.\n\n"I hope everyone here finds something real."',
+noah:'Noah nods with quiet respect.\n\n"Take care of each other. That matters more than winning."',
+lisa:'Lisa forces a confident smile.\n\n"Flame Cay has not seen the last surprise yet."'
+};
+
+showScene({
+speaker:eliminatedPerson,
+background:'night',
+text:characters[eliminatedPerson].name+' has been eliminated.\n\n'+farewells[eliminatedPerson]
+});
+
+choices('<button class="eliminationButton" onclick="showEliminationAftermath()">🌙 Say Goodbye</button>');
+}
+
+function showEliminationAftermath(){
+const savedName=characters[savedPerson].name;
+const eliminatedName=characters[eliminatedPerson].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The villa falls silent as '+eliminatedName+' leaves Flame Cay.\n\n"'+savedName+' is safe because of your choice."\n\n"The Crystal Flame remembers who you protected... and who you allowed to leave."'
+});
+
+choices('<button class="dayFiveButton" onclick="beginDayFive()">☀️ Begin Day 5</button>');
+}
+
+function beginDayFive(){
+currentDay=5;
+currentTime='Morning';
+actionUsed=false;
+eveningEventDone=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+const partnerName=characters[coupledWith].name;
+const savedName=characters[savedPerson].name;
+const eliminatedName=characters[eliminatedPerson].name;
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'Morning arrives after a difficult night.\n\n📅 Day 5\n☀️ Morning\n\n'+eliminatedName+' is gone.\n'+savedName+' is still in the villa because of your choice.\n\nYou wake up beside '+partnerName+', but the villa feels different.\n\n⭐ One new activity is available.'
+});
+
+choices('<button class="dayFiveButton" onclick="openIslandMap()">🗺️ Begin Day 5</button>');
+}
+
+function getUpsetIslander(){
+const order=['isabella','sofia','noah','maya','kai','lucas','ethan','lisa'];
+
+return order.find(person=>
+person!==coupledWith &&
+person!==savedPerson &&
+person!==eliminatedPerson
+) || savedPerson;
+}
+
+function addFriendshipPoint(person){
+if(person==='lucas')lucasStats.friendship++;
+if(person==='maya')mayaStats.friendship++;
+if(person==='kai')kaiStats.friendship++;
+if(person==='isabella')isabellaStats.friendship++;
+if(person==='ethan')ethanStats.friendship++;
+if(person==='sofia')sofiaStats.friendship++;
+if(person==='noah')noahStats.friendship++;
+if(person==='lisa')lisaStats.friendship++;
+if(person==='valentina')valentinaStats.friendship++;
+}
+
+function visitDayFiveLocation(loc){
+const partnerName=characters[coupledWith].name;
+const savedName=characters[savedPerson].name;
+const eliminatedName=characters[eliminatedPerson].name;
+const upsetPerson=getUpsetIslander();
+
+if(loc==='villa'){
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:partnerName+' is sitting quietly in the lounge.\n\n"Last night changed everything," your partner says.\n\n"I want to know how you are feeling."'
+});
+choices('<button class="dayFiveButton" onclick="dayFivePartnerTalk()">❤️ Talk to Your Partner</button>'+backMap());
+return;
+}
+
+if(loc==='beach'){
+showScene({
+speaker:savedPerson,
+background:'beach',
+text:savedName+' is standing near the water.\n\n"I am still here because you saved me."\n\n"I wanted to thank you before the day gets busy."'
+});
+choices('<button class="dayFiveButton" onclick="dayFiveSavedTalk()">🛡️ Talk to '+savedName+'</button>'+backMap());
+return;
+}
+
+if(loc==='pool'){
+showScene({
+speaker:'valentina',
+background:'beach',
+text:'Valentina is relaxing beside the Infinity Pool.\n\n"One person leaves, and suddenly everyone starts acting honest."\n\nShe looks directly at you.\n\n"Are you ready for the truth?"'
+});
+choices(
+'<button class="dayFiveButton" onclick="dayFiveValentinaTalk(\'boundaries\')">💚 Set clear boundaries</button>'+
+'<button onclick="dayFiveValentinaTalk(\'friendly\')">🙂 Hear her out calmly</button>'+
+'<button onclick="dayFiveValentinaTalk(\'open\')">🔥 Keep your options open</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='firepit'){
+showScene({
+speaker:upsetPerson,
+background:'villa',
+text:characters[upsetPerson].name+' stands near the cold Fire Pit.\n\n"I understand why you saved '+savedName+'."\n\n"But '+eliminatedName+' deserved another chance too."'
+});
+choices(
+'<button class="dayFiveButton" onclick="dayFiveUpsetTalk(\'apologize\')">🤝 Apologize and explain</button>'+
+'<button onclick="dayFiveUpsetTalk(\'stand\')">🔥 Stand by your decision</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='shrine'){
+if(eliminatedPerson!=='maya'){
+showScene({
+speaker:'maya',
+background:'crystal',
+text:'Maya studies the Crystal Flame in silence.\n\n"The Flame changed after the elimination."\n\n"It remembers every person who leaves."'
+});
+choices('<button class="dayFiveButton" onclick="dayFiveShrineTalk()">💎 Examine the new mark</button>'+backMap());
+}else{
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The Shrine is empty without Maya.\n\nA new dark mark has appeared beneath the Crystal Flame.'
+});
+choices('<button class="dayFiveButton" onclick="dayFiveShrineTalk()">💎 Examine the new mark</button>'+backMap());
+}
+return;
+}
+
+if(loc==='cove'){
+showEmpty('🌙 Moonlight Cove','The cove is quiet. A single set of footprints disappears into the water.','beach');
+return;
+}
+
+if(loc==='jungle'){
+showEmpty('🌿 Whispering Jungle','The glowing-stone trail has faded since the elimination.','jungle');
+return;
+}
+
+if(loc==='gym'){
+showEmpty('💪 Gym','The gym is unusually quiet this morning.','villa');
+return;
+}
+
+if(loc==='kitchen'){
+showEmpty('🍳 Kitchen','Breakfast has been prepared, but one seat remains empty.','villa');
+return;
+}
+
+if(loc==='volcano'){
+showEmpty('🌋 Volcano Peak','The message on the gate now reads: "Every choice requires a sacrifice."','volcano');
+return;
+}
+
+showEmpty('Flame Cay','The island feels different after the elimination.','villa');
+}
+
+function dayFivePartnerTalk(){
+if(actionAlreadyUsed())return;
+
+relationships[coupledWith]+=2;
+couplingRomance++;
+couplingTrust++;
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:'You tell your partner the truth about how difficult the elimination felt.\n\nYour partner listens without interrupting.\n\n"Thank you for trusting me."\n\n❤️ Partner Connection +2\n💕 Couple Romance +1\n💚 Couple Trust +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveSavedTalk(){
+if(actionAlreadyUsed())return;
+
+relationships[savedPerson]+=3;
+addFriendshipPoint(savedPerson);
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:savedPerson,
+background:'beach',
+text:'You tell '+characters[savedPerson].name+' that saving them was not an easy decision.\n\n"I will prove that you made the right choice."\n\n❤️ Connection +3\n🤝 Friendship +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveValentinaTalk(choice){
+if(actionAlreadyUsed())return;
+
+let result='';
+
+if(choice==='boundaries'){
+relationships[coupledWith]+=2;
+couplingTrust++;
+relationships.valentina+=1;
+valentinaStats.boldness++;
+result='You tell Valentina that your current couple deserves respect.\n\nShe smiles, but does not look discouraged.\n\n❤️ Partner Connection +2\n💚 Couple Trust +1\n❤️ Valentina Connection +1\n🔥 Valentina Boldness +1';
+}else if(choice==='friendly'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+result='You listen without making any promises.\n\nValentina appreciates your honesty.\n\n❤️ Valentina Connection +2\n🤝 Valentina Friendship +2';
+}else{
+relationships.valentina+=3;
+valentinaStats.romance+=2;
+couplingTrust=Math.max(0,couplingTrust-1);
+result='You admit that you are still curious about her.\n\nValentina moves closer with a confident smile.\n\n❤️ Valentina Connection +3\n💕 Valentina Romance +2\n💚 Couple Trust -1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'valentina',
+background:'beach',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveUpsetTalk(choice){
+if(actionAlreadyUsed())return;
+
+const upsetPerson=getUpsetIslander();
+let result='';
+
+if(choice==='apologize'){
+relationships[upsetPerson]+=2;
+addFriendshipPoint(upsetPerson);
+result='You explain that the elimination decision was painful and that you never wanted anyone to feel forgotten.\n\n'+characters[upsetPerson].name+' slowly nods.\n\n❤️ Connection +2\n🤝 Friendship +1';
+}else{
+relationships[upsetPerson]+=1;
+result='You explain that you made the decision you believed was right.\n\n'+characters[upsetPerson].name+' respects your honesty, even if they disagree.\n\n❤️ Connection +1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:upsetPerson,
+background:'villa',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveShrineTalk(){
+if(actionAlreadyUsed())return;
+
+mayaStats.mystery++;
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The dark mark forms the shape of a broken circle.\n\nA whisper moves through the Shrine:\n\n"Those who leave are never fully forgotten."\n\n🔥 Mystery +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function beginDayFiveAfternoon(){
+currentTime='Afternoon';
+actionUsed=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'afternoon',
+text:'The morning tension follows everyone into the afternoon.\n\n📅 Day 5\n🌤️ Afternoon\n\nA message appears on every villa phone:\n\n"Valentina will choose someone for the first Bombshell date tonight."\n\n⭐ One new activity is available.'
+});
+
+choices('<button class="afternoonButton" onclick="openIslandMap()">🗺️ Begin Day 5 Afternoon</button>');
+}
+
+function visitDayFiveAfternoonLocation(loc){
+const partnerName=characters[coupledWith].name;
+const savedName=characters[savedPerson].name;
+const upsetPerson=getUpsetIslander();
+
+if(loc==='villa'){
+showScene({
+speaker:coupledWith,
+background:'afternoon',
+text:partnerName+' waits for you in the villa lounge.\n\n"Valentina is choosing a date tonight."\n\n"Are you hoping she picks you?"'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonPartnerTalk(\'reassure\')">💚 Reassure Your Partner</button>'+
+'<button onclick="dayFiveAfternoonPartnerTalk(\'honest\')">💬 Admit You Are Curious</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='beach'){
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:'Valentina walks beside the shoreline holding a gold invitation.\n\n"I have not chosen my date yet."\n\n"Give me one reason it should be you."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonValentinaTalk(\'flirt\')">😏 Make a Bold Impression</button>'+
+'<button onclick="dayFiveAfternoonValentinaTalk(\'friendly\')">🙂 Keep It Friendly</button>'+
+'<button onclick="dayFiveAfternoonValentinaTalk(\'loyal\')">💚 Say You Are Staying Loyal</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='pool'){
+showScene({
+speaker:savedPerson,
+background:'afternoon',
+text:savedName+' sits beside the Infinity Pool.\n\n"Valentina’s date choice could break a couple apart."\n\n"You saved me last night. I want to help you today."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonSavedTalk()">🛡️ Ask for Advice</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='firepit'){
+showScene({
+speaker:upsetPerson,
+background:'afternoon',
+text:characters[upsetPerson].name+' is watching the empty Fire Pit.\n\n"Everyone is focused on Valentina now."\n\n"But the elimination still does not feel right."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonUpsetTalk()">🤝 Try to Repair the Friendship</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='shrine'){
+showScene({
+speaker:'maya',
+background:'crystal',
+text:eliminatedPerson==='maya'
+?'The Shrine is empty, but the Crystal Flame projects the image of a golden invitation.'
+:'Maya watches the Crystal Flame project the image of a golden invitation.\n\n"It is reacting to Valentina’s choice before she has even made it."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonShrineTalk()">💎 Study the Date Vision</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='kitchen'){
+showScene({
+speaker:'isabella',
+background:'afternoon',
+text:eliminatedPerson==='isabella'
+?'The kitchen is quiet. A villa phone on the counter keeps flashing with date rumors.'
+:'Isabella is collecting every rumor about Valentina’s date choice.\n\n"Half the villa thinks she will choose you."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonRumorTalk()">🎭 Ask About the Rumors</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='jungle'){
+showEmpty('🌿 Whispering Jungle','A gold ribbon is tied to one tree. It matches Valentina’s invitation.','jungle');
+return;
+}
+
+if(loc==='gym'){
+showEmpty('💪 Gym','The Islanders are too distracted by the date announcement to train.','afternoon');
+return;
+}
+
+if(loc==='cove'){
+showEmpty('🌙 Moonlight Cove','A private table is being prepared for tonight’s Bombshell date.','afternoon');
+return;
+}
+
+if(loc==='volcano'){
+showEmpty('🌋 Volcano Peak','The gate now reads: "Desire reveals what loyalty hides."','volcano');
+return;
+}
+
+showEmpty('Flame Cay','Everyone is waiting to learn who Valentina will choose.','afternoon');
+}
+
+function dayFiveAfternoonPartnerTalk(choice){
+if(actionAlreadyUsed())return;
+
+let result='';
+
+if(choice==='reassure'){
+relationships[coupledWith]+=3;
+couplingTrust+=2;
+couplingRomance+=1;
+result='You tell your partner that your current relationship comes first.\n\n'+characters[coupledWith].name+' relaxes and reaches for your hand.\n\n❤️ Partner Connection +3\n💚 Couple Trust +2\n💕 Couple Romance +1';
+}else{
+relationships[coupledWith]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+relationships.valentina+=1;
+result='You admit that part of you is curious about Valentina.\n\nYour partner appreciates the honesty, but the answer still hurts.\n\n❤️ Partner Connection +1\n💚 Couple Trust -1\n❤️ Valentina Connection +1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:coupledWith,
+background:'afternoon',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonValentinaTalk(choice){
+if(actionAlreadyUsed())return;
+
+let result='';
+
+if(choice==='flirt'){
+relationships.valentina+=4;
+valentinaStats.romance+=3;
+valentinaStats.boldness+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+result='You tell Valentina that choosing you would make the date unforgettable.\n\nShe smiles and folds the invitation slowly.\n\n❤️ Valentina Connection +4\n💕 Valentina Romance +3\n🔥 Valentina Boldness +1\n💚 Couple Trust -1';
+}else if(choice==='friendly'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+result='You tell Valentina that you are happy to get to know her without making promises.\n\nShe respects the balanced answer.\n\n❤️ Valentina Connection +2\n🤝 Valentina Friendship +2';
+}else{
+relationships[coupledWith]+=2;
+couplingTrust+=2;
+relationships.valentina+=1;
+result='You tell Valentina that you are protecting your current couple.\n\nShe looks impressed instead of offended.\n\n❤️ Partner Connection +2\n💚 Couple Trust +2\n❤️ Valentina Connection +1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonSavedTalk(){
+if(actionAlreadyUsed())return;
+
+relationships[savedPerson]+=2;
+addFriendshipPoint(savedPerson);
+couplingTrust+=1;
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:savedPerson,
+background:'afternoon',
+text:characters[savedPerson].name+' tells you to be honest before Valentina makes her choice.\n\n"Secrets create more damage than the date itself."\n\n❤️ Saved Islander Connection +2\n🤝 Friendship +1\n💚 Couple Trust +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonUpsetTalk(){
+if(actionAlreadyUsed())return;
+
+const upsetPerson=getUpsetIslander();
+relationships[upsetPerson]+=3;
+addFriendshipPoint(upsetPerson);
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:upsetPerson,
+background:'afternoon',
+text:'You listen instead of defending yourself.\n\n'+characters[upsetPerson].name+' finally admits that the anger came from fear of being next.\n\n❤️ Connection +3\n🤝 Friendship +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonShrineTalk(){
+if(actionAlreadyUsed())return;
+
+mayaStats.mystery+=2;
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The vision shows Valentina standing between two flames.\n\nOne flame represents desire.\nThe other represents loyalty.\n\nA whisper says:\n\n"Tonight, one choice will test both."\n\n🔥 Mystery +2\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonRumorTalk(){
+if(actionAlreadyUsed())return;
+
+if(eliminatedPerson!=='isabella'){
+relationships.isabella+=2;
+isabellaStats.social+=2;
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:eliminatedPerson==='isabella'?'narrator':'isabella',
+background:'afternoon',
+text:eliminatedPerson==='isabella'
+?'You read the messages flashing across the abandoned villa phone.\n\nThe strongest rumor says Valentina is choosing between you and your partner.\n\n🎭 Rumor discovered\n\n✅ Activity complete.'
+:'Isabella tells you that Valentina has asked questions about both you and your partner.\n\n"Whatever happens tonight, someone will be jealous."\n\n❤️ Isabella Connection +2\n🎭 Social +2\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function chooseDateInvitee(){
+if(relationships.valentina>=5||valentinaStats.romance>=3){
+dateInvitee='player';
+return;
+}
+
+const candidates=['lucas','maya','kai','isabella','ethan','sofia','noah','lisa']
+.filter(person=>person!==coupledWith&&person!==eliminatedPerson);
+
+dateInvitee=candidates.sort((a,b)=>relationships[b]-relationships[a])[0]||savedPerson;
+}
+
+function startValentinaDate(){
+if(dateComplete){
+showVersionComplete();
+return;
+}
+
+chooseDateInvitee();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The villa phones light up at the same time.\n\n"Islanders... Valentina has made her first date choice."'
+});
+
+choices('<button class="dateButton" onclick="revealDateChoice()">💖 Reveal the Date Choice</button>');
+}
+
+function revealDateChoice(){
+if(dateInvitee==='player'){
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina steps forward holding the gold invitation.\n\n"'+playerName+', I choose you."\n\n"I want to know whether our connection is real... or just dangerous."'
+});
+choices('<button class="dateButton" onclick="beginPlayerDate()">🌙 Go on the Date</button>');
+return;
+}
+
+const inviteeName=characters[dateInvitee].name;
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina raises the gold invitation.\n\n"I choose '+inviteeName+'."\n\nShe glances at you before leaving the Fire Pit.'
+});
+
+choices('<button class="dateButton" onclick="watchOtherDate()">👀 Watch the Date Begin</button>');
+}
+
+function beginPlayerDate(){
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Moonlight Cove has been prepared with lanterns and a private table.\n\nValentina sits across from you.\n\n"Tell me the truth. What are you looking for on Flame Cay?"'
+});
+
+choices(
+'<div class="card dateCard"><h3>💖 Choose Your Date Answer</h3>'+
+'<button class="dateButton" onclick="finishPlayerDate(\'romance\')">❤️ Say you feel a real spark with her</button>'+
+'<button onclick="finishPlayerDate(\'honest\')">💬 Say you are curious but still committed</button>'+
+'<button onclick="finishPlayerDate(\'loyal\')">💚 Say your current partner comes first</button></div>'
+);
+}
+
+function finishPlayerDate(choice){
+if(dateChoice)return;
+dateChoice=choice;
+dateComplete=true;
+
+let result='';
+
+if(choice==='romance'){
+relationships.valentina+=5;
+valentinaStats.romance+=4;
+valentinaStats.boldness+=2;
+relationships[coupledWith]-=2;
+couplingTrust=Math.max(0,couplingTrust-2);
+
+result='You admit that the chemistry feels real.\n\nValentina smiles and reaches across the table.\n\n"I was hoping you would say that."\n\n❤️ Valentina Connection +5\n💕 Valentina Romance +4\n🔥 Valentina Boldness +2\n💔 Partner Connection -2\n💚 Couple Trust -2';
+}else if(choice==='honest'){
+relationships.valentina+=3;
+valentinaStats.friendship+=2;
+valentinaStats.romance+=1;
+couplingTrust+=1;
+
+result='You tell Valentina that you are curious, but you refuse to lie about your current relationship.\n\nShe respects the answer.\n\n"Honesty makes this more interesting."\n\n❤️ Valentina Connection +3\n🤝 Valentina Friendship +2\n💕 Valentina Romance +1\n💚 Couple Trust +1';
+}else{
+relationships[coupledWith]+=3;
+couplingTrust+=3;
+couplingRomance+=1;
+relationships.valentina+=1;
+
+result='You tell Valentina that your current partner comes first.\n\nShe studies you for a moment, then smiles.\n\n"Loyalty is rare here. I respect it."\n\n❤️ Partner Connection +3\n💚 Couple Trust +3\n💕 Couple Romance +1\n❤️ Valentina Connection +1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:result
+});
+
+choices('<button class="dateButton" onclick="showDateAftermath()">🌙 Return to the Villa</button>');
+}
+
+function watchOtherDate(){
+const inviteeName=characters[dateInvitee].name;
+
+showScene({
+speaker:dateInvitee,
+background:'night',
+text:inviteeName+' joins Valentina at Moonlight Cove.\n\nThey laugh together as the lanterns glow.\n\nFrom the villa, you cannot hear what they are saying.'
+});
+
+choices(
+'<button class="dateButton" onclick="reactToOtherDate(\'jealous\')">😠 Admit You Feel Jealous</button>'+
+'<button onclick="reactToOtherDate(\'calm\')">🙂 Stay Calm and Trust Your Partner</button>'+
+'<button onclick="reactToOtherDate(\'relieved\')">😌 Feel Relieved It Was Not You</button>'
+);
+}
+
+function reactToOtherDate(choice){
+if(dateChoice)return;
+dateChoice=choice;
+dateComplete=true;
+
+let result='';
+
+if(choice==='jealous'){
+relationships.valentina+=2;
+valentinaStats.boldness+=2;
+couplingTrust=Math.max(0,couplingTrust-1);
+
+result='You realize Valentina’s choice bothers you more than expected.\n\nYour partner notices your reaction.\n\n❤️ Valentina Connection +2\n🔥 Valentina Boldness +2\n💚 Couple Trust -1';
+}else if(choice==='calm'){
+relationships[coupledWith]+=2;
+couplingTrust+=2;
+result='You choose not to create drama before knowing the truth.\n\nYour partner appreciates your calm reaction.\n\n❤️ Partner Connection +2\n💚 Couple Trust +2';
+}else{
+relationships[coupledWith]+=1;
+couplingRomance+=1;
+result='You feel relieved that the date did not test your couple directly.\n\nYour partner smiles when you say so.\n\n❤️ Partner Connection +1\n💕 Couple Romance +1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:coupledWith,
+background:'night',
+text:result
+});
+
+choices('<button class="dateButton" onclick="showDateAftermath()">🌙 Wait for Valentina to Return</button>');
+}
+
+function showDateAftermath(){
+const partnerName=characters[coupledWith].name;
+
+if(dateInvitee==='player'){
+showScene({
+speaker:coupledWith,
+background:'night',
+text:partnerName+' waits for you near the villa entrance.\n\n"How was the date?"\n\nThe answer hangs between you.'
+});
+choices('<button class="dateButton" onclick="finishDateAftermath()">💬 Tell the Truth About the Date</button>');
+return;
+}
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina returns from Moonlight Cove with '+characters[dateInvitee].name+'.\n\nShe gives nothing away.\n\n"That was useful," she says.'
+});
+choices('<button class="dateButton" onclick="finishDateAftermath()">🔥 Continue</button>');
+}
+
+function finishDateAftermath(){
+if(dateInvitee==='player'){
+if(dateChoice==='romance'){
+couplingTrust=Math.max(0,couplingTrust-1);
+}else{
+couplingTrust+=1;
+}
+updateRelationships();
+autoSaveGame();
+}
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Crystal Flame glows above the villa.\n\n"One date can create a connection... or expose a weakness."\n\n"Tomorrow, everyone will learn what changed tonight."'
+});
+
+choices('<button class="casaButton" onclick="startCasaDrama()">🏝️ Continue to the Casa Twist</button>');
+}
+
+function startCasaDrama(){
+if(casaComplete){
+showVersionComplete();
+return;
+}
+
+casaStarted=true;
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The villa phones suddenly flash with a new message.\n\n"Islanders, pack a small bag immediately."\n\n"Tonight, Flame Cay will be divided."'
+});
+
+choices('<button class="casaButton" onclick="revealCasaTwist()">🏝️ Reveal the Twist</button>');
+}
+
+function revealCasaTwist(){
+const partnerName=characters[coupledWith].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"Half of the Islanders will remain in the Main Villa."\n\n"The others will move to Moonlight House on the opposite side of the island."\n\nYou and '+partnerName+' will be separated.\n\nFor the next test, you will not know what your partner is doing.'
+});
+
+choices('<button class="casaButton" onclick="showCasaArrival()">🌙 Enter Moonlight House</button>');
+}
+
+function showCasaArrival(){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'Moonlight House is smaller, quieter, and filled with unfamiliar faces.\n\nA sealed card waits on your bed.\n\nIt reads:\n\n"Tonight, choose loyalty... curiosity... or temptation."'
+});
+
+choices('<button class="casaButton" onclick="showCasaChoice()">💌 Open the Loyalty Test</button>');
+}
+
+function showCasaChoice(){
+const partnerName=characters[coupledWith].name;
+
+showScene({
+speaker:'host',
+background:'night',
+text:'"You have one private evening before the villas reunite."\n\n"Your choice will remain secret for now."\n\nRemember: '+partnerName+' is making a choice too.'
+});
+
+choices(
+'<div class="card casaCard"><h3>🏝️ Casa Loyalty Test</h3>'+
+'<button class="loyaltyButton" onclick="chooseCasaPath(\'loyal\')">💚 Stay completely loyal</button>'+
+'<button class="casaButton" onclick="chooseCasaPath(\'curious\')">💬 Get to know someone new</button>'+
+'<button class="temptationButton" onclick="chooseCasaPath(\'tempted\')">🔥 Give in to temptation</button></div>'
+);
+}
+
+function chooseCasaPath(choice){
+if(casaChoice)return;
+
+casaChoice=choice;
+casaPartnerReaction=calculatePartnerCasaReaction();
+casaComplete=true;
+
+let result='';
+
+if(choice==='loyal'){
+setStoryFlag('stayedLoyalToPartner',true,'Stayed loyal during the Casa test');
+recordChoice('casa_loyal','Stayed loyal during Casa','You protected your current relationship.',{reputation:2});
+relationships[coupledWith]+=4;
+couplingTrust+=4;
+couplingRomance+=2;
+result='You decide that your current relationship deserves a real chance.\n\nYou spend the evening alone on the terrace, writing a message you are not allowed to send.\n\n❤️ Partner Connection +4\n💚 Couple Trust +4\n💕 Couple Romance +2';
+}else if(choice==='curious'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+couplingTrust=Math.max(0,couplingTrust-1);
+result='You join a late-night conversation and allow yourself to be open to a new connection.\n\nNothing serious happens, but the choice creates uncertainty.\n\n❤️ Valentina Connection +2\n🤝 Valentina Friendship +2\n💚 Couple Trust -1';
+}else{
+setStoryFlag('gaveInToTemptation',true,'Gave in to temptation during Casa');
+recordChoice('casa_tempted','Gave in to temptation','This choice can return later.',{reputation:-3});
+scheduleConsequence(
+'casa_secret_revealed',
+'A Casa Secret Reaches the Villa',
+'Someone reveals that you gave in to temptation during Casa. The villa begins questioning your loyalty.',
+'gaveInToTemptation',
+2,
+{reputation:-4,jealousy:{[coupledWith]:10}}
+);
+relationships.valentina+=5;
+valentinaStats.romance+=4;
+valentinaStats.boldness+=2;
+relationships[coupledWith]-=3;
+couplingTrust=Math.max(0,couplingTrust-3);
+result='You choose excitement over caution.\n\nThe moment is private, but Flame Cay has a way of revealing secrets.\n\n❤️ Valentina Connection +5\n💕 Valentina Romance +4\n🔥 Valentina Boldness +2\n💔 Partner Connection -3\n💚 Couple Trust -3';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'night',
+text:result
+});
+
+choices('<button class="casaButton" onclick="showPartnerCasaChoice()">📱 Learn What Your Partner Did</button>');
+}
+
+function calculatePartnerCasaReaction(){
+if(couplingTrust>=8)return 'loyal';
+if(couplingTrust>=4)return 'curious';
+return 'tempted';
+}
+
+function showPartnerCasaChoice(){
+const partnerName=characters[coupledWith].name;
+let text='';
+
+if(casaPartnerReaction==='loyal'){
+text=partnerName+' chose to stay loyal.\n\nYour partner turned down every opportunity to explore another connection.';
+}else if(casaPartnerReaction==='curious'){
+text=partnerName+' chose to talk with someone new.\n\nNothing serious happened, but your partner did not stay completely closed off.';
+}else{
+text=partnerName+' gave in to temptation.\n\nThe message does not explain exactly what happened.';
+}
+
+showScene({
+speaker:coupledWith,
+background:'night',
+text:text
+});
+
+choices('<button class="casaButton" onclick="showCasaConflict()">🔥 Continue</button>');
+}
+
+function showCasaConflict(){
+const partnerName=characters[coupledWith].name;
+let text='';
+
+if(casaChoice==='loyal'&&casaPartnerReaction==='loyal'){
+relationships[coupledWith]+=3;
+couplingTrust+=3;
+text='Both of you stayed loyal.\n\nThe separation made your connection stronger.';
+}else if(casaChoice==='loyal'&&casaPartnerReaction!=='loyal'){
+text='You stayed loyal, but '+partnerName+' explored another connection.\n\nFor the first time, you question whether the relationship is balanced.';
+}else if(casaChoice!=='loyal'&&casaPartnerReaction==='loyal'){
+couplingTrust=Math.max(0,couplingTrust-1);
+text=partnerName+' stayed loyal while you explored something new.\n\nThe secret feels heavier now.';
+}else{
+text='Both of you explored other connections.\n\nThe reunion will not be simple.';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:text+'\n\n"Tomorrow, the two villas will reunite."\n\n"Every Islander must decide whether to return alone... or recouple."'
+});
+
+choices('<button class="recoupleButton" onclick="startCasaRecoupling()">🔥 Continue to Casa Recoupling</button>');
+}
+
+function startCasaRecoupling(){
+if(recouplingComplete){
+showVersionComplete();
+return;
+}
+
+previousPartner=coupledWith;
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The two villas reunite beneath the Crystal Flame.\n\nEvery Islander stands around the Fire Pit.\n\n"Tonight, each couple must decide whether to stay together... or choose someone new."'
+});
+
+choices('<button class="recoupleButton" onclick="showPartnerReturn()">🔥 Begin the Recoupling</button>');
+}
+
+function showPartnerReturn(){
+const partnerName=characters[previousPartner].name;
+let returnText='';
+
+if(casaPartnerReaction==='loyal'){
+returnText=partnerName+' returns alone.\n\nYour partner chose loyalty.';
+}else if(casaPartnerReaction==='curious'){
+returnText=partnerName+' returns alone, but admits they explored another connection.';
+}else{
+returnText=partnerName+' returns with uncertainty in their eyes.\n\nSomething happened at the other villa.';
+}
+
+showScene({
+speaker:previousPartner,
+background:'night',
+text:returnText
+});
+
+choices('<button class="recoupleButton" onclick="showRecouplingChoice()">💔 Make Your Choice</button>');
+}
+
+function getRecouplingOptions(){
+const options=['valentina','lucas','maya','kai','isabella','ethan','sofia','noah','lisa']
+.filter(person=>
+person!==previousPartner &&
+person!==eliminatedPerson
+);
+
+return options.slice(0,4);
+}
+
+function showRecouplingChoice(){
+const partnerName=characters[previousPartner].name;
+const options=getRecouplingOptions();
+
+let buttons=
+'<div class="card recouplingCard"><h3>🔥 Casa Recoupling</h3>'+
+'<button class="stayButton" onclick="chooseRecoupling(\'stay\')">💚 Stay with '+partnerName+'</button>';
+
+options.forEach(person=>{
+buttons+='<button class="recoupleButton" onclick="chooseRecoupling(\''+person+'\')">❤️ Recouple with '+characters[person].name+'</button>';
+});
+
+buttons+='<button class="singleButton" onclick="chooseRecoupling(\'single\')">🌙 Return Single</button></div>';
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"'+playerName+', the decision is yours."\n\n"Will you stay loyal, choose someone new, or return single?"'
+});
+
+choices(buttons);
+}
+
+function chooseRecoupling(choice){
+if(recouplingChoice)return;
+
+recouplingChoice=choice;
+recouplingPartnerChoice=calculatePartnerRecouplingChoice();
+
+let text='';
+
+if(choice==='stay'){
+coupledWith=previousPartner;
+relationships[coupledWith]+=5;
+couplingTrust+=4;
+couplingRomance+=3;
+
+text='You choose to stay with '+characters[previousPartner].name+'.\n\nThe Fire Pit erupts with applause.\n\n❤️ Partner Connection +5\n💚 Couple Trust +4\n💕 Couple Romance +3';
+}else if(choice==='single'){
+setStoryFlag('returnedSingle',true,'Returned single during the Casa recoupling');
+recordChoice('returned_single','Returned single','You chose independence over an uncertain couple.',{reputation:2});
+coupledWith='';
+couplingTrust=Math.max(0,couplingTrust-2);
+
+text='You choose to return single.\n\nThe villa falls silent.\n\nYou are no longer officially coupled.\n\n💚 Couple Trust -2';
+}else{
+coupledWith=choice;
+relationships[choice]+=6;
+couplingRomance=3;
+couplingTrust=1;
+
+text='You choose to recouple with '+characters[choice].name+'.\n\nYour old partner looks stunned.\n\n❤️ New Partner Connection +6\n💕 Couple Romance reset to 3\n💚 Couple Trust reset to 1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:choice==='stay'?previousPartner:choice==='single'?'narrator':choice,
+background:'night',
+text:text
+});
+
+choices('<button class="recoupleButton" onclick="revealPartnerRecouplingChoice()">🔥 Reveal Your Former Partner’s Choice</button>');
+}
+
+function calculatePartnerRecouplingChoice(){
+if(casaPartnerReaction==='loyal'&&couplingTrust>=6){
+return 'stay';
+}
+
+if(casaPartnerReaction==='tempted'){
+return 'new';
+}
+
+return couplingTrust>=4?'stay':'new';
+}
+
+function revealPartnerRecouplingChoice(){
+const formerName=characters[previousPartner].name;
+let text='';
+
+if(recouplingPartnerChoice==='stay'){
+text=formerName+' chose to remain loyal to you.';
+}else{
+text=formerName+' chose to explore a new connection.';
+}
+
+showScene({
+speaker:previousPartner,
+background:'night',
+text:text
+});
+
+choices('<button class="recoupleButton" onclick="showRecouplingOutcome()">🔥 Continue</button>');
+}
+
+function showRecouplingOutcome(){
+const formerName=characters[previousPartner].name;
+let text='';
+
+if(recouplingChoice==='stay'&&recouplingPartnerChoice==='stay'){
+relationships[previousPartner]+=3;
+couplingTrust+=3;
+couplingRomance+=2;
+text='Both of you stayed loyal.\n\nYour couple survives Casa stronger than before.';
+}else if(recouplingChoice==='stay'&&recouplingPartnerChoice==='new'){
+coupledWith='';
+couplingTrust=0;
+text='You stayed loyal, but '+formerName+' chose someone new.\n\nYou are left single.';
+}else if(recouplingChoice!=='stay'&&recouplingPartnerChoice==='stay'){
+text=formerName+' stayed loyal while you chose another path.\n\nThe hurt is impossible to hide.';
+}else{
+text='Both of you chose new paths.\n\nYour original couple is officially over.';
+}
+
+recouplingComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:text+'\n\n"The Casa Recoupling is complete."\n\n"Tomorrow, every decision will have consequences."'
+});
+
+choices('<button class="falloutButton" onclick="startFalloutDay()">☀️ Continue to Fallout Day</button>');
+}
+
+function startFalloutDay(){
+if(falloutComplete){
+showVersionComplete();
+return;
+}
+
+falloutStarted=true;
+currentDay=6;
+currentTime='Morning';
+actionUsed=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+let opening='';
+
+if(recouplingChoice==='stay'&&recouplingPartnerChoice==='stay'){
+opening='You and '+characters[previousPartner].name+' survived Casa together.\n\nBut the rest of the villa is full of broken couples.';
+}else if(coupledWith){
+opening='You wake up beside '+characters[coupledWith].name+'.\n\nYour former partner is only a few rooms away.';
+}else{
+opening='You wake up single after the Casa Recoupling.\n\nEvery conversation feels more important now.';
+}
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'📅 Day 6\n☀️ Fallout Morning\n\n'+opening+'\n\n⭐ Choose one major conversation.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutChoices()">🔥 Begin Fallout Day</button>');
+}
+
+function showFalloutChoices(){
+const formerName=characters[previousPartner].name;
+const currentName=coupledWith&&characters[coupledWith]?characters[coupledWith].name:'No current partner';
+
+let html='<div class="card falloutCard"><h3>🔥 Fallout Conversations</h3>';
+
+if(previousPartner&&previousPartner!==coupledWith){
+html+='<button class="argumentButton" onclick="chooseFalloutScene(\'former\')">💔 Talk to Former Partner: '+formerName+'</button>';
+}
+
+if(coupledWith){
+html+='<button class="peaceButton" onclick="chooseFalloutScene(\'current\')">❤️ Talk to Current Partner: '+currentName+'</button>';
+}
+
+html+='<button class="falloutButton" onclick="chooseFalloutScene(\'valentina\')">💃 Confront Valentina</button>';
+html+='<button onclick="chooseFalloutScene(\'friends\')">🤝 Talk to the Villa</button>';
+html+='</div>';
+
+showScene({
+speaker:'host',
+background:'villa',
+text:'"Casa is over, but the consequences are just beginning."\n\n"Choose who you need to face first."'
+});
+
+choices(html);
+}
+
+function chooseFalloutScene(choice){
+if(falloutChoice)return;
+falloutChoice=choice;
+
+if(choice==='former'){
+showFormerPartnerFallout();
+return;
+}
+
+if(choice==='current'){
+showCurrentPartnerFallout();
+return;
+}
+
+if(choice==='valentina'){
+showValentinaFallout();
+return;
+}
+
+showFriendshipFallout();
+}
+
+function showFormerPartnerFallout(){
+const formerName=characters[previousPartner].name;
+
+showScene({
+speaker:previousPartner,
+background:'villa',
+text:formerName+' waits near the Fire Pit.\n\n"Was any of our relationship real to you?"'
+});
+
+choices(
+'<button class="peaceButton" onclick="finishFormerFallout(\'apologize\')">🤝 Apologize honestly</button>'+
+'<button class="argumentButton" onclick="finishFormerFallout(\'defend\')">🔥 Defend your choice</button>'+
+'<button onclick="finishFormerFallout(\'closure\')">🌙 Ask for peaceful closure</button>'
+);
+}
+
+function finishFormerFallout(choice){
+let result='';
+
+if(choice==='apologize'){
+relationships[previousPartner]+=3;
+result='You admit that your decision hurt them and that they deserved honesty.\n\n❤️ Former Partner Connection +3';
+}else if(choice==='defend'){
+relationships[previousPartner]-=1;
+result='You explain that Casa changed your feelings and that you refuse to pretend otherwise.\n\n💔 Former Partner Connection -1';
+}else{
+relationships[previousPartner]+=2;
+result='You both agree that the relationship mattered, even if it is over.\n\n❤️ Former Partner Connection +2';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:previousPartner,
+background:'villa',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showCurrentPartnerFallout(){
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:characters[coupledWith].name+' looks nervous.\n\n"Everyone thinks our new couple will fail."\n\n"Do you believe in us?"'
+});
+
+choices(
+'<button class="peaceButton" onclick="finishCurrentFallout(\'commit\')">❤️ Commit to the new couple</button>'+
+'<button class="falloutButton" onclick="finishCurrentFallout(\'slow\')">💬 Say you need time</button>'+
+'<button class="argumentButton" onclick="finishCurrentFallout(\'doubt\')">💔 Admit you have doubts</button>'
+);
+}
+
+function finishCurrentFallout(choice){
+let result='';
+
+if(choice==='commit'){
+relationships[coupledWith]+=4;
+couplingRomance+=3;
+couplingTrust+=2;
+result='You promise to give the new relationship a real chance.\n\n❤️ Partner Connection +4\n💕 Couple Romance +3\n💚 Couple Trust +2';
+}else if(choice==='slow'){
+relationships[coupledWith]+=2;
+couplingTrust+=1;
+result='You ask to move carefully instead of forcing something too quickly.\n\n❤️ Partner Connection +2\n💚 Couple Trust +1';
+}else{
+relationships[coupledWith]-=1;
+couplingTrust=Math.max(0,couplingTrust-2);
+result='You admit that the recoupling may have been an emotional decision.\n\n💔 Partner Connection -1\n💚 Couple Trust -2';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:coupledWith,
+background:'villa',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showValentinaFallout(){
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:'Valentina waits beside the pool.\n\n"Everyone is blaming me for couples breaking apart."\n\n"But nobody forced anyone to make a choice."'
+});
+
+choices(
+'<button class="argumentButton" onclick="finishValentinaFallout(\'blame\')">🔥 Blame her for the chaos</button>'+
+'<button class="peaceButton" onclick="finishValentinaFallout(\'fair\')">🤝 Admit everyone made their own choices</button>'+
+'<button class="falloutButton" onclick="finishValentinaFallout(\'flirt\')">😏 Say the drama was worth it</button>'
+);
+}
+
+function finishValentinaFallout(choice){
+let result='';
+
+if(choice==='blame'){
+relationships.valentina-=2;
+valentinaStats.boldness+=1;
+result='You tell Valentina that she enjoyed creating chaos.\n\nShe refuses to apologize.\n\n💔 Valentina Connection -2\n🔥 Boldness +1';
+}else if(choice==='fair'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+result='You admit that everyone made their own decisions.\n\nValentina respects your fairness.\n\n❤️ Valentina Connection +2\n🤝 Friendship +2';
+}else{
+relationships.valentina+=4;
+valentinaStats.romance+=3;
+if(coupledWith)couplingTrust=Math.max(0,couplingTrust-1);
+result='You tell Valentina that the tension made everything more exciting.\n\nShe smiles.\n\n❤️ Valentina Connection +4\n💕 Valentina Romance +3\n💚 Couple Trust -1';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showFriendshipFallout(){
+const friend=getFalloutFriend();
+
+showScene({
+speaker:friend,
+background:'villa',
+text:characters[friend].name+' pulls you aside.\n\n"The villa is splitting into sides."\n\n"If we do not calm things down, the next challenge will destroy someone."'
+});
+
+choices(
+'<button class="peaceButton" onclick="finishFriendshipFallout(\'peace\')">🤝 Help calm the villa</button>'+
+'<button class="falloutButton" onclick="finishFriendshipFallout(\'observe\')">👀 Stay out of the drama</button>'
+);
+}
+
+function getFalloutFriend(){
+const order=['maya','noah','sofia','isabella','lucas','kai','ethan','lisa'];
+return order.find(person=>person!==eliminatedPerson&&person!==coupledWith&&person!==previousPartner)||'valentina';
+}
+
+function finishFriendshipFallout(choice){
+const friend=getFalloutFriend();
+let result='';
+
+if(choice==='peace'){
+relationships[friend]+=3;
+addFriendshipPoint(friend);
+result='You agree to help stop the villa from turning against itself.\n\n❤️ Connection +3\n🤝 Friendship +1';
+}else{
+relationships[friend]+=1;
+result='You decide to watch carefully before choosing a side.\n\n❤️ Connection +1';
+}
+
+falloutComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:friend,
+background:'villa',
+text:result+'\n\n✅ Fallout conversation complete.'
+});
+
+choices('<button class="falloutButton" onclick="showFalloutAftermath()">🔥 Continue</button>');
+}
+
+function showFalloutAftermath(){
+let status='';
+
+if(coupledWith){
+status='Current Partner: '+characters[coupledWith].name;
+}else{
+status='Current Status: Single';
+}
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Crystal Flame glows above the villa.\n\n"Fallout reveals the truth faster than romance."\n\n'+status+'\n\n"Tomorrow, every couple will face a Compatibility Challenge."'
+});
+
+choices('<button class="compatibilityButton" onclick="startCompatibilityChallenge()">🏆 Continue to Compatibility Challenge</button>');
+}
+
+function getCompatibilityPartner(){
+if(coupledWith&&characters[coupledWith]){
+return coupledWith;
+}
+
+const candidates=['lucas','maya','kai','isabella','ethan','sofia','noah','lisa','valentina']
+.filter(person=>person!==eliminatedPerson);
+
+return candidates.sort((a,b)=>relationships[b]-relationships[a])[0]||savedPerson||'valentina';
+}
+
+function startCompatibilityChallenge(){
+if(compatibilityComplete){
+showVersionComplete();
+return;
+}
+
+compatibilityStarted=true;
+compatibilityScore=0;
+compatibilityQuestion=0;
+compatibilityPartner=getCompatibilityPartner();
+autoSaveGame();
+
+const partnerName=characters[compatibilityPartner].name;
+const intro=coupledWith
+?'You and '+partnerName+' will compete as an official couple.'
+:'Because you are single, '+partnerName+' has been assigned as your temporary challenge partner.';
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'The Islanders gather beside the Infinity Pool.\n\n"Welcome to the Compatibility Challenge."\n\n'+intro+'\n\n"Your answers will reveal how well you understand each other."'
+});
+
+choices('<button class="compatibilityButton" onclick="showCompatibilityRules()">🏆 Hear the Rules</button>');
+}
+
+function showCompatibilityRules(){
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'"You will face four questions."\n\n"Each strong answer is worth three points."\n\n"Earn at least eight points to win the luxury date."'
+});
+
+choices('<button class="compatibilityButton" onclick="compatibilityQuestionOne()">🔥 Start Challenge</button>');
+}
+
+function compatibilityQuestionOne(){
+compatibilityQuestion=1;
+
+showScene({
+speaker:compatibilityPartner,
+background:'afternoon',
+text:'QUESTION 1 OF 4\n\nYour partner has had a difficult day.\n\nWhat would help them most?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="answerCompatibility(3,2)">💚 Listen and stay beside them</button>'+
+'<button onclick="answerCompatibility(2,2)">🎉 Distract them with something fun</button>'+
+'<button onclick="answerCompatibility(0,2)">😶 Give them space without asking</button>'
+);
+}
+
+function compatibilityQuestionTwo(){
+compatibilityQuestion=2;
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'QUESTION 2 OF 4\n\nA rumor spreads about your relationship.\n\nWhat do you do first?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="answerCompatibility(3,3)">💬 Talk privately with your partner</button>'+
+'<button onclick="answerCompatibility(1,3)">🔥 Confront the whole villa</button>'+
+'<button onclick="answerCompatibility(0,3)">🤫 Pretend you did not hear it</button>'
+);
+}
+
+function compatibilityQuestionThree(){
+compatibilityQuestion=3;
+
+showScene({
+speaker:compatibilityPartner,
+background:'afternoon',
+text:'QUESTION 3 OF 4\n\nThe Crystal Flame offers your couple safety, but only if another couple becomes vulnerable.\n\nWhat do you choose?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="answerCompatibility(3,4)">🤝 Refuse and compete fairly</button>'+
+'<button onclick="answerCompatibility(1,4)">🏆 Accept the safety</button>'+
+'<button onclick="answerCompatibility(2,4)">💬 Ask your partner before deciding</button>'
+);
+}
+
+function compatibilityQuestionFour(){
+compatibilityQuestion=4;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'QUESTION 4 OF 4\n\nWhat matters most in a lasting relationship?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="finishCompatibilityAnswer(3)">💚 Trust and honesty</button>'+
+'<button onclick="finishCompatibilityAnswer(2)">❤️ Attraction and excitement</button>'+
+'<button onclick="finishCompatibilityAnswer(1)">🏆 Winning together</button>'
+);
+}
+
+function answerCompatibility(points,nextQuestion){
+compatibilityScore+=points;
+
+if(nextQuestion===2){
+compatibilityQuestionTwo();
+return;
+}
+
+if(nextQuestion===3){
+compatibilityQuestionThree();
+return;
+}
+
+compatibilityQuestionFour();
+}
+
+function finishCompatibilityAnswer(points){
+compatibilityScore+=points;
+compatibilityComplete=true;
+
+let resultTitle='';
+let rewardText='';
+
+if(compatibilityScore>=11){
+resultTitle='PERFECT MATCH';
+relationships[compatibilityPartner]+=5;
+couplingRomance+=4;
+couplingTrust+=4;
+rewardText='❤️ Partner Connection +5\n💕 Couple Romance +4\n💚 Couple Trust +4\n🏆 Luxury Date Won';
+}else if(compatibilityScore>=8){
+resultTitle='CHALLENGE PASSED';
+relationships[compatibilityPartner]+=3;
+couplingRomance+=2;
+couplingTrust+=2;
+rewardText='❤️ Partner Connection +3\n💕 Couple Romance +2\n💚 Couple Trust +2\n🏆 Luxury Date Won';
+}else{
+resultTitle='COMPATIBILITY AT RISK';
+relationships[compatibilityPartner]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+rewardText='❤️ Partner Connection +1\n💚 Couple Trust -1\n⚠️ No Luxury Date';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'🏆 '+resultTitle+'\n\nFinal Score: '+compatibilityScore+' / 12\n\n'+rewardText
+});
+
+choices('<button class="compatibilityButton" onclick="showCompatibilityReaction()">❤️ See Your Partner’s Reaction</button>');
+}
+
+function showCompatibilityReaction(){
+const reactions={
+lucas:'Lucas smiles with relief.\n\n"We work best when we trust each other."',
+maya:'Maya looks toward the Crystal Flame.\n\n"It answered differently when we agreed."',
+kai:'Kai grins.\n\n"Looks like we are stronger than people thought."',
+isabella:'Isabella beams.\n\n"I knew our energy matched."',
+ethan:'Ethan nods approvingly.\n\n"Good communication. Strong result."',
+sofia:'Sofia smiles softly.\n\n"I feel closer to you after that."',
+noah:'Noah looks proud.\n\n"Honesty made the difference."',
+lisa:'Lisa gives you a surprised smile.\n\n"Maybe we understand each other better than expected."',
+valentina:'Valentina raises an eyebrow and smiles.\n\n"That was more real than I expected."'
+};
+
+showScene({
+speaker:compatibilityPartner,
+background:'afternoon',
+text:reactions[compatibilityPartner]
+});
+
+choices('<button class="compatibilityButton" onclick="showCompatibilityAftermath()">🔥 Continue</button>');
+}
+
+function showCompatibilityAftermath(){
+const wonDate=compatibilityScore>=8;
+const partnerName=characters[compatibilityPartner].name;
+
+showScene({
+speaker:'host',
+background:'night',
+text:wonDate
+?'"'+playerName+' and '+partnerName+', you have earned a luxury date."\n\n"Tomorrow, you will leave the villa for a private evening."'
+:'"Your score was not high enough for the luxury date."\n\n"The lowest-scoring couple will become vulnerable in the next vote."'
+});
+
+choices('<button class="luxuryButton" onclick="startLuxuryDate()">🌅 Continue to Luxury Date</button>');
+}
+
+function startLuxuryDate(){
+if(luxuryDateComplete){
+showVersionComplete();
+return;
+}
+
+luxuryDateStarted=true;
+autoSaveGame();
+
+const wonDate=compatibilityScore>=8;
+const partnerName=characters[compatibilityPartner].name;
+
+if(wonDate){
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'A private boat waits at Arrival Beach.\n\n"'+playerName+' and '+partnerName+', your Compatibility Challenge victory has earned you a luxury date."\n\n"Enjoy the sunset... and decide what this connection really means."'
+});
+
+choices('<button class="luxuryButton" onclick="beginLuxuryDateScene()">🌅 Leave for the Date</button>');
+return;
+}
+
+showScene({
+speaker:'host',
+background:'night',
+text:'Your Compatibility Challenge score was not high enough to win the official luxury date.\n\nBut '+partnerName+' asks to spend private time with you at Moonlight Cove anyway.'
+});
+
+choices('<button class="luxuryButton" onclick="beginPrivateCoveScene()">🌙 Meet at Moonlight Cove</button>');
+}
+
+function beginLuxuryDateScene(){
+showScene({
+speaker:'narrator',
+background:'afternoon',
+text:'The boat carries you to a quiet beach beyond the villa.\n\nA table waits beneath hanging lanterns. The ocean turns gold as the sun begins to set.'
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateConversation()">❤️ Sit Down Together</button>');
+}
+
+function beginPrivateCoveScene(){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'Moonlight Cove is empty except for two chairs beside the water.\n\nIt is not the official luxury date, but the moment feels private and honest.'
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateConversation()">💬 Start the Conversation</button>');
+}
+
+function showLuxuryDateConversation(){
+const partnerName=characters[compatibilityPartner].name;
+
+showScene({
+speaker:compatibilityPartner,
+background:compatibilityScore>=8?'afternoon':'night',
+text:partnerName+' looks across the table at you.\n\n"After everything that happened in Casa and the recoupling... what do you want from us now?"'
+});
+
+choices(
+'<div class="card luxuryCard"><h3>🌅 Luxury Date Choice</h3>'+
+'<button class="romanceButton" onclick="chooseLuxuryDatePath(\'romance\')">❤️ Say you want something real</button>'+
+'<button class="friendButton" onclick="chooseLuxuryDatePath(\'friendship\')">🤝 Say you want to build trust slowly</button>'+
+'<button class="luxuryButton" onclick="chooseLuxuryDatePath(\'uncertain\')">💬 Admit you are still unsure</button></div>'
+);
+}
+
+function chooseLuxuryDatePath(choice){
+if(luxuryDateChoice)return;
+
+luxuryDateChoice=choice;
+let result='';
+
+if(choice==='romance'){
+relationships[compatibilityPartner]+=5;
+couplingRomance+=4;
+couplingTrust+=2;
+luxuryDateResult='Romantic connection strengthened';
+
+result='You tell '+characters[compatibilityPartner].name+' that you want to explore a real relationship.\n\nThe tension disappears from their face.\n\n❤️ Partner Connection +5\n💕 Couple Romance +4\n💚 Couple Trust +2';
+}else if(choice==='friendship'){
+relationships[compatibilityPartner]+=3;
+couplingTrust+=4;
+addFriendshipPoint(compatibilityPartner);
+luxuryDateResult='Trust and friendship strengthened';
+
+result='You explain that trust matters more than rushing into romance.\n\nYour partner respects the honesty.\n\n❤️ Partner Connection +3\n💚 Couple Trust +4\n🤝 Friendship +1';
+}else{
+relationships[compatibilityPartner]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+luxuryDateResult='Relationship remains uncertain';
+
+result='You admit that you still do not know what you want.\n\nThe answer is honest, but it creates distance.\n\n❤️ Partner Connection +1\n💚 Couple Trust -1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:compatibilityPartner,
+background:compatibilityScore>=8?'afternoon':'night',
+text:result
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateMoment()">🌅 Continue the Date</button>');
+}
+
+function showLuxuryDateMoment(){
+const partnerName=characters[compatibilityPartner].name;
+
+showScene({
+speaker:compatibilityPartner,
+background:'night',
+text:'The sun disappears and the lanterns glow brighter.\n\n'+partnerName+' reaches across the table.\n\n"One more question. How should this date end?"'
+});
+
+choices(
+'<button class="romanceButton" onclick="finishLuxuryDate(\'kiss\')">❤️ Share a kiss</button>'+
+'<button class="luxuryButton" onclick="finishLuxuryDate(\'hands\')">🤝 Hold hands</button>'+
+'<button class="friendButton" onclick="finishLuxuryDate(\'friendzone\')">🙂 End as friends</button>'
+);
+}
+
+function finishLuxuryDate(ending){
+if(luxuryDateComplete)return;
+
+luxuryDateComplete=true;
+let result='';
+
+if(ending==='kiss'){
+relationships[compatibilityPartner]+=4;
+couplingRomance+=4;
+couplingTrust+=1;
+luxuryDateResult+='; ended with a kiss';
+
+result='You lean closer and share a quiet kiss beneath the lanterns.\n\n❤️ Partner Connection +4\n💕 Couple Romance +4\n💚 Couple Trust +1';
+}else if(ending==='hands'){
+relationships[compatibilityPartner]+=2;
+couplingRomance+=2;
+couplingTrust+=2;
+luxuryDateResult+='; ended holding hands';
+
+result='You sit together in silence, holding hands as the waves move below.\n\n❤️ Partner Connection +2\n💕 Couple Romance +2\n💚 Couple Trust +2';
+}else{
+relationships[compatibilityPartner]+=1;
+addFriendshipPoint(compatibilityPartner);
+luxuryDateResult+='; ended as friends';
+
+result='You choose not to force romance and end the evening with a warm hug.\n\n❤️ Partner Connection +1\n🤝 Friendship +1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:compatibilityPartner,
+background:'night',
+text:result
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateAftermath()">🏡 Return to the Villa</button>');
+}
+
+function showLuxuryDateAftermath(){
+const partnerName=characters[compatibilityPartner].name;
+const official=compatibilityScore>=8
+?'The villa watches as you return from the official luxury date.'
+:'The villa notices that you and '+partnerName+' disappeared together.';
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:official+'\n\nWhispers begin immediately.\n\nSome Islanders are happy for you. Others look worried about what your growing connection means.'
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateAnnouncement()">📱 Read the New Message</button>');
+}
+
+function showLuxuryDateAnnouncement(){
+showScene({
+speaker:'host',
+background:'crystal',
+text:'Every villa phone lights up.\n\n"Islanders, tomorrow you will vote in secret."\n\n"You must choose the couple you believe is least likely to survive outside Flame Cay."'
+});
+
+choices('<button class="voteButton" onclick="startSecretVote()">🗳️ Continue to Secret Vote</button>');
+}
+
+function getActiveVoteCandidates(){
+return ['lucas','maya','kai','isabella','ethan','sofia','noah','lisa','valentina']
+.filter(person=>person!==eliminatedPerson&&person!==coupledWith);
+}
+
+function startSecretVote(){
+if(secretVoteComplete){
+showVersionComplete();
+return;
+}
+
+secretVoteStarted=true;
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The villa lights dim.\n\nEvery Islander receives a private voting card.\n\n"Tonight, you must vote for the couple you believe is least likely to survive outside Flame Cay."'
+});
+
+choices('<button class="voteButton" onclick="showSecretVoteChoices()">🗳️ Enter the Voting Booth</button>');
+}
+
+function showSecretVoteChoices(){
+const candidates=getActiveVoteCandidates().slice(0,4);
+
+let html='<div class="card voteCard"><h3>🗳️ Secret Vote</h3>';
+
+candidates.forEach(person=>{
+html+='<button class="voteButton" onclick="castSecretVote(\''+person+'\')">Vote against '+characters[person].name+'</button>';
+});
+
+html+='</div>';
+
+showScene({
+speaker:'narrator',
+background:'night',
+text:'You enter the private booth.\n\nNo one will know who received your vote.'
+});
+
+choices(html);
+}
+
+function castSecretVote(person){
+if(secretVoteChoice)return;
+
+secretVoteChoice=person;
+secretVoteResult=calculateSecretVoteResult(person);
+secretVoteComplete=true;
+
+relationships[person]-=1;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'night',
+text:'You secretly vote against '+characters[person].name+'.\n\n💔 Connection -1\n\nYour vote is locked.'
+});
+
+choices('<button class="voteButton" onclick="revealSecretVoteResult()">🔥 Reveal the Villa Result</button>');
+}
+
+function calculateSecretVoteResult(playerVote){
+const candidates=getActiveVoteCandidates();
+const scored=candidates.map(person=>{
+let score=0;
+
+score+=Math.max(0,6-relationships[person]);
+
+if(person===playerVote){
+score+=3;
+}
+
+if(person==='valentina'){
+score+=2;
+}
+
+if(person===savedPerson){
+score=Math.max(0,score-1);
+}
+
+return{person,score};
+});
+
+scored.sort((a,b)=>b.score-a.score);
+
+return scored[0]?.person||playerVote;
+}
+
+function revealSecretVoteResult(){
+const resultName=characters[secretVoteResult].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Crystal Flame turns red.\n\n"The Islander receiving the most votes is..."\n\n⚠️ '+resultName+'\n\n"They are now vulnerable at the next elimination."'
+});
+
+choices('<button class="vulnerableButton" onclick="showVoteReactions()">😮 See the Villa Reactions</button>');
+}
+
+function showVoteReactions(){
+const reactions={
+lucas:'Lucas looks disappointed but composed.\n\n"I thought people trusted me more than that."',
+maya:'Maya studies the room carefully.\n\n"Votes reveal fear more than truth."',
+kai:'Kai gives a tense smile.\n\n"Looks like I have something to prove."',
+isabella:'Isabella looks shocked.\n\n"I did not expect my name to come up."',
+ethan:'Ethan folds his arms.\n\n"Interesting. Now I know where I stand."',
+sofia:'Sofia looks hurt.\n\n"I wish people had spoken to me first."',
+noah:'Noah nods slowly.\n\n"I will face it with honesty."',
+lisa:'Lisa raises an eyebrow.\n\n"Someone clearly feels threatened."',
+valentina:'Valentina smiles without warmth.\n\n"Of course they voted for the Bombshell."'
+};
+
+showScene({
+speaker:secretVoteResult,
+background:'night',
+text:reactions[secretVoteResult]
+});
+
+choices('<button class="voteButton" onclick="showSecretVoteAftermath()">🔥 Continue</button>');
+}
+
+function showSecretVoteAftermath(){
+const vulnerableName=characters[secretVoteResult].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"'+vulnerableName+' is not eliminated tonight."\n\n"But they will enter the next ceremony at risk."\n\n"One more vote could end their time on Flame Cay."'
+});
+
+choices('<button class="secondEliminationButton" onclick="startSecondElimination()">🔥 Continue to Second Elimination</button>');
+}
+
+function getSecondEliminationOpponent(){
+const candidates=['lucas','maya','kai','isabella','ethan','sofia','noah','lisa','valentina']
+.filter(person=>
+person!==eliminatedPerson &&
+person!==secretVoteResult &&
+person!==coupledWith
+);
+
+candidates.sort((a,b)=>relationships[a]-relationships[b]);
+
+return candidates[0]||savedPerson||'valentina';
+}
+
+function startSecondElimination(){
+if(secondEliminationComplete){
+showVersionComplete();
+return;
+}
+
+secondEliminationStarted=true;
+autoSaveGame();
+
+const opponent=getSecondEliminationOpponent();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The Islanders gather around the Fire Pit.\n\n"The Secret Vote has placed '+characters[secretVoteResult].name+' at risk."\n\n"But they will not face the decision alone."\n\n"Tonight, one more Islander joins them."'
+});
+
+choices('<button class="secondEliminationButton" onclick="revealSecondBottomTwo()">🔥 Reveal the Bottom Two</button>');
+}
+
+function revealSecondBottomTwo(){
+const opponent=getSecondEliminationOpponent();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The two Islanders at risk are:\n\n⚠️ '+characters[secretVoteResult].name+'\n⚠️ '+characters[opponent].name+'\n\n"'+playerName+', you must save one."\n\n"The other will leave Flame Cay tonight."'
+});
+
+choices(
+'<div class="card eliminationCard"><h3>🔥 Save One Islander</h3>'+
+'<button class="saveIslanderButton" onclick="chooseSecondEliminationSave(\''+secretVoteResult+'\')">🛡️ Save '+characters[secretVoteResult].name+'</button>'+
+'<button class="saveIslanderButton" onclick="chooseSecondEliminationSave(\''+opponent+'\')">🛡️ Save '+characters[opponent].name+'</button></div>'
+);
+}
+
+function chooseSecondEliminationSave(person){
+if(secondEliminationSaved)return;
+
+const opponent=getSecondEliminationOpponent();
+
+secondEliminationSaved=person;
+secondEliminatedPerson=person===secretVoteResult?opponent:secretVoteResult;
+secondEliminationComplete=true;
+
+relationships[person]+=3;
+relationships[secondEliminatedPerson]-=2;
+
+if(secondEliminatedPerson===coupledWith){
+coupledWith='';
+couplingRomance=0;
+couplingTrust=0;
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:person,
+background:'night',
+text:'You save '+characters[person].name+'.\n\n❤️ Connection +3\n\n'+characters[secondEliminatedPerson].name+' is now eliminated.'
+});
+
+choices('<button class="eliminateButton" onclick="showSecondEliminationFarewell()">🌙 Say Goodbye</button>');
+}
+
+function showSecondEliminationFarewell(){
+const farewells={
+lucas:'Lucas takes one last look at the villa.\n\n"I hoped my story would last longer, but I am leaving with no regrets."',
+maya:'Maya looks toward the Crystal Flame.\n\n"The island still has secrets. Do not stop searching."',
+kai:'Kai forces a smile.\n\n"I hate losing, but I know when the game is over."',
+isabella:'Isabella wipes away a tear.\n\n"Keep choosing people who make you feel safe."',
+ethan:'Ethan nods calmly.\n\n"Every ending creates a new strategy."',
+sofia:'Sofia speaks softly.\n\n"I hope something real survives all of this."',
+noah:'Noah gives everyone a final wave.\n\n"Take care of each other. That matters more than winning."',
+lisa:'Lisa smiles through the disappointment.\n\n"Flame Cay is never finished with surprises."',
+valentina:'Valentina raises her chin.\n\n"I changed this villa the moment I arrived. Nobody can take that away."'
+};
+
+showScene({
+speaker:secondEliminatedPerson,
+background:'night',
+text:characters[secondEliminatedPerson].name+' has been eliminated.\n\n'+farewells[secondEliminatedPerson]
+});
+
+choices('<button class="secondEliminationButton" onclick="showSecondEliminationAftermath()">🔥 Continue</button>');
+}
+
+function showSecondEliminationAftermath(){
+const savedName=characters[secondEliminationSaved].name;
+const eliminatedName=characters[secondEliminatedPerson].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Fire Pit falls silent as '+eliminatedName+' leaves Flame Cay.\n\n"'+savedName+' remains because of your decision."\n\n"From this moment forward, the final phase of the game begins."'
+});
+
+choices('<button class="finalWeekButton" onclick="startFinalWeek()">🌅 Continue to Final Week</button>');
+}
+
+function startFinalWeek(){
+if(finalWeekComplete){
+showVersionComplete();
+return;
+}
+
+finalWeekStarted=true;
+currentDay=7;
+currentTime='Morning';
+actionUsed=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+const status=coupledWith&&characters[coupledWith]
+?'You enter Final Week coupled with '+characters[coupledWith].name+'.'
+:'You enter Final Week single.';
+
+showScene({
+speaker:'host',
+background:'arrival',
+text:'The sun rises over Flame Cay.\n\n📅 Day 7\n🌅 FINAL WEEK\n\n"Islanders, only the strongest stories remain."\n\n'+status+'\n\n"From this moment forward, every choice affects the finale."'
+});
+
+choices('<button class="finalWeekButton" onclick="showFinalWeekAnnouncement()">🔥 Hear the Final Week Rules</button>');
+}
+
+function showFinalWeekAnnouncement(){
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"Final Week will include family messages, one final challenge, final dates, and the Grand Finale."\n\n"The Crystal Flame will judge love, loyalty, courage, and honesty."\n\n"Today begins with a message from home."'
+});
+
+choices('<button class="familyButton" onclick="showFamilyMessage()">📱 Watch Your Family Message</button>');
+}
+
+function showFamilyMessage(){
+const partnerText=coupledWith&&characters[coupledWith]
+?'They also mention '+characters[coupledWith].name+' and ask whether the relationship feels real.'
+:'They ask whether you are ready to leave Flame Cay single or open your heart again.';
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:'A video begins playing on the villa screen.\n\nYour family tells you they are proud of how far you have come.\n\n'+partnerText
+});
+
+choices(
+'<div class="card finalWeekCard"><h3>📱 Respond to the Message</h3>'+
+'<button class="familyButton" onclick="chooseFamilyMessage(\'heart\')">❤️ Say you followed your heart</button>'+
+'<button onclick="chooseFamilyMessage(\'growth\')">🌱 Say the island changed you</button>'+
+'<button class="finalChoiceButton" onclick="chooseFamilyMessage(\'win\')">🏆 Say you came to win</button></div>'
+);
+}
+
+function chooseFamilyMessage(choice){
+if(familyMessageChoice)return;
+
+familyMessageChoice=choice;
+let text='';
+
+if(choice==='heart'){
+setStoryFlag('followedHeart',true,'Told family you followed your heart');
+recordChoice('family_heart','Followed your heart','Your family response strengthened the love route.',{reputation:2});
+if(coupledWith){
+relationships[coupledWith]+=3;
+couplingRomance+=2;
+couplingTrust+=2;
+}
+text='You say that your biggest choices came from your heart.\n\nYour family smiles through the screen.\n\n❤️ Partner Connection +3\n💕 Couple Romance +2\n💚 Couple Trust +2';
+}else if(choice==='growth'){
+if(coupledWith){
+relationships[coupledWith]+=2;
+couplingTrust+=2;
+}
+text='You say Flame Cay taught you to be more honest and brave.\n\nYour family tells you they can see the change.\n\n❤️ Partner Connection +2\n💚 Couple Trust +2';
+}else{
+if(coupledWith){
+relationships[coupledWith]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+}
+text='You say you still want to win the season.\n\nYour family reminds you not to lose yourself in the competition.\n\n❤️ Partner Connection +1\n💚 Couple Trust -1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:text
+});
+
+choices('<button class="finalWeekButton" onclick="showFinalWeekChoice()">🌅 Continue Final Week</button>');
+}
+
+function showFinalWeekChoice(){
+let html='<div class="card finalWeekCard"><h3>🌅 Choose Your Final Week Focus</h3>';
+
+if(coupledWith){
+html+='<button class="finalChoiceButton" onclick="chooseFinalWeekPath(\'partner\')">❤️ Strengthen Your Couple</button>';
+}
+
+html+='<button class="familyButton" onclick="chooseFinalWeekPath(\'friendships\')">🤝 Repair Villa Friendships</button>';
+html+='<button class="finalWeekButton" onclick="chooseFinalWeekPath(\'crystal\')">💎 Investigate the Crystal Flame</button>';
+html+='</div>';
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'"You have time for one important Final Week conversation."\n\n"Choose carefully. This choice will affect the final challenge."'
+});
+
+choices(html);
+}
+
+function chooseFinalWeekPath(choice){
+if(finalWeekChoice)return;
+
+finalWeekChoice=choice;
+let text='';
+
+if(choice==='partner'){
+relationships[coupledWith]+=4;
+couplingRomance+=3;
+couplingTrust+=3;
+
+text='You spend the afternoon talking honestly with '+characters[coupledWith].name+'.\n\nYou discuss life outside Flame Cay and whether the relationship can survive without the cameras.\n\n❤️ Partner Connection +4\n💕 Couple Romance +3\n💚 Couple Trust +3';
+}else if(choice==='friendships'){
+const friend=getFinalWeekFriend();
+relationships[friend]+=4;
+addFriendshipPoint(friend);
+
+text='You meet with '+characters[friend].name+' and repair the tension left by Casa and the eliminations.\n\n❤️ Connection +4\n🤝 Friendship +1';
+}else{
+setStoryFlag('choseCrystalMystery',true,'Investigated the Crystal Flame during Final Week');
+recordChoice('final_week_crystal','Investigated the Crystal Flame','You prioritized the island mystery.',{reputation:1});
+mayaStats.mystery+=3;
+
+text='You return to the Crystal Shrine.\n\nThe Flame shows four symbols: love, betrayal, courage, and sacrifice.\n\nA final message appears:\n\n"The Keeper will be chosen at the finale."\n\n🔥 Mystery +3';
+}
+
+finalWeekComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:choice==='partner'?coupledWith:choice==='friendships'?getFinalWeekFriend():'narrator',
+background:choice==='crystal'?'crystal':'afternoon',
+text:text
+});
+
+choices('<button class="finalWeekButton" onclick="showFinalWeekAftermath()">🔥 Continue</button>');
+}
+
+function getFinalWeekFriend(){
+const unavailable=[eliminatedPerson,secondEliminatedPerson,coupledWith];
+const order=['maya','noah','sofia','isabella','lucas','kai','ethan','lisa','valentina'];
+
+return order.find(person=>!unavailable.includes(person))||'valentina';
+}
+
+function showFinalWeekAftermath(){
+showScene({
+speaker:'host',
+background:'night',
+text:'The Islanders gather at the Fire Pit.\n\n"Tomorrow, you will face the Final Challenge."\n\n"It will test every decision you made from Day 1 until now."\n\n"The winning couple will earn an advantage in the Grand Finale."'
+});
+
+choices('<button class="finalDateButton" onclick="startFinalDates()">🌅 Continue to Final Dates</button>');
+}
+
+function getFinalDatePartner(){
+if(coupledWith&&characters[coupledWith]){
+return coupledWith;
+}
+
+const unavailable=[eliminatedPerson,secondEliminatedPerson];
+const candidates=['lucas','maya','kai','isabella','ethan','sofia','noah','lisa','valentina']
+.filter(person=>!unavailable.includes(person));
+
+return candidates.sort((a,b)=>relationships[b]-relationships[a])[0]||'valentina';
+}
+
+function startFinalDates(){
+if(finalDateComplete){
+showVersionComplete();
+return;
+}
+
+finalDateStarted=true;
+finalDatePartner=getFinalDatePartner();
+autoSaveGame();
+
+const partnerName=characters[finalDatePartner].name;
+const setup=coupledWith
+?'You and '+partnerName+' have earned one final date before the finale.'
+:'Because you are single, '+partnerName+' has chosen to spend the final date with you.';
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'The villa receives its final date message.\n\n'+setup+'\n\n"Tonight, you must decide what this connection means outside Flame Cay."'
+});
+
+choices('<button class="finalDateButton" onclick="beginFinalDateJourney()">🌅 Leave for the Final Date</button>');
+}
+
+function beginFinalDateJourney(){
+showScene({
+speaker:'narrator',
+background:'afternoon',
+text:'A boat carries you beyond the familiar shores of Flame Cay.\n\nA private dinner waits on a cliff above the ocean.\n\nThe Crystal Flame glows in a lantern at the center of the table.'
+});
+
+choices('<button class="finalDateButton" onclick="showFinalDateConversation()">❤️ Sit Down Together</button>');
+}
+
+function showFinalDateConversation(){
+const partnerName=characters[finalDatePartner].name;
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:partnerName+' looks across the table.\n\n"We made it through Casa, eliminations, and every test."\n\n"When this ends, what do you want from us?"'
+});
+
+choices(
+'<div class="card finalDateCard"><h3>🌅 Final Date Decision</h3>'+
+'<button class="futureButton" onclick="chooseFinalDatePath(\'future\')">💚 Build a real future together</button>'+
+'<button class="promiseButton" onclick="chooseFinalDatePath(\'try\')">💬 Promise to keep trying outside</button>'+
+'<button class="finalDateButton" onclick="chooseFinalDatePath(\'honest\')">🌙 Admit you are still uncertain</button></div>'
+);
+}
+
+function chooseFinalDatePath(choice){
+if(finalDateChoice)return;
+
+finalDateChoice=choice;
+let result='';
+
+if(choice==='future'){
+setStoryFlag('choseFutureTogether',true,'Chose a real future on the final date');
+recordChoice('final_date_future','Chose a future together','You committed to life after Flame Cay.',{connection:{[finalDatePartner]:3}});
+relationships[finalDatePartner]+=6;
+couplingRomance+=5;
+couplingTrust+=5;
+
+result='You say you want a real future beyond Flame Cay.\n\n'+characters[finalDatePartner].name+' smiles with visible relief.\n\n❤️ Partner Connection +6\n💕 Couple Romance +5\n💚 Couple Trust +5';
+}else if(choice==='try'){
+relationships[finalDatePartner]+=4;
+couplingRomance+=3;
+couplingTrust+=3;
+
+result='You promise to give the relationship a real chance after the cameras stop.\n\nYour partner accepts the honest promise.\n\n❤️ Partner Connection +4\n💕 Couple Romance +3\n💚 Couple Trust +3';
+}else{
+relationships[finalDatePartner]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+
+result='You admit that the future still scares you.\n\nThe honesty matters, but the uncertainty creates distance.\n\n❤️ Partner Connection +1\n💚 Couple Trust -1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:result
+});
+
+choices('<button class="finalDateButton" onclick="showFinalDatePromise()">💌 Exchange Final Promises</button>');
+}
+
+function showFinalDatePromise(){
+const partnerName=characters[finalDatePartner].name;
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:partnerName+' places a small card beside the Crystal Flame lantern.\n\n"Before the finale, I want one promise from you."\n\n"What will you promise?"'
+});
+
+choices(
+'<button class="futureButton" onclick="chooseFinalDatePromise(\'loyalty\')">💚 Promise loyalty</button>'+
+'<button class="promiseButton" onclick="chooseFinalDatePromise(\'honesty\')">💬 Promise honesty</button>'+
+'<button class="finalDateButton" onclick="chooseFinalDatePromise(\'courage\')">🔥 Promise courage</button>'
+);
+}
+
+function chooseFinalDatePromise(choice){
+if(finalDatePromise)return;
+
+finalDatePromise=choice;
+let result='';
+
+if(choice==='loyalty'){
+relationships[finalDatePartner]+=3;
+couplingTrust+=4;
+result='You promise to protect the relationship even when things become difficult.\n\n❤️ Partner Connection +3\n💚 Couple Trust +4';
+}else if(choice==='honesty'){
+relationships[finalDatePartner]+=3;
+couplingTrust+=3;
+couplingRomance+=1;
+result='You promise to tell the truth, even when it would be easier to hide it.\n\n❤️ Partner Connection +3\n💚 Couple Trust +3\n💕 Couple Romance +1';
+}else{
+relationships[finalDatePartner]+=2;
+couplingRomance+=2;
+mayaStats.mystery+=1;
+result='You promise to be brave enough to choose love without knowing the ending.\n\n❤️ Partner Connection +2\n💕 Couple Romance +2\n🔥 Mystery +1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:result+'\n\nThe Crystal Flame lantern glows brighter.'
+});
+
+choices('<button class="finalDateButton" onclick="showFinalDateEnding()">🌙 End the Final Date</button>');
+}
+
+function showFinalDateEnding(){
+const partnerName=characters[finalDatePartner].name;
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:'The two of you stand at the cliff’s edge as the ocean reflects the moonlight.\n\n'+partnerName+' takes your hand.\n\n"Whatever happens tomorrow, this was real to me."'
+});
+
+choices(
+'<button class="finalDateButton" onclick="finishFinalDate(\'embrace\')">❤️ Share a final embrace</button>'+
+'<button class="promiseButton" onclick="finishFinalDate(\'hands\')">🤝 Hold hands in silence</button>'+
+'<button onclick="finishFinalDate(\'space\')">🌙 Leave with quiet respect</button>'
+);
+}
+
+function finishFinalDate(ending){
+if(finalDateComplete)return;
+
+finalDateComplete=true;
+let result='';
+
+if(ending==='embrace'){
+relationships[finalDatePartner]+=3;
+couplingRomance+=3;
+finalDatePromise+='; final embrace';
+result='You hold each other beneath the moonlight.\n\n❤️ Partner Connection +3\n💕 Couple Romance +3';
+}else if(ending==='hands'){
+relationships[finalDatePartner]+=2;
+couplingTrust+=2;
+finalDatePromise+='; held hands';
+result='You stand together, holding hands as the boat arrives.\n\n❤️ Partner Connection +2\n💚 Couple Trust +2';
+}else{
+relationships[finalDatePartner]+=1;
+finalDatePromise+='; respectful ending';
+result='You leave the moment with honesty and respect.\n\n❤️ Partner Connection +1';
+}
+
+if(!coupledWith){
+coupledWith=finalDatePartner;
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:result
+});
+
+choices('<button class="finalDateButton" onclick="showFinalDateAftermath()">🏡 Return to the Villa</button>');
+}
+
+function showFinalDateAftermath(){
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The final couples return to the Fire Pit.\n\n"Tomorrow, Flame Cay will choose its winning story."\n\n"The public vote, the Crystal Flame, and your final decisions will determine the ending."'
+});
+
+choices('<button class="finaleButton" onclick="startGrandFinale()">🏆 Continue to Grand Finale</button>');
+}
+
+function startGrandFinale(){
+if(finaleComplete){
+showVersionComplete();
+return;
+}
+
+finaleStarted=true;
+autoSaveGame();
+
+const partnerName=finalDatePartner&&characters[finalDatePartner]
+?characters[finalDatePartner].name
+:'your final partner';
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The Fire Pit is transformed for the final ceremony.\n\nEvery remaining Islander stands beneath the Crystal Flame.\n\n"Tonight, one story will win The Island of Flames."\n\n"'+playerName+' and '+partnerName+', your final chapter begins now."'
+});
+
+choices('<button class="finaleButton" onclick="showFinalSpeechChoice()">🎤 Give Your Final Speech</button>');
+}
+
+function showFinalSpeechChoice(){
+const partnerName=characters[finalDatePartner].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"Speak directly to '+partnerName+'."\n\n"Tell the villa what this journey truly meant to you."'
+});
+
+choices(
+'<div class="card finaleCard"><h3 class="endingTitle">🎤 Final Speech</h3>'+
+'<button class="winnerButton" onclick="chooseFinalSpeech(\'love\')">❤️ Choose love over the prize</button>'+
+'<button class="crystalButton" onclick="chooseFinalSpeech(\'truth\')">💎 Speak with complete honesty</button>'+
+'<button class="finaleButton" onclick="chooseFinalSpeech(\'victory\')">🏆 Say you came to win together</button></div>'
+);
+}
+
+function chooseFinalSpeech(choice){
+if(finalSpeechChoice)return;
+
+finalSpeechChoice=choice;
+let speech='';
+
+if(choice==='love'){
+speech='You tell '+characters[finalDatePartner].name+' that the prize matters less than the connection you built.\n\n"If this ends tonight, I still choose you."';
+}else if(choice==='truth'){
+speech='You speak honestly about every mistake, every doubt, and every moment that changed you.\n\n"I cannot promise perfection. I can promise the truth."';
+}else{
+speech='You say the two of you survived every test because you became a team.\n\n"We came this far together. Now we finish together."';
+}
+
+showScene({
+speaker:'narrator',
+background:'night',
+text:speech
+});
+
+choices('<button class="finaleButton" onclick="showPartnerFinalSpeech()">❤️ Hear Your Partner’s Speech</button>');
+}
+
+function showPartnerFinalSpeech(){
+const partnerName=characters[finalDatePartner].name;
+let speech='';
+
+if(couplingTrust>=10&&couplingRomance>=10){
+speech=partnerName+' looks at you with complete confidence.\n\n"You became the person I trusted most on this island."\n\n"Whatever happens next, I want our story to continue."';
+}else if(couplingTrust>=6||couplingRomance>=8){
+speech=partnerName+' smiles nervously.\n\n"Our journey was not perfect, but it was real."\n\n"I want to see what happens outside Flame Cay."';
+}else{
+speech=partnerName+' takes a careful breath.\n\n"We survived a lot, but I still have questions."\n\n"Tonight, I am choosing honesty over an easy promise."';
+}
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:speech
+});
+
+choices('<button class="crystalButton" onclick="beginCrystalJudgment()">💎 Begin the Crystal Flame Judgment</button>');
+}
+
+function calculateFinaleScore(){
+let score=0;
+
+score+=Math.max(0,Math.min(20,couplingRomance));
+score+=Math.max(0,Math.min(20,couplingTrust));
+score+=Math.max(0,Math.min(10,mayaStats.mystery));
+
+if(finalDateChoice==='future')score+=8;
+else if(finalDateChoice==='try')score+=5;
+else if(finalDateChoice==='honest')score+=2;
+
+if(finalSpeechChoice==='love')score+=8;
+else if(finalSpeechChoice==='truth')score+=7;
+else if(finalSpeechChoice==='victory')score+=5;
+
+if(casaChoice==='loyal')score+=6;
+else if(casaChoice==='curious')score+=2;
+else if(casaChoice==='tempted')score-=2;
+
+if(recouplingChoice==='stay')score+=5;
+else if(recouplingChoice==='single')score+=1;
+else if(recouplingChoice)score+=2;
+
+if(compatibilityScore>=11)score+=6;
+else if(compatibilityScore>=8)score+=4;
+else score+=1;
+
+if(familyMessageChoice==='heart')score+=4;
+else if(familyMessageChoice==='growth')score+=3;
+else if(familyMessageChoice==='win')score+=1;
+
+if(finalWeekChoice==='partner')score+=4;
+else if(finalWeekChoice==='friendships')score+=3;
+else if(finalWeekChoice==='crystal')score+=5;
+
+return Math.max(0,score);
+}
+
+function beginCrystalJudgment(){
+finaleScore=calculateFinaleScore();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Crystal Flame rises above the Fire Pit.\n\nIt reviews every choice:\n\n❤️ Love\n💔 Betrayal\n💚 Loyalty\n🔥 Courage\n💎 Truth\n\n"Your final score is being decided."'
+});
+
+choices('<button class="crystalButton" onclick="revealCrystalJudgment()">🔥 Reveal the Judgment</button>');
+}
+
+function revealCrystalJudgment(){
+let judgment='';
+
+if(finaleScore>=70){
+finaleEnding='Crystal Keeper Ending';
+keeperChosen=true;
+finaleWinner=true;
+judgment='The Crystal Flame turns gold.\n\n"Your choices showed love, loyalty, courage, and truth."\n\n"You have been chosen as the Keeper of the Crystal Flame."';
+}else if(finaleScore>=52){
+finaleEnding='Grand Champion Ending';
+keeperChosen=false;
+finaleWinner=true;
+judgment='The Crystal Flame shines bright red and gold.\n\n"Your story was not perfect, but it was strong enough to inspire Flame Cay."\n\n"You are a Grand Finale winner."';
+}else if(finaleScore>=36){
+finaleEnding='Love Over Victory Ending';
+keeperChosen=false;
+finaleWinner=false;
+judgment='The Crystal Flame glows softly.\n\n"You did not win the island’s highest honor."\n\n"But the connection you built may be more valuable than the prize."';
+}else{
+finaleEnding='Independent Flame Ending';
+keeperChosen=false;
+finaleWinner=false;
+judgment='The Crystal Flame becomes calm.\n\n"Your journey was shaped by uncertainty, risk, and self-discovery."\n\n"You leave Flame Cay without the title, but with a story that belongs to you."';
+}
+
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:judgment+'\n\nFinale Score: '+finaleScore
+});
+
+choices('<button class="finaleButton" onclick="revealPublicVote()">🗳️ Reveal the Public Vote</button>');
+}
+
+function revealPublicVote(){
+const partnerName=characters[finalDatePartner].name;
+let voteText='';
+
+if(finaleWinner){
+voteText='The public vote confirms the Crystal Flame’s decision.\n\n'+playerName+' and '+partnerName+' are announced as the winning couple of Season 1.';
+}else if(finaleScore>=36){
+voteText='The public vote places you among the finalists, but another couple receives more votes.\n\nThe villa applauds your journey.';
+}else{
+voteText='The public vote does not place your couple at the top.\n\nStill, your choices created one of the season’s most unforgettable stories.';
+}
+
+showScene({
+speaker:'host',
+background:'night',
+text:voteText
+});
+
+choices('<button class="winnerButton" onclick="showPrizeDecision()">💰 Continue to the Final Prize</button>');
+}
+
+function showPrizeDecision(){
+if(!finaleWinner){
+showFinaleAftermath();
+return;
+}
+
+showScene({
+speaker:'host',
+background:'night',
+text:'"The winning prize is one million dollars."\n\n"One final choice remains."\n\n"Will you share the prize with '+characters[finalDatePartner].name+'... or keep it?"'
+});
+
+choices(
+'<button class="winnerButton" onclick="choosePrizeEnding(\'share\')">❤️ Share the prize</button>'+
+'<button class="finaleButton" onclick="choosePrizeEnding(\'keep\')">💰 Keep the prize</button>'
+);
+}
+
+function choosePrizeEnding(choice){
+if(choice==='share'){
+setStoryFlag('sharedPrize',true,'Shared the final prize');
+recordChoice('shared_prize','Shared the prize','You chose the relationship over keeping all the money.',{reputation:8});
+finaleEnding+=' — Shared Prize';
+relationships[finalDatePartner]+=5;
+couplingTrust+=5;
+couplingRomance+=3;
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:'You choose to share the prize.\n\n'+characters[finalDatePartner].name+' looks overwhelmed.\n\n"We won this together."\n\n❤️ Partner Connection +5\n💚 Couple Trust +5\n💕 Couple Romance +3'
+});
+}else{
+setStoryFlag('keptPrize',true,'Kept the final prize');
+recordChoice('kept_prize','Kept the prize','You chose the money over sharing.',{reputation:-10});
+scheduleConsequence(
+'kept_prize_aftermath',
+'The Villa Reacts to the Prize Decision',
+'Your decision to keep the prize becomes the biggest story of the season.',
+'keptPrize',
+0,
+{reputation:-10}
+);
+finaleEnding+=' — Kept Prize';
+relationships[finalDatePartner]-=5;
+couplingTrust=0;
+
+showScene({
+speaker:finalDatePartner,
+background:'night',
+text:'You choose to keep the prize.\n\nThe Fire Pit falls silent.\n\n'+characters[finalDatePartner].name+' looks stunned.\n\n💔 Partner Connection -5\n💚 Couple Trust reset to 0'
+});
+}
+
+updateRelationships();
+autoSaveGame();
+
+choices('<button class="finaleButton" onclick="showFinaleAftermath()">🔥 See the Final Ending</button>');
+}
+
+function showFinaleAftermath(){
+finaleComplete=true;
+autoSaveGame();
+
+const partnerName=characters[finalDatePartner].name;
+let endingText='';
+
+if(keeperChosen){
+endingText='The Crystal Shrine opens completely for the first time.\n\nYou and '+partnerName+' stand before the Flame as its new Keepers.\n\nSeason 1 ends with the island finally awake.';
+}else if(finaleWinner){
+endingText='Confetti falls across the Fire Pit.\n\nYou and '+partnerName+' leave Flame Cay as Season 1 champions.';
+}else if(finaleScore>=36){
+endingText='You leave the finale holding '+partnerName+'’s hand.\n\nThe prize is gone, but your future remains unwritten.';
+}else{
+endingText='You walk down Arrival Beach as the sun rises.\n\nThe Crystal Flame remains behind, waiting for another story.';
+}
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:endingText
+});
+
+choices('<button onclick="showVersionComplete()">🏆 Finish Season 1</button>');
+}
+
+function showVersionComplete(){
+const partnerName=characters[finalDatePartner].name;
+
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'🏆 SEASON 1 COMPLETE\n\nTHE ISLAND OF FLAMES\nSeason 1 — The Crystal Awakens\n\nFinal Partner: '+partnerName+'\nFinale Score: '+finaleScore+'\nEnding: '+finaleEnding+'\nWinner: '+(finaleWinner?'Yes':'No')+'\nCrystal Keeper: '+(keeperChosen?'Yes':'No')+'\n\nThank you for playing.'
+});
+
+choices(
+'<button onclick="showGrandFinaleSummary()">📜 View Season Summary</button>'+
+'<button onclick="restartSeason()">🔄 Start a New Season 1 Game</button>'
+);
+}
+
+function showGrandFinaleSummary(){
+const partnerName=characters[finalDatePartner].name;
+
+showScene({
+speaker:'host',
+background:'night',
+text:'📜 SEASON 1 SUMMARY\n\nPlayer: '+playerName+'\nFinal Partner: '+partnerName+'\nFinale Score: '+finaleScore+'\nEnding: '+finaleEnding+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nCrystal Mystery: '+mayaStats.mystery+'\nFirst Eliminated: '+(eliminatedPerson?characters[eliminatedPerson].name:'None')+'\nSecond Eliminated: '+(secondEliminatedPerson?characters[secondEliminatedPerson].name:'None')+'\n\nYour choices created this ending.'
+});
+
+choices('<button onclick="showVersionComplete()">⬅ Back to Ending</button>');
+}
+
+function restartSeason(){
+localStorage.removeItem(AUTO_SAVE_KEY);
+location.reload();
+}
+
+function updateRelationships(){
+initializeRelationshipSystem();
+updateAllCharacterMoods();
+updateReputationSummary();
+
+q('relationshipBox').innerHTML=
+'<strong>🔥 Reputation: '+getReputationTitle()+' ('+playerReputation+')</strong><br><br>'+
+(coupledWith
+?'<strong>🔥 Official Couple: '+playerName+' + '+characters[coupledWith].name+'</strong>'+
+'<br>&nbsp;&nbsp;💕 Couple Romance: '+couplingRomance+
+'<br>&nbsp;&nbsp;💚 Couple Trust: '+couplingTrust+
+(challengeComplete?'<br>&nbsp;&nbsp;🏆 Challenge Score: '+challengeScore+' / 9':'')+
+'<br><br>'
+:'<strong>🔥 Official Couple: Single</strong><br><br>')+
+((eliminatedPerson==='lucas'||secondEliminatedPerson==='lucas')?'❌ Lucas — ELIMINATED':'❤️ Lucas Connection: '+relationships.lucas)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+lucasStats.friendship+
+'<br>&nbsp;&nbsp;❤️ Romance: '+lucasStats.romance+
+'<br>&nbsp;&nbsp;💚 Trust: '+lucasStats.trust+
+
+'<br><br>'+((eliminatedPerson==='maya'||secondEliminatedPerson==='maya')?'❌ Maya — ELIMINATED':'❤️ Maya Connection: '+relationships.maya)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+mayaStats.friendship+
+'<br>&nbsp;&nbsp;💚 Trust: '+mayaStats.trust+
+'<br>&nbsp;&nbsp;🔥 Mystery: '+mayaStats.mystery+
+
+'<br><br>'+((eliminatedPerson==='kai'||secondEliminatedPerson==='kai')?'❌ Kai — ELIMINATED':'❤️ Kai Connection: '+relationships.kai)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+kaiStats.friendship+
+'<br>&nbsp;&nbsp;❤️ Romance: '+kaiStats.romance+
+'<br>&nbsp;&nbsp;🏆 Competition: '+kaiStats.competition+
+
+'<br><br>'+((eliminatedPerson==='isabella'||secondEliminatedPerson==='isabella')?'❌ Isabella — ELIMINATED':'❤️ Isabella Connection: '+relationships.isabella)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+isabellaStats.friendship+
+'<br>&nbsp;&nbsp;💕 Romance: '+isabellaStats.romance+
+'<br>&nbsp;&nbsp;🎭 Social: '+isabellaStats.social+
+
+'<br><br>'+((eliminatedPerson==='ethan'||secondEliminatedPerson==='ethan')?'❌ Ethan — ELIMINATED':'❤️ Ethan Connection: '+relationships.ethan)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+ethanStats.friendship+
+'<br>&nbsp;&nbsp;❤️ Romance: '+ethanStats.romance+
+'<br>&nbsp;&nbsp;🧠 Strategy: '+ethanStats.strategy+
+
+'<br><br>'+((eliminatedPerson==='sofia'||secondEliminatedPerson==='sofia')?'❌ Sofia — ELIMINATED':'❤️ Sofia Connection: '+relationships.sofia)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+sofiaStats.friendship+
+'<br>&nbsp;&nbsp;💕 Romance: '+sofiaStats.romance+
+'<br>&nbsp;&nbsp;💬 Openness: '+sofiaStats.openness+
+
+'<br><br>'+((eliminatedPerson==='noah'||secondEliminatedPerson==='noah')?'❌ Noah — ELIMINATED':'❤️ Noah Connection: '+relationships.noah)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+noahStats.friendship+
+'<br>&nbsp;&nbsp;❤️ Romance: '+noahStats.romance+
+'<br>&nbsp;&nbsp;💪 Courage: '+noahStats.courage+
+
+'<br><br>'+((eliminatedPerson==='lisa'||secondEliminatedPerson==='lisa')?'❌ Lisa — ELIMINATED':'❤️ Lisa Connection: '+relationships.lisa)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+lisaStats.friendship+
+'<br>&nbsp;&nbsp;💕 Romance: '+lisaStats.romance+
+'<br>&nbsp;&nbsp;🎭 Honesty: '+lisaStats.honesty+
+
+'<br><br>'+((secondEliminatedPerson==='valentina')?'❌ Valentina — ELIMINATED':'❤️ Valentina Connection: '+relationships.valentina)+
+'<br>&nbsp;&nbsp;🤝 Friendship: '+valentinaStats.friendship+
+'<br>&nbsp;&nbsp;💕 Romance: '+valentinaStats.romance+
+'<br>&nbsp;&nbsp;🔥 Boldness: '+valentinaStats.boldness;
+}
+
+window.addEventListener('load',()=>{
+preloadPortraits();
+initializeRelationshipSystem();
+initializeChoiceConsequences();
+refreshSaveMenus();
+});
