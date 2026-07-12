@@ -1,159 +1,108 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,Helvetica,sans-serif;
-}
-
-body{
-    background:linear-gradient(180deg,#78d9ff,#0d5d77);
-    background-size:cover;
-    background-position:center;
-    background-attachment:fixed;
-    color:#fff;
-    min-height:100vh;
-    transition:.5s;
-}
-
-.screen{
-    max-width:430px;
-    margin:auto;
-    min-height:100vh;
-    padding:18px;
-}
-
-.hidden{
-    display:none;
-}
-
-h1{
-    font-size:40px;
-    text-align:center;
-    margin-bottom:15px;
-    text-shadow:0 2px 10px rgba(0,0,0,.4);
-}
-
-h2{
-    font-size:24px;
-    text-align:center;
-    margin-bottom:20px;
-}
-
-input{
-    width:100%;
-    padding:16px;
-    border:none;
-    border-radius:18px;
-    font-size:20px;
-    text-align:center;
-    margin:18px 0;
-}
-
-button{
-    width:100%;
-    padding:16px;
-    margin:10px 0;
-    border:none;
-    border-radius:18px;
-    background:linear-gradient(180deg,#ffb300,#ff8800);
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:.25s;
-}
-
-button:hover{
-    transform:scale(1.02);
-}
-
-.card{
-    background:rgba(20,20,20,.45);
-    backdrop-filter:blur(10px);
-    border:2px solid rgba(255,255,255,.15);
-    border-radius:24px;
-    padding:22px;
-    margin-top:18px;
-    box-shadow:0 10px 30px rgba(0,0,0,.35);
-}
-
-#portraitBox{
-    width:240px;
-    margin:20px auto;
-    text-align:center;
-}
-
+:root{--card:rgba(255,255,255,.95);--text:#222;--accent:#e65c00}
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;margin:0;min-height:100vh;background:linear-gradient(180deg,#70d8ff,#08657e);color:var(--text);display:flex;justify-content:center;transition:background .8s ease}
+.screen{width:100%;max-width:600px;padding:20px}
+.card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.15);margin-bottom:15px;border-left:5px solid var(--accent)}
+h1,h2,h3{margin-top:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
+body{overflow-x:hidden}
+.screen{overflow-x:hidden}
+#menu h1{font-size:clamp(34px,10vw,54px);line-height:1.08;overflow-wrap:anywhere}
+#menu h2{font-size:clamp(25px,7vw,38px);line-height:1.15;overflow-wrap:anywhere}
+#welcome{font-size:clamp(26px,8vw,38px);line-height:1.15;overflow-wrap:anywhere;word-break:break-word;max-width:100%}
+button{display:block;width:100%;background:linear-gradient(90deg,#ff9d00,#f06400);color:#fff;border:0;padding:13px;margin:9px 0;font-size:16px;font-weight:700;border-radius:10px}
+button:active{transform:scale(.98)}
+input{width:100%;padding:12px;border:2px solid #ccc;border-radius:8px;margin-bottom:10px;font-size:16px}
+.hidden{display:none!important}
+#portraitBox{display:flex;align-items:center;gap:15px;background:rgba(255,255,255,.92);padding:12px;border-radius:14px;margin-bottom:15px}
+#portrait,#portraitImage{width:64px;height:64px;border-radius:50%}
+#portrait{display:flex;align-items:center;justify-content:center;background:#fff;font-size:34px}
 #portraitImage{
-    width:240px;
-    height:320px;
-    border-radius:26px;
-    object-fit:cover;
-    display:none;
-    border:4px solid #ffd54f;
-    background:#222;
-    box-shadow:
-        0 0 25px rgba(255,215,0,.4),
-        0 10px 30px rgba(0,0,0,.45);
+object-fit:cover;
+opacity:0;
+transition:opacity .18s ease;
+background:#fff;
 }
-
-#portrait{
-    width:240px;
-    height:320px;
-    border-radius:26px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:120px;
-    background:rgba(255,255,255,.08);
-    border:4px solid rgba(255,255,255,.25);
-    box-shadow:0 0 20px rgba(255,255,255,.15);
-}
-
-#speakerName{
-    margin-top:12px;
-    font-size:28px;
-    font-weight:bold;
-    letter-spacing:1px;
-    text-shadow:0 3px 8px rgba(0,0,0,.45);
-}
-
-#story{
-    font-size:22px;
-    line-height:1.6;
-    min-height:120px;
-}
-
-#relationshipBox{
-    font-size:20px;
-    text-align:left;
-}
-
-#continueButton{
-    margin-top:18px;
-}
-
-#choices button{
-    margin-top:12px;
-}
-/* =====================================
-   VERSION 0.6.2
-   Character Entrance Animation
-===================================== */
-
-#portraitBox{
-    animation: characterEnter .6s ease;
-}
-
-@keyframes characterEnter{
-
-    0%{
-        opacity:0;
-        transform:translateY(40px) scale(.95);
-    }
-
-    100%{
-        opacity:1;
-        transform:translateY(0) scale(1);
-    }
-
-}
+#portraitImage.loaded{opacity:1}
+#relationshipBox{font-size:14px;line-height:1.55;background:rgba(0,0,0,.78);color:white;border-left-color:#ffd400}
+.couplingTitle{text-align:center;color:#8b2500;font-size:22px;margin-bottom:12px}
+.couplingChoice{background:linear-gradient(90deg,#ff5f6d,#d7265e)}
+.ceremonyButton{background:linear-gradient(90deg,#7b2cff,#d7265e)}
+.challengeButton{background:linear-gradient(90deg,#00a8a8,#087f8c)}
+.challengeScore{text-align:center;font-size:22px;font-weight:700;color:#7b2cff}
+.bombshellButton{background:linear-gradient(90deg,#ff477e,#ff7b00)}
+.eliminationButton{background:linear-gradient(90deg,#b00020,#5a0010)}
+.safeButton{background:linear-gradient(90deg,#2e9d58,#176b3a)}
+.dangerCard{border-left-color:#b00020;background:rgba(255,245,245,.97)}
+.dayFiveButton{background:linear-gradient(90deg,#5d3fd3,#9c4dcc)}
+.saveButton{background:linear-gradient(90deg,#1877d2,#0d4f9c)}
+.loadButton{background:linear-gradient(90deg,#6750a4,#452b7a)}
+.afternoonButton{background:linear-gradient(90deg,#f28c28,#d95f02)}
+.dateButton{background:linear-gradient(90deg,#ff4d88,#b81d62)}
+.dateCard{border-left-color:#ff4d88;background:rgba(255,247,251,.97)}
+.casaButton{background:linear-gradient(90deg,#6a11cb,#2575fc)}
+.loyaltyButton{background:linear-gradient(90deg,#11998e,#38ef7d)}
+.temptationButton{background:linear-gradient(90deg,#ff416c,#ff4b2b)}
+.casaCard{border-left-color:#6a11cb;background:rgba(248,245,255,.97)}
+.recoupleButton{background:linear-gradient(90deg,#d7265e,#7b2cff)}
+.stayButton{background:linear-gradient(90deg,#11998e,#38ef7d)}
+.singleButton{background:linear-gradient(90deg,#555,#222)}
+.recouplingCard{border-left-color:#d7265e;background:rgba(255,247,252,.98)}
+.falloutButton{background:linear-gradient(90deg,#f7971e,#ffd200)}
+.argumentButton{background:linear-gradient(90deg,#c31432,#240b36)}
+.peaceButton{background:linear-gradient(90deg,#56ab2f,#a8e063)}
+.falloutCard{border-left-color:#f7971e;background:rgba(255,251,240,.98)}
+.compatibilityButton{background:linear-gradient(90deg,#00b09b,#96c93d)}
+.compatibilityCard{border-left-color:#00b09b;background:rgba(244,255,250,.98)}
+.scoreBox{text-align:center;font-size:24px;font-weight:700;color:#176b3a;padding:12px}
+.luxuryButton{background:linear-gradient(90deg,#ff9966,#ff5e62)}
+.romanceButton{background:linear-gradient(90deg,#ff4d88,#d7265e)}
+.friendButton{background:linear-gradient(90deg,#36d1dc,#5b86e5)}
+.luxuryCard{border-left-color:#ff9966;background:rgba(255,249,244,.98)}
+.voteButton{background:linear-gradient(90deg,#434343,#000000)}
+.voteCard{border-left-color:#111;background:rgba(248,248,248,.98)}
+.vulnerableButton{background:linear-gradient(90deg,#b00020,#6a0012)}
+.secondEliminationButton{background:linear-gradient(90deg,#8e0e00,#1f1c18)}
+.saveIslanderButton{background:linear-gradient(90deg,#2e9d58,#176b3a)}
+.eliminateButton{background:linear-gradient(90deg,#b00020,#4d000b)}
+.eliminationCard{border-left-color:#b00020;background:rgba(255,245,245,.98)}
+.finalWeekButton{background:linear-gradient(90deg,#f6d365,#fda085)}
+.familyButton{background:linear-gradient(90deg,#5f2c82,#49a09d)}
+.finalChoiceButton{background:linear-gradient(90deg,#ff512f,#dd2476)}
+.finalWeekCard{border-left-color:#f6a623;background:rgba(255,252,242,.98)}
+.finalDateButton{background:linear-gradient(90deg,#ff758c,#ff7eb3)}
+.promiseButton{background:linear-gradient(90deg,#4facfe,#00f2fe)}
+.futureButton{background:linear-gradient(90deg,#43e97b,#38f9d7)}
+.finalDateCard{border-left-color:#ff758c;background:rgba(255,247,251,.98)}
+.finaleButton{background:linear-gradient(90deg,#f7971e,#ffd200)}
+.winnerButton{background:linear-gradient(90deg,#11998e,#38ef7d)}
+.crystalButton{background:linear-gradient(90deg,#7b2cff,#d7265e)}
+.finaleCard{border-left-color:#ffd200;background:rgba(255,252,235,.98)}
+.endingTitle{text-align:center;font-size:26px;line-height:1.15;color:#8b2500}
+.trophyBox{text-align:center;font-size:42px;margin:8px 0}
+.villaLifeButton{background:linear-gradient(90deg,#16a085,#2ecc71)}
+.gossipButton{background:linear-gradient(90deg,#8e44ad,#c0392b)}
+.listenButton{background:linear-gradient(90deg,#3498db,#2980b9)}
+.joinButton{background:linear-gradient(90deg,#f39c12,#e67e22)}
+.leaveButton{background:linear-gradient(90deg,#7f8c8d,#34495e)}
+.villaLifeCard{border-left-color:#16a085;background:rgba(245,255,250,.98)}
+.memoryNote{font-size:14px;color:#555;background:#f2f2f2;padding:10px;border-radius:9px;margin-top:10px}
+.locationBadge{display:inline-block;background:#eefaf4;padding:6px 10px;border-radius:999px;font-weight:700;margin-bottom:8px}
+.relationshipButton{background:linear-gradient(90deg,#ff5f6d,#ffc371)}
+.relationshipCard{border-left-color:#ff5f6d;background:rgba(255,248,250,.98)}
+.statBar{height:10px;background:#e5e5e5;border-radius:999px;overflow:hidden;margin:5px 0 10px}
+.statFill{height:100%;background:linear-gradient(90deg,#ff5f6d,#ffc371);border-radius:999px}
+.relationshipLevel{display:inline-block;padding:5px 9px;border-radius:999px;background:#fff0f3;font-size:13px;font-weight:700;margin:3px 3px 6px 0}
+.moodBadge{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef6ff;font-size:13px;font-weight:700;margin:3px 3px 6px 0}
+.reputationBox{font-weight:700;background:#fff8dc;padding:10px;border-radius:10px;margin-bottom:12px}
+.consequenceButton{background:linear-gradient(90deg,#6a11cb,#2575fc)}
+.flagButton{background:linear-gradient(90deg,#ff8a00,#e52e71)}
+.consequenceCard{border-left-color:#6a11cb;background:rgba(248,246,255,.98)}
+.flagTag{display:inline-block;padding:5px 9px;border-radius:999px;background:#f0eaff;font-size:13px;font-weight:700;margin:3px}
+.consequenceLog{font-size:14px;line-height:1.5;background:#f7f7f7;padding:10px;border-radius:10px;margin:8px 0}
+.deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
+.slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
+.slotCard p{margin:5px 0;line-height:1.4}
+#saveStatus{font-weight:700;color:#3c2b73}
+#savePanel{border-left-color:#1877d2}
+@keyframes characterEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
