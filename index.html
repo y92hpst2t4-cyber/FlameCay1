@@ -87,6 +87,14 @@ background:#fff;
 .finaleCard{border-left-color:#ffd200;background:rgba(255,252,235,.98)}
 .endingTitle{text-align:center;font-size:26px;line-height:1.15;color:#8b2500}
 .trophyBox{text-align:center;font-size:42px;margin:8px 0}
+.villaLifeButton{background:linear-gradient(90deg,#16a085,#2ecc71)}
+.gossipButton{background:linear-gradient(90deg,#8e44ad,#c0392b)}
+.listenButton{background:linear-gradient(90deg,#3498db,#2980b9)}
+.joinButton{background:linear-gradient(90deg,#f39c12,#e67e22)}
+.leaveButton{background:linear-gradient(90deg,#7f8c8d,#34495e)}
+.villaLifeCard{border-left-color:#16a085;background:rgba(245,255,250,.98)}
+.memoryNote{font-size:14px;color:#555;background:#f2f2f2;padding:10px;border-radius:9px;margin-top:10px}
+.locationBadge{display:inline-block;background:#eefaf4;padding:6px 10px;border-radius:999px;font-weight:700;margin-bottom:8px}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -100,7 +108,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 4.0.0 — Grand Finale</strong></p>
+<p><strong>Version 3.1.0 — Better Villa Life</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -178,12 +186,19 @@ background:#fff;
 </div>
 </div>
 
+<div class="card" id="villaLifePanel">
+<h3>🏡 Better Villa Life</h3>
+<p>See what the Islanders are doing between major story scenes.</p>
+<button class="villaLifeButton" onclick="openVillaLifeHub()">👀 Explore Living Villa</button>
+<p id="villaLifeStatus" class="memoryNote">NPC conversations, gossip, and changing daily schedules are active.</p>
+</div>
+
 <div class="card" id="relationshipBox"></div>
 </section>
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='4.0.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false,secondEliminationStarted=false,secondEliminationSaved='',secondEliminatedPerson='',secondEliminationComplete=false,finalWeekStarted=false,familyMessageChoice='',finalWeekChoice='',finalWeekComplete=false,finalDateStarted=false,finalDatePartner='',finalDateChoice='',finalDatePromise='',finalDateComplete=false,finaleStarted=false,finalSpeechChoice='',finaleScore=0,finaleEnding='',finaleWinner=false,keeperChosen=false,finaleComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='3.1.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false,secondEliminationStarted=false,secondEliminationSaved='',secondEliminatedPerson='',secondEliminationComplete=false,finalWeekStarted=false,familyMessageChoice='',finalWeekChoice='',finalWeekComplete=false,finalDateStarted=false,finalDatePartner='',finalDateChoice='',finalDatePromise='',finalDateComplete=false,finaleStarted=false,finalSpeechChoice='',finaleScore=0,finaleEnding='',finaleWinner=false,keeperChosen=false,finaleComplete=false,villaLifeVisits=0,villaLifeEventIndex=0,villaLifeLastLocation='',villaLifeGossip=[],villaLifeMemories={};
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -324,7 +339,12 @@ finaleScore,
 finaleEnding,
 finaleWinner,
 keeperChosen,
-finaleComplete
+finaleComplete,
+villaLifeVisits,
+villaLifeEventIndex,
+villaLifeLastLocation,
+villaLifeGossip,
+villaLifeMemories
 };
 }
 
@@ -412,6 +432,11 @@ finaleEnding=data.finaleEnding||'';
 finaleWinner=Boolean(data.finaleWinner);
 keeperChosen=Boolean(data.keeperChosen);
 finaleComplete=Boolean(data.finaleComplete);
+villaLifeVisits=Number(data.villaLifeVisits||0);
+villaLifeEventIndex=Number(data.villaLifeEventIndex||0);
+villaLifeLastLocation=data.villaLifeLastLocation||'';
+villaLifeGossip=Array.isArray(data.villaLifeGossip)?data.villaLifeGossip:[];
+villaLifeMemories=(data.villaLifeMemories&&typeof data.villaLifeMemories==='object')?data.villaLifeMemories:{};
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -422,6 +447,7 @@ q('continueButton').style.display='none';
 
 updateTimeDisplay();
 updateRelationships();
+updateVillaLifeStatus();
 resumeSavedProgress();
 }
 
@@ -758,6 +784,255 @@ text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+' has been restor
 choices('<button onclick="openIslandMap()">🗺️ Continue Game</button>');
 }
 
+
+const villaLifeSchedules={
+Morning:[
+{loc:'kitchen',label:'🍳 Kitchen',people:['lucas','sofia'],activity:'making breakfast and arguing over the coffee machine'},
+{loc:'beach',label:'🏖 Arrival Beach',people:['kai','noah'],activity:'training beside the waves'},
+{loc:'shrine',label:'💎 Crystal Shrine',people:['maya','valentina'],activity:'studying a new symbol'},
+{loc:'pool',label:'🏊 Infinity Pool',people:['isabella','lisa'],activity:'sharing villa gossip'},
+{loc:'gym',label:'💪 Gym',people:['ethan','lucas'],activity:'competing during a workout'}
+],
+Afternoon:[
+{loc:'pool',label:'🏊 Infinity Pool',people:['kai','isabella'],activity:'planning a pool game'},
+{loc:'villa',label:'🏡 Main Villa',people:['sofia','noah'],activity:'talking quietly in the lounge'},
+{loc:'beach',label:'🏖 Arrival Beach',people:['valentina','lisa'],activity:'discussing who is playing the game'},
+{loc:'jungle',label:'🌿 Whispering Jungle',people:['maya','ethan'],activity:'following a hidden trail'},
+{loc:'firepit',label:'🔥 Fire Pit',people:['lucas','kai'],activity:'debating loyalty after Casa'}
+],
+Evening:[
+{loc:'firepit',label:'🔥 Fire Pit',people:['lucas','sofia'],activity:'talking about the strongest couples'},
+{loc:'cove',label:'🌙 Moonlight Cove',people:['valentina','kai'],activity:'having a secret conversation'},
+{loc:'villa',label:'🏡 Main Villa',people:['isabella','noah'],activity:'trying to calm the villa'},
+{loc:'kitchen',label:'🍳 Kitchen',people:['lisa','ethan'],activity:'making a late-night snack'},
+{loc:'shrine',label:'💎 Crystal Shrine',people:['maya','lucas'],activity:'watching the Flame change color'}
+]
+};
+
+const villaLifeDialogue={
+kitchen:[
+'"You always use too much sugar," one Islander says.',
+'"At least I know how to make coffee," the other answers.'
+],
+beach:[
+'"The villa feels different when nobody is watching," one of them says.',
+'"Somebody is always watching," the other replies.'
+],
+shrine:[
+'"This symbol was not here yesterday," Maya whispers.',
+'"Maybe the island changes when we make choices," the other Islander says.'
+],
+pool:[
+'"I heard someone wants to switch couples again," one Islander says.',
+'"That rumor better not be about me," the other answers.'
+],
+gym:[
+'"You train like every challenge is the finale," one Islander jokes.',
+'"That is because every challenge matters," the other replies.'
+],
+villa:[
+'"Nobody says what they really think at the Fire Pit," one Islander says.',
+'"Then maybe we should start now," the other answers.'
+],
+jungle:[
+'"There are footprints here," one Islander says.',
+'"They lead away from the villa," the other replies.'
+],
+firepit:[
+'"Loyalty is easy until a Bombshell walks in," one Islander says.',
+'"Real loyalty survives the test," the other answers.'
+],
+cove:[
+'"This place is perfect for secrets," one Islander says.',
+'"Secrets never stay secret on Flame Cay," the other replies.'
+]
+};
+
+function getActiveVillaLifeSchedule(){
+const period=villaLifeSchedules[currentTime]?currentTime:'Morning';
+return villaLifeSchedules[period].filter(event=>{
+return ![eliminatedPerson,secondEliminatedPerson].includes(event.people[0]) &&
+![eliminatedPerson,secondEliminatedPerson].includes(event.people[1]);
+});
+}
+
+function openVillaLifeHub(){
+['islandMap','walkingScreen','dialogueCard','portraitBox','choices'].forEach(id=>q(id).classList.add('hidden'));
+
+const schedule=getActiveVillaLifeSchedule();
+let html='<div class="card villaLifeCard"><h2>🏡 Living Villa</h2>'+
+'<p>'+getTimeIcon()+' Day '+currentDay+' — '+currentTime+'</p>'+
+'<p>Islanders move, talk, and create drama even when you are not part of the conversation.</p>';
+
+schedule.forEach((event,index)=>{
+html+='<button class="villaLifeButton" onclick="visitVillaLifeEvent('+index+')">'+
+event.label+' — '+characters[event.people[0]].name.split(' ')[0]+' & '+characters[event.people[1]].name.split(' ')[0]+
+'</button>';
+});
+
+html+='<button onclick="showVillaLifeGossip()">🗣️ Review Gossip</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button></div>';
+
+q('choices').innerHTML=html;
+q('choices').classList.remove('hidden');
+}
+
+function visitVillaLifeEvent(index){
+const schedule=getActiveVillaLifeSchedule();
+const event=schedule[index];
+if(!event){
+openVillaLifeHub();
+return;
+}
+
+villaLifeEventIndex=index;
+villaLifeLastLocation=event.loc;
+villaLifeVisits++;
+
+const first=event.people[0];
+const second=event.people[1];
+const dialogue=(villaLifeDialogue[event.loc]||villaLifeDialogue.villa)[villaLifeVisits%2];
+
+showScene({
+speaker:first,
+background:getVillaLifeBackground(event.loc),
+text:characters[first].name+' and '+characters[second].name+' are '+event.activity+'.\n\n'+dialogue
+});
+
+choices(
+'<button class="listenButton" onclick="handleVillaLifeChoice(\'listen\')">👂 Listen quietly</button>'+
+'<button class="joinButton" onclick="handleVillaLifeChoice(\'join\')">💬 Join the conversation</button>'+
+'<button class="gossipButton" onclick="handleVillaLifeChoice(\'gossip\')">🗣️ Ask for the real gossip</button>'+
+'<button class="leaveButton" onclick="handleVillaLifeChoice(\'leave\')">🚶 Walk away</button>'
+);
+}
+
+function getVillaLifeBackground(loc){
+if(loc==='shrine')return 'crystal';
+if(loc==='jungle')return 'jungle';
+if(loc==='beach'||loc==='pool'||loc==='cove')return currentTime==='Evening'?'night':'beach';
+if(loc==='firepit')return currentTime==='Evening'?'night':'afternoon';
+return currentTime==='Evening'?'night':currentTime==='Afternoon'?'afternoon':'villa';
+}
+
+function rememberVillaLife(person,key){
+if(!villaLifeMemories[person]){
+villaLifeMemories[person]={talked:0,listened:0,gossip:0,ignored:0};
+}
+villaLifeMemories[person][key]=(villaLifeMemories[person][key]||0)+1;
+}
+
+function addVillaLifeConnection(person,amount){
+if(relationships[person]===undefined)return;
+relationships[person]+=amount;
+}
+
+function handleVillaLifeChoice(choice){
+const event=getActiveVillaLifeSchedule()[villaLifeEventIndex];
+if(!event){
+openVillaLifeHub();
+return;
+}
+
+const first=event.people[0];
+const second=event.people[1];
+let result='';
+
+if(choice==='listen'){
+addVillaLifeConnection(first,1);
+addVillaLifeConnection(second,1);
+rememberVillaLife(first,'listened');
+rememberVillaLife(second,'listened');
+result='You stay nearby and listen without interrupting.\n\nBoth Islanders notice that you respected their space.\n\n❤️ '+characters[first].name.split(' ')[0]+' Connection +1\n❤️ '+characters[second].name.split(' ')[0]+' Connection +1';
+}else if(choice==='join'){
+addVillaLifeConnection(first,2);
+addVillaLifeConnection(second,1);
+rememberVillaLife(first,'talked');
+rememberVillaLife(second,'talked');
+result='You join naturally instead of taking over the conversation.\n\n'+characters[first].name+' welcomes you into the discussion.\n\n❤️ '+characters[first].name.split(' ')[0]+' Connection +2\n❤️ '+characters[second].name.split(' ')[0]+' Connection +1';
+}else if(choice==='gossip'){
+addVillaLifeConnection(first,1);
+rememberVillaLife(first,'gossip');
+const gossip=createVillaLifeGossip(first,second,event.loc);
+if(!villaLifeGossip.includes(gossip)){
+villaLifeGossip.push(gossip);
+}
+result='You ask what is really happening in the villa.\n\n'+characters[first].name+' lowers their voice.\n\n"'+gossip+'"\n\n🗣️ New gossip saved\n❤️ '+characters[first].name.split(' ')[0]+' Connection +1';
+}else{
+rememberVillaLife(first,'ignored');
+rememberVillaLife(second,'ignored');
+result='You decide not to interrupt.\n\nThe Islanders continue their conversation without you.';
+}
+
+updateRelationships();
+updateVillaLifeStatus();
+autoSaveGame();
+
+showScene({
+speaker:choice==='leave'?'narrator':first,
+background:getVillaLifeBackground(event.loc),
+text:result+'\n\nMemory updated: these Islanders can remember this interaction.'
+});
+
+choices(
+'<button class="villaLifeButton" onclick="openVillaLifeHub()">🏡 Keep Exploring</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button>'
+);
+}
+
+function createVillaLifeGossip(first,second,loc){
+const options=[
+characters[second].name.split(' ')[0]+' may be questioning their current connection.',
+'Someone plans to confront Valentina before the next Fire Pit.',
+'The Crystal Flame reacted during a private conversation.',
+'One Islander thinks the strongest couple is only pretending.',
+'A secret chat happened near '+(locationNames[loc]||'the villa')+'.'
+];
+return options[(villaLifeVisits+villaLifeGossip.length)%options.length];
+}
+
+function showVillaLifeGossip(){
+let text='🗣️ VILLA GOSSIP\n\n';
+
+if(villaLifeGossip.length===0){
+text+='You have not discovered any gossip yet.\n\nExplore the villa and ask Islanders what is happening.';
+}else{
+villaLifeGossip.slice(-6).forEach((item,index)=>{
+text+=(index+1)+'. '+item+'\n\n';
+});
+}
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:text
+});
+
+choices(
+'<button class="villaLifeButton" onclick="openVillaLifeHub()">🏡 Return to Living Villa</button>'+
+'<button onclick="returnToMainStory()">⬅ Return to Main Story</button>'
+);
+}
+
+function getVillaLifeMemoryTotal(){
+return Object.values(villaLifeMemories).reduce((total,memory)=>{
+return total+(memory.talked||0)+(memory.listened||0)+(memory.gossip||0)+(memory.ignored||0);
+},0);
+}
+
+function updateVillaLifeStatus(){
+if(!q('villaLifeStatus'))return;
+q('villaLifeStatus').textContent=
+'Villa visits: '+villaLifeVisits+
+' • Gossip found: '+villaLifeGossip.length+
+' • Remembered interactions: '+getVillaLifeMemoryTotal();
+}
+
+function returnToMainStory(){
+updateVillaLifeStatus();
+resumeSavedProgress();
+}
+
 function q(id){return document.getElementById(id)}
 function choices(html){q('choices').innerHTML=html;q('choices').classList.remove('hidden')}
 function backMap(){return '<button onclick="openIslandMap()">⬅ Back to Map</button>'}
@@ -768,7 +1043,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;secretVoteStarted=false;secretVoteChoice='';secretVoteResult='';secretVoteComplete=false;secondEliminationStarted=false;secondEliminationSaved='';secondEliminatedPerson='';secondEliminationComplete=false;finalWeekStarted=false;familyMessageChoice='';finalWeekChoice='';finalWeekComplete=false;finalDateStarted=false;finalDatePartner='';finalDateChoice='';finalDatePromise='';finalDateComplete=false;finaleStarted=false;finalSpeechChoice='';finaleScore=0;finaleEnding='';finaleWinner=false;keeperChosen=false;finaleComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;secretVoteStarted=false;secretVoteChoice='';secretVoteResult='';secretVoteComplete=false;secondEliminationStarted=false;secondEliminationSaved='';secondEliminatedPerson='';secondEliminationComplete=false;finalWeekStarted=false;familyMessageChoice='';finalWeekChoice='';finalWeekComplete=false;finalDateStarted=false;finalDatePartner='';finalDateChoice='';finalDatePromise='';finalDateComplete=false;finaleStarted=false;finalSpeechChoice='';finaleScore=0;finaleEnding='';finaleWinner=false;keeperChosen=false;finaleComplete=false;villaLifeVisits=0;villaLifeEventIndex=0;villaLifeLastLocation='';villaLifeGossip=[];villaLifeMemories={};
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -783,6 +1058,7 @@ q('continueButton').style.display='block';
 showScene(introDialogue[0]);
 updateTimeDisplay();
 updateRelationships();
+updateVillaLifeStatus();
 }
 
 function nextDialogue(){
