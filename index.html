@@ -44,6 +44,7 @@ background:#fff;
 .dayFiveButton{background:linear-gradient(90deg,#5d3fd3,#9c4dcc)}
 .saveButton{background:linear-gradient(90deg,#1877d2,#0d4f9c)}
 .loadButton{background:linear-gradient(90deg,#6750a4,#452b7a)}
+.afternoonButton{background:linear-gradient(90deg,#f28c28,#d95f02)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -57,7 +58,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.0.0 — Save & Load System</strong></p>
+<p><strong>Version 2.1.0 — Day 5 Afternoon</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -140,7 +141,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.0.0';
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.1.0';
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -612,7 +613,13 @@ q('actionStatus').textContent=actionUsed?'✅ Activity complete':'⭐ One activi
 }
 
 function getTimeIcon(){return currentTime==='Morning'?'☀️':currentTime==='Afternoon'?'🌤️':'🌙'}
-function getAdvanceButtonText(){if(currentDay===3&&currentTime==='Morning')return '🔥 Begin First Coupling Ceremony';if(currentDay===4&&currentTime==='Morning')return '🏆 Begin First Challenge';if(currentDay===5&&currentTime==='Morning')return '✅ Finish Version 1.6.1';return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit'}
+function getAdvanceButtonText(){
+if(currentDay===3&&currentTime==='Morning')return '🔥 Begin First Coupling Ceremony';
+if(currentDay===4&&currentTime==='Morning')return '🏆 Begin First Challenge';
+if(currentDay===5&&currentTime==='Morning')return '🌤️ Continue to Day 5 Afternoon';
+if(currentDay===5&&currentTime==='Afternoon')return '✅ Finish Version 2.1.0';
+return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit';
+}
 
 function openIslandMap(){
 ['choices','walkingScreen','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
@@ -643,6 +650,11 @@ return;
 }
 
 if(currentDay===5&&currentTime==='Morning'){
+beginDayFiveAfternoon();
+return;
+}
+
+if(currentDay===5&&currentTime==='Afternoon'){
 showVersionComplete();
 return;
 }
@@ -694,6 +706,11 @@ q('choices').classList.remove('hidden');
 
 if(currentDay===5&&currentTime==='Morning'){
 visitDayFiveLocation(loc);
+return;
+}
+
+if(currentDay===5&&currentTime==='Afternoon'){
+visitDayFiveAfternoonLocation(loc);
 return;
 }
 
@@ -1857,27 +1874,299 @@ text:'The dark mark forms the shape of a broken circle.\n\nA whisper moves throu
 showCompletedButtons();
 }
 
+function beginDayFiveAfternoon(){
+currentTime='Afternoon';
+actionUsed=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'afternoon',
+text:'The morning tension follows everyone into the afternoon.\n\n📅 Day 5\n🌤️ Afternoon\n\nA message appears on every villa phone:\n\n"Valentina will choose someone for the first Bombshell date tonight."\n\n⭐ One new activity is available.'
+});
+
+choices('<button class="afternoonButton" onclick="openIslandMap()">🗺️ Begin Day 5 Afternoon</button>');
+}
+
+function visitDayFiveAfternoonLocation(loc){
+const partnerName=characters[coupledWith].name;
+const savedName=characters[savedPerson].name;
+const upsetPerson=getUpsetIslander();
+
+if(loc==='villa'){
+showScene({
+speaker:coupledWith,
+background:'afternoon',
+text:partnerName+' waits for you in the villa lounge.\n\n"Valentina is choosing a date tonight."\n\n"Are you hoping she picks you?"'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonPartnerTalk(\'reassure\')">💚 Reassure Your Partner</button>'+
+'<button onclick="dayFiveAfternoonPartnerTalk(\'honest\')">💬 Admit You Are Curious</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='beach'){
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:'Valentina walks beside the shoreline holding a gold invitation.\n\n"I have not chosen my date yet."\n\n"Give me one reason it should be you."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonValentinaTalk(\'flirt\')">😏 Make a Bold Impression</button>'+
+'<button onclick="dayFiveAfternoonValentinaTalk(\'friendly\')">🙂 Keep It Friendly</button>'+
+'<button onclick="dayFiveAfternoonValentinaTalk(\'loyal\')">💚 Say You Are Staying Loyal</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='pool'){
+showScene({
+speaker:savedPerson,
+background:'afternoon',
+text:savedName+' sits beside the Infinity Pool.\n\n"Valentina’s date choice could break a couple apart."\n\n"You saved me last night. I want to help you today."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonSavedTalk()">🛡️ Ask for Advice</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='firepit'){
+showScene({
+speaker:upsetPerson,
+background:'afternoon',
+text:characters[upsetPerson].name+' is watching the empty Fire Pit.\n\n"Everyone is focused on Valentina now."\n\n"But the elimination still does not feel right."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonUpsetTalk()">🤝 Try to Repair the Friendship</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='shrine'){
+showScene({
+speaker:'maya',
+background:'crystal',
+text:eliminatedPerson==='maya'
+?'The Shrine is empty, but the Crystal Flame projects the image of a golden invitation.'
+:'Maya watches the Crystal Flame project the image of a golden invitation.\n\n"It is reacting to Valentina’s choice before she has even made it."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonShrineTalk()">💎 Study the Date Vision</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='kitchen'){
+showScene({
+speaker:'isabella',
+background:'afternoon',
+text:eliminatedPerson==='isabella'
+?'The kitchen is quiet. A villa phone on the counter keeps flashing with date rumors.'
+:'Isabella is collecting every rumor about Valentina’s date choice.\n\n"Half the villa thinks she will choose you."'
+});
+choices(
+'<button class="afternoonButton" onclick="dayFiveAfternoonRumorTalk()">🎭 Ask About the Rumors</button>'+
+backMap()
+);
+return;
+}
+
+if(loc==='jungle'){
+showEmpty('🌿 Whispering Jungle','A gold ribbon is tied to one tree. It matches Valentina’s invitation.','jungle');
+return;
+}
+
+if(loc==='gym'){
+showEmpty('💪 Gym','The Islanders are too distracted by the date announcement to train.','afternoon');
+return;
+}
+
+if(loc==='cove'){
+showEmpty('🌙 Moonlight Cove','A private table is being prepared for tonight’s Bombshell date.','afternoon');
+return;
+}
+
+if(loc==='volcano'){
+showEmpty('🌋 Volcano Peak','The gate now reads: "Desire reveals what loyalty hides."','volcano');
+return;
+}
+
+showEmpty('Flame Cay','Everyone is waiting to learn who Valentina will choose.','afternoon');
+}
+
+function dayFiveAfternoonPartnerTalk(choice){
+if(actionAlreadyUsed())return;
+
+let result='';
+
+if(choice==='reassure'){
+relationships[coupledWith]+=3;
+couplingTrust+=2;
+couplingRomance+=1;
+result='You tell your partner that your current relationship comes first.\n\n'+characters[coupledWith].name+' relaxes and reaches for your hand.\n\n❤️ Partner Connection +3\n💚 Couple Trust +2\n💕 Couple Romance +1';
+}else{
+relationships[coupledWith]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+relationships.valentina+=1;
+result='You admit that part of you is curious about Valentina.\n\nYour partner appreciates the honesty, but the answer still hurts.\n\n❤️ Partner Connection +1\n💚 Couple Trust -1\n❤️ Valentina Connection +1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:coupledWith,
+background:'afternoon',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonValentinaTalk(choice){
+if(actionAlreadyUsed())return;
+
+let result='';
+
+if(choice==='flirt'){
+relationships.valentina+=4;
+valentinaStats.romance+=3;
+valentinaStats.boldness+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+result='You tell Valentina that choosing you would make the date unforgettable.\n\nShe smiles and folds the invitation slowly.\n\n❤️ Valentina Connection +4\n💕 Valentina Romance +3\n🔥 Valentina Boldness +1\n💚 Couple Trust -1';
+}else if(choice==='friendly'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+result='You tell Valentina that you are happy to get to know her without making promises.\n\nShe respects the balanced answer.\n\n❤️ Valentina Connection +2\n🤝 Valentina Friendship +2';
+}else{
+relationships[coupledWith]+=2;
+couplingTrust+=2;
+relationships.valentina+=1;
+result='You tell Valentina that you are protecting your current couple.\n\nShe looks impressed instead of offended.\n\n❤️ Partner Connection +2\n💚 Couple Trust +2\n❤️ Valentina Connection +1';
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'valentina',
+background:'afternoon',
+text:result+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonSavedTalk(){
+if(actionAlreadyUsed())return;
+
+relationships[savedPerson]+=2;
+addFriendshipPoint(savedPerson);
+couplingTrust+=1;
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:savedPerson,
+background:'afternoon',
+text:characters[savedPerson].name+' tells you to be honest before Valentina makes her choice.\n\n"Secrets create more damage than the date itself."\n\n❤️ Saved Islander Connection +2\n🤝 Friendship +1\n💚 Couple Trust +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonUpsetTalk(){
+if(actionAlreadyUsed())return;
+
+const upsetPerson=getUpsetIslander();
+relationships[upsetPerson]+=3;
+addFriendshipPoint(upsetPerson);
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:upsetPerson,
+background:'afternoon',
+text:'You listen instead of defending yourself.\n\n'+characters[upsetPerson].name+' finally admits that the anger came from fear of being next.\n\n❤️ Connection +3\n🤝 Friendship +1\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonShrineTalk(){
+if(actionAlreadyUsed())return;
+
+mayaStats.mystery+=2;
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The vision shows Valentina standing between two flames.\n\nOne flame represents desire.\nThe other represents loyalty.\n\nA whisper says:\n\n"Tonight, one choice will test both."\n\n🔥 Mystery +2\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
+function dayFiveAfternoonRumorTalk(){
+if(actionAlreadyUsed())return;
+
+if(eliminatedPerson!=='isabella'){
+relationships.isabella+=2;
+isabellaStats.social+=2;
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:eliminatedPerson==='isabella'?'narrator':'isabella',
+background:'afternoon',
+text:eliminatedPerson==='isabella'
+?'You read the messages flashing across the abandoned villa phone.\n\nThe strongest rumor says Valentina is choosing between you and your partner.\n\n🎭 Rumor discovered\n\n✅ Activity complete.'
+:'Isabella tells you that Valentina has asked questions about both you and your partner.\n\n"Whatever happens tonight, someone will be jealous."\n\n❤️ Isabella Connection +2\n🎭 Social +2\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
+}
+
 function showVersionComplete(){
 const partnerName=characters[coupledWith].name;
 const savedName=characters[savedPerson].name;
 const eliminatedName=characters[eliminatedPerson].name;
 
+autoSaveGame();
+
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 1.6.1 COMPLETE\n\nYou finished the morning after the elimination.\n\nPartner: '+partnerName+'\nSaved Islander: '+savedName+'\nEliminated Islander: '+eliminatedName+'\n\nValentina’s first date choice begins next in Version 1.7.0.'
+text:'✅ VERSION 2.1.0 COMPLETE\n\nYou finished Day 5 Afternoon.\n\nPartner: '+partnerName+'\nSaved Islander: '+savedName+'\nEliminated Islander: '+eliminatedName+'\nValentina Connection: '+relationships.valentina+'\n\nValentina’s First Date begins next in Version 2.2.0.'
 });
 
-choices('<button onclick="showDayFiveSummary()">☀️ View Day 5 Summary</button><button onclick="openIslandMap()">🗺️ Return to Day 5 Morning</button>');
+choices(
+'<button onclick="showDayFiveAfternoonSummary()">🌤️ View Afternoon Summary</button>'+
+'<button onclick="openIslandMap()">🗺️ Return to Day 5 Afternoon</button>'
+);
 }
 
-function showDayFiveSummary(){
+function showDayFiveAfternoonSummary(){
 const upsetPerson=getUpsetIslander();
 
 showScene({
 speaker:'host',
 background:'night',
-text:'☀️ DAY 5 MORNING SUMMARY\n\nOfficial Partner: '+characters[coupledWith].name+'\nSaved Islander: '+characters[savedPerson].name+'\nEliminated Islander: '+characters[eliminatedPerson].name+'\nVilla tension: '+characters[upsetPerson].name+'\nValentina Connection: '+relationships.valentina+'\n\nYour choices will shape Valentina’s first date.'
+text:'🌤️ DAY 5 AFTERNOON SUMMARY\n\nOfficial Partner: '+characters[coupledWith].name+'\nValentina Connection: '+relationships.valentina+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nVilla tension: '+characters[upsetPerson].name+'\n\nValentina will choose her first date next.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
