@@ -59,6 +59,9 @@ background:#fff;
 .argumentButton{background:linear-gradient(90deg,#c31432,#240b36)}
 .peaceButton{background:linear-gradient(90deg,#56ab2f,#a8e063)}
 .falloutCard{border-left-color:#f7971e;background:rgba(255,251,240,.98)}
+.compatibilityButton{background:linear-gradient(90deg,#00b09b,#96c93d)}
+.compatibilityCard{border-left-color:#00b09b;background:rgba(244,255,250,.98)}
+.scoreBox{text-align:center;font-size:24px;font-weight:700;color:#176b3a;padding:12px}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -72,7 +75,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.5.0 — Fallout Day</strong></p>
+<p><strong>Version 2.6.0 — Compatibility Challenge</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -155,7 +158,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.5.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.6.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -263,7 +266,12 @@ recouplingComplete,
 previousPartner,
 falloutStarted,
 falloutChoice,
-falloutComplete
+falloutComplete,
+compatibilityStarted,
+compatibilityScore,
+compatibilityQuestion,
+compatibilityPartner,
+compatibilityComplete
 };
 }
 
@@ -318,6 +326,11 @@ previousPartner=data.previousPartner||'';
 falloutStarted=Boolean(data.falloutStarted);
 falloutChoice=data.falloutChoice||'';
 falloutComplete=Boolean(data.falloutComplete);
+compatibilityStarted=Boolean(data.compatibilityStarted);
+compatibilityScore=Number(data.compatibilityScore||0);
+compatibilityQuestion=Number(data.compatibilityQuestion||0);
+compatibilityPartner=data.compatibilityPartner||'';
+compatibilityComplete=Boolean(data.compatibilityComplete);
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -486,13 +499,23 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(compatibilityComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Compatibility Challenge is complete.'
+});
+choices('<button onclick="showVersionComplete()">🏆 View Challenge Results</button>');
+return;
+}
+
 if(falloutComplete){
 showScene({
 speaker:'narrator',
 background:'night',
 text:'💾 SAVE LOADED\n\nFallout Day is complete.'
 });
-choices('<button onclick="showVersionComplete()">🔥 View Fallout Results</button>');
+choices('<button onclick="startCompatibilityChallenge()">🏆 Continue to Compatibility Challenge</button>');
 return;
 }
 
@@ -604,7 +627,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -3030,45 +3053,236 @@ background:'crystal',
 text:'The Crystal Flame glows above the villa.\n\n"Fallout reveals the truth faster than romance."\n\n'+status+'\n\n"Tomorrow, every couple will face a Compatibility Challenge."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 2.5.0</button>');
+choices('<button class="compatibilityButton" onclick="startCompatibilityChallenge()">🏆 Continue to Compatibility Challenge</button>');
+}
+
+function getCompatibilityPartner(){
+if(coupledWith&&characters[coupledWith]){
+return coupledWith;
+}
+
+const candidates=['lucas','maya','kai','isabella','ethan','sofia','noah','lisa','valentina']
+.filter(person=>person!==eliminatedPerson);
+
+return candidates.sort((a,b)=>relationships[b]-relationships[a])[0]||savedPerson||'valentina';
+}
+
+function startCompatibilityChallenge(){
+if(compatibilityComplete){
+showVersionComplete();
+return;
+}
+
+compatibilityStarted=true;
+compatibilityScore=0;
+compatibilityQuestion=0;
+compatibilityPartner=getCompatibilityPartner();
+autoSaveGame();
+
+const partnerName=characters[compatibilityPartner].name;
+const intro=coupledWith
+?'You and '+partnerName+' will compete as an official couple.'
+:'Because you are single, '+partnerName+' has been assigned as your temporary challenge partner.';
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'The Islanders gather beside the Infinity Pool.\n\n"Welcome to the Compatibility Challenge."\n\n'+intro+'\n\n"Your answers will reveal how well you understand each other."'
+});
+
+choices('<button class="compatibilityButton" onclick="showCompatibilityRules()">🏆 Hear the Rules</button>');
+}
+
+function showCompatibilityRules(){
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'"You will face four questions."\n\n"Each strong answer is worth three points."\n\n"Earn at least eight points to win the luxury date."'
+});
+
+choices('<button class="compatibilityButton" onclick="compatibilityQuestionOne()">🔥 Start Challenge</button>');
+}
+
+function compatibilityQuestionOne(){
+compatibilityQuestion=1;
+
+showScene({
+speaker:compatibilityPartner,
+background:'afternoon',
+text:'QUESTION 1 OF 4\n\nYour partner has had a difficult day.\n\nWhat would help them most?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="answerCompatibility(3,2)">💚 Listen and stay beside them</button>'+
+'<button onclick="answerCompatibility(2,2)">🎉 Distract them with something fun</button>'+
+'<button onclick="answerCompatibility(0,2)">😶 Give them space without asking</button>'
+);
+}
+
+function compatibilityQuestionTwo(){
+compatibilityQuestion=2;
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'QUESTION 2 OF 4\n\nA rumor spreads about your relationship.\n\nWhat do you do first?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="answerCompatibility(3,3)">💬 Talk privately with your partner</button>'+
+'<button onclick="answerCompatibility(1,3)">🔥 Confront the whole villa</button>'+
+'<button onclick="answerCompatibility(0,3)">🤫 Pretend you did not hear it</button>'
+);
+}
+
+function compatibilityQuestionThree(){
+compatibilityQuestion=3;
+
+showScene({
+speaker:compatibilityPartner,
+background:'afternoon',
+text:'QUESTION 3 OF 4\n\nThe Crystal Flame offers your couple safety, but only if another couple becomes vulnerable.\n\nWhat do you choose?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="answerCompatibility(3,4)">🤝 Refuse and compete fairly</button>'+
+'<button onclick="answerCompatibility(1,4)">🏆 Accept the safety</button>'+
+'<button onclick="answerCompatibility(2,4)">💬 Ask your partner before deciding</button>'
+);
+}
+
+function compatibilityQuestionFour(){
+compatibilityQuestion=4;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'QUESTION 4 OF 4\n\nWhat matters most in a lasting relationship?'
+});
+
+choices(
+'<button class="compatibilityButton" onclick="finishCompatibilityAnswer(3)">💚 Trust and honesty</button>'+
+'<button onclick="finishCompatibilityAnswer(2)">❤️ Attraction and excitement</button>'+
+'<button onclick="finishCompatibilityAnswer(1)">🏆 Winning together</button>'
+);
+}
+
+function answerCompatibility(points,nextQuestion){
+compatibilityScore+=points;
+
+if(nextQuestion===2){
+compatibilityQuestionTwo();
+return;
+}
+
+if(nextQuestion===3){
+compatibilityQuestionThree();
+return;
+}
+
+compatibilityQuestionFour();
+}
+
+function finishCompatibilityAnswer(points){
+compatibilityScore+=points;
+compatibilityComplete=true;
+
+let resultTitle='';
+let rewardText='';
+
+if(compatibilityScore>=11){
+resultTitle='PERFECT MATCH';
+relationships[compatibilityPartner]+=5;
+couplingRomance+=4;
+couplingTrust+=4;
+rewardText='❤️ Partner Connection +5\n💕 Couple Romance +4\n💚 Couple Trust +4\n🏆 Luxury Date Won';
+}else if(compatibilityScore>=8){
+resultTitle='CHALLENGE PASSED';
+relationships[compatibilityPartner]+=3;
+couplingRomance+=2;
+couplingTrust+=2;
+rewardText='❤️ Partner Connection +3\n💕 Couple Romance +2\n💚 Couple Trust +2\n🏆 Luxury Date Won';
+}else{
+resultTitle='COMPATIBILITY AT RISK';
+relationships[compatibilityPartner]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+rewardText='❤️ Partner Connection +1\n💚 Couple Trust -1\n⚠️ No Luxury Date';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'🏆 '+resultTitle+'\n\nFinal Score: '+compatibilityScore+' / 12\n\n'+rewardText
+});
+
+choices('<button class="compatibilityButton" onclick="showCompatibilityReaction()">❤️ See Your Partner’s Reaction</button>');
+}
+
+function showCompatibilityReaction(){
+const reactions={
+lucas:'Lucas smiles with relief.\n\n"We work best when we trust each other."',
+maya:'Maya looks toward the Crystal Flame.\n\n"It answered differently when we agreed."',
+kai:'Kai grins.\n\n"Looks like we are stronger than people thought."',
+isabella:'Isabella beams.\n\n"I knew our energy matched."',
+ethan:'Ethan nods approvingly.\n\n"Good communication. Strong result."',
+sofia:'Sofia smiles softly.\n\n"I feel closer to you after that."',
+noah:'Noah looks proud.\n\n"Honesty made the difference."',
+lisa:'Lisa gives you a surprised smile.\n\n"Maybe we understand each other better than expected."',
+valentina:'Valentina raises an eyebrow and smiles.\n\n"That was more real than I expected."'
+};
+
+showScene({
+speaker:compatibilityPartner,
+background:'afternoon',
+text:reactions[compatibilityPartner]
+});
+
+choices('<button class="compatibilityButton" onclick="showCompatibilityAftermath()">🔥 Continue</button>');
+}
+
+function showCompatibilityAftermath(){
+const wonDate=compatibilityScore>=8;
+const partnerName=characters[compatibilityPartner].name;
+
+showScene({
+speaker:'host',
+background:'night',
+text:wonDate
+?'"'+playerName+' and '+partnerName+', you have earned a luxury date."\n\n"Tomorrow, you will leave the villa for a private evening."'
+:'"Your score was not high enough for the luxury date."\n\n"The lowest-scoring couple will become vulnerable in the next vote."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 2.6.0</button>');
 }
 
 function showVersionComplete(){
-const currentPartner=coupledWith&&characters[coupledWith]
-?characters[coupledWith].name
-:'Single';
+const partnerName=characters[compatibilityPartner].name;
+const wonDate=compatibilityScore>=8?'Yes':'No';
 
 autoSaveGame();
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.5.0 COMPLETE\n\nFallout Day is complete.\n\nCurrent Partner: '+currentPartner+'\nFallout Choice: '+formatFalloutChoice(falloutChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe Compatibility Challenge begins next in Version 2.6.0.'
+text:'✅ VERSION 2.6.0 COMPLETE\n\nThe Compatibility Challenge is complete.\n\nChallenge Partner: '+partnerName+'\nScore: '+compatibilityScore+' / 12\nLuxury Date Won: '+wonDate+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe Luxury Date begins next in Version 2.7.0.'
 });
 
 choices(
-'<button onclick="showFalloutSummary()">🔥 View Fallout Summary</button>'+
+'<button onclick="showCompatibilitySummary()">🏆 View Challenge Summary</button>'+
 '<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function formatFalloutChoice(choice){
-if(choice==='former')return 'Faced former partner';
-if(choice==='current')return 'Strengthened current couple';
-if(choice==='valentina')return 'Confronted Valentina';
-if(choice==='friends')return 'Handled villa friendships';
-return 'Not chosen';
-}
-
-function showFalloutSummary(){
-const currentPartner=coupledWith&&characters[coupledWith]
-?characters[coupledWith].name
-:'Single';
+function showCompatibilitySummary(){
+const partnerName=characters[compatibilityPartner].name;
 
 showScene({
 speaker:'host',
 background:'night',
-text:'🔥 FALLOUT DAY SUMMARY\n\nCurrent Partner: '+currentPartner+'\nFormer Partner: '+characters[previousPartner].name+'\nMain Conversation: '+formatFalloutChoice(falloutChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nValentina Connection: '+relationships.valentina+'\n\nThe villa is ready for its next test.'
+text:'🏆 COMPATIBILITY SUMMARY\n\nPartner: '+partnerName+'\nFinal Score: '+compatibilityScore+' / 12\nLuxury Date: '+(compatibilityScore>=8?'Unlocked':'Not unlocked')+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nYour score will affect the next episode.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
