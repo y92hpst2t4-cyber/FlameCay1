@@ -73,6 +73,10 @@ background:#fff;
 .saveIslanderButton{background:linear-gradient(90deg,#2e9d58,#176b3a)}
 .eliminateButton{background:linear-gradient(90deg,#b00020,#4d000b)}
 .eliminationCard{border-left-color:#b00020;background:rgba(255,245,245,.98)}
+.finalWeekButton{background:linear-gradient(90deg,#f6d365,#fda085)}
+.familyButton{background:linear-gradient(90deg,#5f2c82,#49a09d)}
+.finalChoiceButton{background:linear-gradient(90deg,#ff512f,#dd2476)}
+.finalWeekCard{border-left-color:#f6a623;background:rgba(255,252,242,.98)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -86,7 +90,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.9.0 — Second Elimination</strong></p>
+<p><strong>Version 3.0.0 — Final Week Begins</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -169,7 +173,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.9.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false,secondEliminationStarted=false,secondEliminationSaved='',secondEliminatedPerson='',secondEliminationComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='3.0.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false,secondEliminationStarted=false,secondEliminationSaved='',secondEliminatedPerson='',secondEliminationComplete=false,finalWeekStarted=false,familyMessageChoice='',finalWeekChoice='',finalWeekComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -294,7 +298,11 @@ secretVoteComplete,
 secondEliminationStarted,
 secondEliminationSaved,
 secondEliminatedPerson,
-secondEliminationComplete
+secondEliminationComplete,
+finalWeekStarted,
+familyMessageChoice,
+finalWeekChoice,
+finalWeekComplete
 };
 }
 
@@ -366,6 +374,10 @@ secondEliminationStarted=Boolean(data.secondEliminationStarted);
 secondEliminationSaved=data.secondEliminationSaved||'';
 secondEliminatedPerson=data.secondEliminatedPerson||'';
 secondEliminationComplete=Boolean(data.secondEliminationComplete);
+finalWeekStarted=Boolean(data.finalWeekStarted);
+familyMessageChoice=data.familyMessageChoice||'';
+finalWeekChoice=data.finalWeekChoice||'';
+finalWeekComplete=Boolean(data.finalWeekComplete);
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -534,13 +546,23 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(finalWeekComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nFinal Week has begun.'
+});
+choices('<button onclick="showVersionComplete()">🌅 View Final Week Results</button>');
+return;
+}
+
 if(secondEliminationComplete){
 showScene({
 speaker:'narrator',
 background:'night',
 text:'💾 SAVE LOADED\n\nThe Second Elimination is complete.'
 });
-choices('<button onclick="showVersionComplete()">🔥 View Elimination Results</button>');
+choices('<button onclick="startFinalWeek()">🌅 Continue to Final Week</button>');
 return;
 }
 
@@ -692,7 +714,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;secretVoteStarted=false;secretVoteChoice='';secretVoteResult='';secretVoteComplete=false;secondEliminationStarted=false;secondEliminationSaved='';secondEliminatedPerson='';secondEliminationComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;secretVoteStarted=false;secretVoteChoice='';secretVoteResult='';secretVoteComplete=false;secondEliminationStarted=false;secondEliminationSaved='';secondEliminatedPerson='';secondEliminationComplete=false;finalWeekStarted=false;familyMessageChoice='';finalWeekChoice='';finalWeekComplete=false;
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -3760,12 +3782,180 @@ background:'crystal',
 text:'The Fire Pit falls silent as '+eliminatedName+' leaves Flame Cay.\n\n"'+savedName+' remains because of your decision."\n\n"From this moment forward, the final phase of the game begins."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 2.9.0</button>');
+choices('<button class="finalWeekButton" onclick="startFinalWeek()">🌅 Continue to Final Week</button>');
+}
+
+function startFinalWeek(){
+if(finalWeekComplete){
+showVersionComplete();
+return;
+}
+
+finalWeekStarted=true;
+currentDay=7;
+currentTime='Morning';
+actionUsed=false;
+currentLocation='villa';
+pendingLocation='';
+updateTimeDisplay();
+autoSaveGame();
+
+const status=coupledWith&&characters[coupledWith]
+?'You enter Final Week coupled with '+characters[coupledWith].name+'.'
+:'You enter Final Week single.';
+
+showScene({
+speaker:'host',
+background:'arrival',
+text:'The sun rises over Flame Cay.\n\n📅 Day 7\n🌅 FINAL WEEK\n\n"Islanders, only the strongest stories remain."\n\n'+status+'\n\n"From this moment forward, every choice affects the finale."'
+});
+
+choices('<button class="finalWeekButton" onclick="showFinalWeekAnnouncement()">🔥 Hear the Final Week Rules</button>');
+}
+
+function showFinalWeekAnnouncement(){
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"Final Week will include family messages, one final challenge, final dates, and the Grand Finale."\n\n"The Crystal Flame will judge love, loyalty, courage, and honesty."\n\n"Today begins with a message from home."'
+});
+
+choices('<button class="familyButton" onclick="showFamilyMessage()">📱 Watch Your Family Message</button>');
+}
+
+function showFamilyMessage(){
+const partnerText=coupledWith&&characters[coupledWith]
+?'They also mention '+characters[coupledWith].name+' and ask whether the relationship feels real.'
+:'They ask whether you are ready to leave Flame Cay single or open your heart again.';
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:'A video begins playing on the villa screen.\n\nYour family tells you they are proud of how far you have come.\n\n'+partnerText
+});
+
+choices(
+'<div class="card finalWeekCard"><h3>📱 Respond to the Message</h3>'+
+'<button class="familyButton" onclick="chooseFamilyMessage(\'heart\')">❤️ Say you followed your heart</button>'+
+'<button onclick="chooseFamilyMessage(\'growth\')">🌱 Say the island changed you</button>'+
+'<button class="finalChoiceButton" onclick="chooseFamilyMessage(\'win\')">🏆 Say you came to win</button></div>'
+);
+}
+
+function chooseFamilyMessage(choice){
+if(familyMessageChoice)return;
+
+familyMessageChoice=choice;
+let text='';
+
+if(choice==='heart'){
+if(coupledWith){
+relationships[coupledWith]+=3;
+couplingRomance+=2;
+couplingTrust+=2;
+}
+text='You say that your biggest choices came from your heart.\n\nYour family smiles through the screen.\n\n❤️ Partner Connection +3\n💕 Couple Romance +2\n💚 Couple Trust +2';
+}else if(choice==='growth'){
+if(coupledWith){
+relationships[coupledWith]+=2;
+couplingTrust+=2;
+}
+text='You say Flame Cay taught you to be more honest and brave.\n\nYour family tells you they can see the change.\n\n❤️ Partner Connection +2\n💚 Couple Trust +2';
+}else{
+if(coupledWith){
+relationships[coupledWith]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+}
+text='You say you still want to win the season.\n\nYour family reminds you not to lose yourself in the competition.\n\n❤️ Partner Connection +1\n💚 Couple Trust -1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:text
+});
+
+choices('<button class="finalWeekButton" onclick="showFinalWeekChoice()">🌅 Continue Final Week</button>');
+}
+
+function showFinalWeekChoice(){
+let html='<div class="card finalWeekCard"><h3>🌅 Choose Your Final Week Focus</h3>';
+
+if(coupledWith){
+html+='<button class="finalChoiceButton" onclick="chooseFinalWeekPath(\'partner\')">❤️ Strengthen Your Couple</button>';
+}
+
+html+='<button class="familyButton" onclick="chooseFinalWeekPath(\'friendships\')">🤝 Repair Villa Friendships</button>';
+html+='<button class="finalWeekButton" onclick="chooseFinalWeekPath(\'crystal\')">💎 Investigate the Crystal Flame</button>';
+html+='</div>';
+
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'"You have time for one important Final Week conversation."\n\n"Choose carefully. This choice will affect the final challenge."'
+});
+
+choices(html);
+}
+
+function chooseFinalWeekPath(choice){
+if(finalWeekChoice)return;
+
+finalWeekChoice=choice;
+let text='';
+
+if(choice==='partner'){
+relationships[coupledWith]+=4;
+couplingRomance+=3;
+couplingTrust+=3;
+
+text='You spend the afternoon talking honestly with '+characters[coupledWith].name+'.\n\nYou discuss life outside Flame Cay and whether the relationship can survive without the cameras.\n\n❤️ Partner Connection +4\n💕 Couple Romance +3\n💚 Couple Trust +3';
+}else if(choice==='friendships'){
+const friend=getFinalWeekFriend();
+relationships[friend]+=4;
+addFriendshipPoint(friend);
+
+text='You meet with '+characters[friend].name+' and repair the tension left by Casa and the eliminations.\n\n❤️ Connection +4\n🤝 Friendship +1';
+}else{
+mayaStats.mystery+=3;
+
+text='You return to the Crystal Shrine.\n\nThe Flame shows four symbols: love, betrayal, courage, and sacrifice.\n\nA final message appears:\n\n"The Keeper will be chosen at the finale."\n\n🔥 Mystery +3';
+}
+
+finalWeekComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:choice==='partner'?coupledWith:choice==='friendships'?getFinalWeekFriend():'narrator',
+background:choice==='crystal'?'crystal':'afternoon',
+text:text
+});
+
+choices('<button class="finalWeekButton" onclick="showFinalWeekAftermath()">🔥 Continue</button>');
+}
+
+function getFinalWeekFriend(){
+const unavailable=[eliminatedPerson,secondEliminatedPerson,coupledWith];
+const order=['maya','noah','sofia','isabella','lucas','kai','ethan','lisa','valentina'];
+
+return order.find(person=>!unavailable.includes(person))||'valentina';
+}
+
+function showFinalWeekAftermath(){
+showScene({
+speaker:'host',
+background:'night',
+text:'The Islanders gather at the Fire Pit.\n\n"Tomorrow, you will face the Final Challenge."\n\n"It will test every decision you made from Day 1 until now."\n\n"The winning couple will earn an advantage in the Grand Finale."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 3.0.0</button>');
 }
 
 function showVersionComplete(){
-const savedName=characters[secondEliminationSaved].name;
-const eliminatedName=characters[secondEliminatedPerson].name;
 const currentPartner=coupledWith&&characters[coupledWith]
 ?characters[coupledWith].name
 :'Single';
@@ -3775,20 +3965,38 @@ autoSaveGame();
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.9.0 COMPLETE\n\nThe Second Elimination is complete.\n\nSaved: '+savedName+'\nEliminated: '+eliminatedName+'\nCurrent Partner: '+currentPartner+'\n\nFinal Week begins next in Version 3.0.0.'
+text:'✅ VERSION 3.0.0 COMPLETE\n\nFinal Week has begun.\n\nCurrent Partner: '+currentPartner+'\nFamily Message Choice: '+formatFamilyChoice(familyMessageChoice)+'\nFinal Week Focus: '+formatFinalWeekChoice(finalWeekChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe Final Challenge begins next in Version 3.1.0.'
 });
 
 choices(
-'<button onclick="showSecondEliminationSummary()">🔥 View Elimination Summary</button>'+
+'<button onclick="showFinalWeekSummary()">🌅 View Final Week Summary</button>'+
 '<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function showSecondEliminationSummary(){
+function formatFamilyChoice(choice){
+if(choice==='heart')return 'Followed your heart';
+if(choice==='growth')return 'Focused on personal growth';
+if(choice==='win')return 'Focused on winning';
+return 'Not chosen';
+}
+
+function formatFinalWeekChoice(choice){
+if(choice==='partner')return 'Strengthened couple';
+if(choice==='friendships')return 'Repaired friendships';
+if(choice==='crystal')return 'Investigated Crystal Flame';
+return 'Not chosen';
+}
+
+function showFinalWeekSummary(){
+const currentPartner=coupledWith&&characters[coupledWith]
+?characters[coupledWith].name
+:'Single';
+
 showScene({
 speaker:'host',
 background:'night',
-text:'🔥 SECOND ELIMINATION SUMMARY\n\nSecret Vote Result: '+characters[secretVoteResult].name+'\nSaved by You: '+characters[secondEliminationSaved].name+'\nEliminated: '+characters[secondEliminatedPerson].name+'\nCurrent Partner: '+(coupledWith?characters[coupledWith].name:'Single')+'\n\nThe villa now enters Final Week.'
+text:'🌅 FINAL WEEK SUMMARY\n\nCurrent Partner: '+currentPartner+'\nFamily Choice: '+formatFamilyChoice(familyMessageChoice)+'\nFinal Week Focus: '+formatFinalWeekChoice(finalWeekChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nMystery Progress: '+mayaStats.mystery+'\n\nThe final challenge will use these results.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
