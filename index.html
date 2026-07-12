@@ -47,6 +47,10 @@ background:#fff;
 .afternoonButton{background:linear-gradient(90deg,#f28c28,#d95f02)}
 .dateButton{background:linear-gradient(90deg,#ff4d88,#b81d62)}
 .dateCard{border-left-color:#ff4d88;background:rgba(255,247,251,.97)}
+.casaButton{background:linear-gradient(90deg,#6a11cb,#2575fc)}
+.loyaltyButton{background:linear-gradient(90deg,#11998e,#38ef7d)}
+.temptationButton{background:linear-gradient(90deg,#ff416c,#ff4b2b)}
+.casaCard{border-left-color:#6a11cb;background:rgba(248,245,255,.97)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -60,7 +64,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.2.0 — Valentina’s First Date</strong></p>
+<p><strong>Version 2.3.0 — Casa-style Drama</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -143,7 +147,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.2.0',dateInvitee='',dateChoice='',dateComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.3.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -240,7 +244,11 @@ savedPerson,
 atRisk,
 dateInvitee,
 dateChoice,
-dateComplete
+dateComplete,
+casaStarted,
+casaChoice,
+casaPartnerReaction,
+casaComplete
 };
 }
 
@@ -284,6 +292,10 @@ atRisk=Array.isArray(data.atRisk)?data.atRisk:[];
 dateInvitee=data.dateInvitee||'';
 dateChoice=data.dateChoice||'';
 dateComplete=Boolean(data.dateComplete);
+casaStarted=Boolean(data.casaStarted);
+casaChoice=data.casaChoice||'';
+casaPartnerReaction=data.casaPartnerReaction||'';
+casaComplete=Boolean(data.casaComplete);
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -452,13 +464,23 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(casaComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Casa-style loyalty test is complete.'
+});
+choices('<button onclick="showVersionComplete()">🏝️ View Casa Results</button>');
+return;
+}
+
 if(dateComplete){
 showScene({
 speaker:'narrator',
 background:'night',
 text:'💾 SAVE LOADED\n\nValentina’s first date is complete.'
 });
-choices('<button onclick="showVersionComplete()">💖 View Date Results</button>');
+choices('<button onclick="startCasaDrama()">🏝️ Continue to the Casa Twist</button>');
 return;
 }
 
@@ -540,7 +562,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -2357,34 +2379,192 @@ background:'crystal',
 text:'The Crystal Flame glows above the villa.\n\n"One date can create a connection... or expose a weakness."\n\n"Tomorrow, everyone will learn what changed tonight."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 2.2.0</button>');
+choices('<button class="casaButton" onclick="startCasaDrama()">🏝️ Continue to the Casa Twist</button>');
+}
+
+function startCasaDrama(){
+if(casaComplete){
+showVersionComplete();
+return;
+}
+
+casaStarted=true;
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The villa phones suddenly flash with a new message.\n\n"Islanders, pack a small bag immediately."\n\n"Tonight, Flame Cay will be divided."'
+});
+
+choices('<button class="casaButton" onclick="revealCasaTwist()">🏝️ Reveal the Twist</button>');
+}
+
+function revealCasaTwist(){
+const partnerName=characters[coupledWith].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"Half of the Islanders will remain in the Main Villa."\n\n"The others will move to Moonlight House on the opposite side of the island."\n\nYou and '+partnerName+' will be separated.\n\nFor the next test, you will not know what your partner is doing.'
+});
+
+choices('<button class="casaButton" onclick="showCasaArrival()">🌙 Enter Moonlight House</button>');
+}
+
+function showCasaArrival(){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'Moonlight House is smaller, quieter, and filled with unfamiliar faces.\n\nA sealed card waits on your bed.\n\nIt reads:\n\n"Tonight, choose loyalty... curiosity... or temptation."'
+});
+
+choices('<button class="casaButton" onclick="showCasaChoice()">💌 Open the Loyalty Test</button>');
+}
+
+function showCasaChoice(){
+const partnerName=characters[coupledWith].name;
+
+showScene({
+speaker:'host',
+background:'night',
+text:'"You have one private evening before the villas reunite."\n\n"Your choice will remain secret for now."\n\nRemember: '+partnerName+' is making a choice too.'
+});
+
+choices(
+'<div class="card casaCard"><h3>🏝️ Casa Loyalty Test</h3>'+
+'<button class="loyaltyButton" onclick="chooseCasaPath(\'loyal\')">💚 Stay completely loyal</button>'+
+'<button class="casaButton" onclick="chooseCasaPath(\'curious\')">💬 Get to know someone new</button>'+
+'<button class="temptationButton" onclick="chooseCasaPath(\'tempted\')">🔥 Give in to temptation</button></div>'
+);
+}
+
+function chooseCasaPath(choice){
+if(casaChoice)return;
+
+casaChoice=choice;
+casaPartnerReaction=calculatePartnerCasaReaction();
+casaComplete=true;
+
+let result='';
+
+if(choice==='loyal'){
+relationships[coupledWith]+=4;
+couplingTrust+=4;
+couplingRomance+=2;
+result='You decide that your current relationship deserves a real chance.\n\nYou spend the evening alone on the terrace, writing a message you are not allowed to send.\n\n❤️ Partner Connection +4\n💚 Couple Trust +4\n💕 Couple Romance +2';
+}else if(choice==='curious'){
+relationships.valentina+=2;
+valentinaStats.friendship+=2;
+couplingTrust=Math.max(0,couplingTrust-1);
+result='You join a late-night conversation and allow yourself to be open to a new connection.\n\nNothing serious happens, but the choice creates uncertainty.\n\n❤️ Valentina Connection +2\n🤝 Valentina Friendship +2\n💚 Couple Trust -1';
+}else{
+relationships.valentina+=5;
+valentinaStats.romance+=4;
+valentinaStats.boldness+=2;
+relationships[coupledWith]-=3;
+couplingTrust=Math.max(0,couplingTrust-3);
+result='You choose excitement over caution.\n\nThe moment is private, but Flame Cay has a way of revealing secrets.\n\n❤️ Valentina Connection +5\n💕 Valentina Romance +4\n🔥 Valentina Boldness +2\n💔 Partner Connection -3\n💚 Couple Trust -3';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'night',
+text:result
+});
+
+choices('<button class="casaButton" onclick="showPartnerCasaChoice()">📱 Learn What Your Partner Did</button>');
+}
+
+function calculatePartnerCasaReaction(){
+if(couplingTrust>=8)return 'loyal';
+if(couplingTrust>=4)return 'curious';
+return 'tempted';
+}
+
+function showPartnerCasaChoice(){
+const partnerName=characters[coupledWith].name;
+let text='';
+
+if(casaPartnerReaction==='loyal'){
+text=partnerName+' chose to stay loyal.\n\nYour partner turned down every opportunity to explore another connection.';
+}else if(casaPartnerReaction==='curious'){
+text=partnerName+' chose to talk with someone new.\n\nNothing serious happened, but your partner did not stay completely closed off.';
+}else{
+text=partnerName+' gave in to temptation.\n\nThe message does not explain exactly what happened.';
+}
+
+showScene({
+speaker:coupledWith,
+background:'night',
+text:text
+});
+
+choices('<button class="casaButton" onclick="showCasaConflict()">🔥 Continue</button>');
+}
+
+function showCasaConflict(){
+const partnerName=characters[coupledWith].name;
+let text='';
+
+if(casaChoice==='loyal'&&casaPartnerReaction==='loyal'){
+relationships[coupledWith]+=3;
+couplingTrust+=3;
+text='Both of you stayed loyal.\n\nThe separation made your connection stronger.';
+}else if(casaChoice==='loyal'&&casaPartnerReaction!=='loyal'){
+text='You stayed loyal, but '+partnerName+' explored another connection.\n\nFor the first time, you question whether the relationship is balanced.';
+}else if(casaChoice!=='loyal'&&casaPartnerReaction==='loyal'){
+couplingTrust=Math.max(0,couplingTrust-1);
+text=partnerName+' stayed loyal while you explored something new.\n\nThe secret feels heavier now.';
+}else{
+text='Both of you explored other connections.\n\nThe reunion will not be simple.';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:text+'\n\n"Tomorrow, the two villas will reunite."\n\n"Every Islander must decide whether to return alone... or recouple."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 2.3.0</button>');
 }
 
 function showVersionComplete(){
-const inviteeName=dateInvitee==='player'?playerName:characters[dateInvitee].name;
 const partnerName=characters[coupledWith].name;
-
 autoSaveGame();
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.2.0 COMPLETE\n\nValentina completed her first date.\n\nDate Invitee: '+inviteeName+'\nYour Partner: '+partnerName+'\nValentina Connection: '+relationships.valentina+'\nCouple Trust: '+couplingTrust+'\n\nThe morning-after reactions begin next in Version 2.2.1.'
+text:'✅ VERSION 2.3.0 COMPLETE\n\nThe Casa-style loyalty test is complete.\n\nYour choice: '+formatCasaChoice(casaChoice)+'\n'+partnerName+' chose: '+formatCasaChoice(casaPartnerReaction)+'\nCouple Trust: '+couplingTrust+'\nValentina Connection: '+relationships.valentina+'\n\nThe Casa Recoupling begins next in Version 2.4.0.'
 });
 
 choices(
-'<button onclick="showDateSummary()">💖 View Date Summary</button>'+
+'<button onclick="showCasaSummary()">🏝️ View Casa Summary</button>'+
 '<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function showDateSummary(){
-const inviteeName=dateInvitee==='player'?playerName:characters[dateInvitee].name;
+function formatCasaChoice(choice){
+if(choice==='loyal')return 'Stayed loyal';
+if(choice==='curious')return 'Explored a conversation';
+if(choice==='tempted')return 'Gave in to temptation';
+return 'Not decided';
+}
+
+function showCasaSummary(){
+const partnerName=characters[coupledWith].name;
 
 showScene({
-speaker:'valentina',
+speaker:'host',
 background:'night',
-text:'💖 FIRST DATE SUMMARY\n\nDate Invitee: '+inviteeName+'\nDate Choice: '+dateChoice+'\nValentina Connection: '+relationships.valentina+'\nValentina Friendship: '+valentinaStats.friendship+'\nValentina Romance: '+valentinaStats.romance+'\nValentina Boldness: '+valentinaStats.boldness+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust
+text:'🏝️ CASA SUMMARY\n\nYour Partner: '+partnerName+'\nYour Choice: '+formatCasaChoice(casaChoice)+'\nPartner Choice: '+formatCasaChoice(casaPartnerReaction)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nValentina Romance: '+valentinaStats.romance+'\n\nThe next decision will determine whether your couple survives.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
