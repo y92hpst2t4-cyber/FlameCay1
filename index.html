@@ -51,6 +51,10 @@ background:#fff;
 .loyaltyButton{background:linear-gradient(90deg,#11998e,#38ef7d)}
 .temptationButton{background:linear-gradient(90deg,#ff416c,#ff4b2b)}
 .casaCard{border-left-color:#6a11cb;background:rgba(248,245,255,.97)}
+.recoupleButton{background:linear-gradient(90deg,#d7265e,#7b2cff)}
+.stayButton{background:linear-gradient(90deg,#11998e,#38ef7d)}
+.singleButton{background:linear-gradient(90deg,#555,#222)}
+.recouplingCard{border-left-color:#d7265e;background:rgba(255,247,252,.98)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -64,7 +68,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.3.0 — Casa-style Drama</strong></p>
+<p><strong>Version 2.4.0 — Casa Recoupling Ceremony</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -147,7 +151,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.3.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.4.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='';
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -248,7 +252,11 @@ dateComplete,
 casaStarted,
 casaChoice,
 casaPartnerReaction,
-casaComplete
+casaComplete,
+recouplingChoice,
+recouplingPartnerChoice,
+recouplingComplete,
+previousPartner
 };
 }
 
@@ -296,6 +304,10 @@ casaStarted=Boolean(data.casaStarted);
 casaChoice=data.casaChoice||'';
 casaPartnerReaction=data.casaPartnerReaction||'';
 casaComplete=Boolean(data.casaComplete);
+recouplingChoice=data.recouplingChoice||'';
+recouplingPartnerChoice=data.recouplingPartnerChoice||'';
+recouplingComplete=Boolean(data.recouplingComplete);
+previousPartner=data.previousPartner||'';
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -464,13 +476,23 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(recouplingComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Casa Recoupling Ceremony is complete.'
+});
+choices('<button onclick="showVersionComplete()">🔥 View Recoupling Results</button>');
+return;
+}
+
 if(casaComplete){
 showScene({
 speaker:'narrator',
 background:'night',
 text:'💾 SAVE LOADED\n\nThe Casa-style loyalty test is complete.'
 });
-choices('<button onclick="showVersionComplete()">🏝️ View Casa Results</button>');
+choices('<button onclick="startCasaRecoupling()">🔥 Continue to Casa Recoupling</button>');
 return;
 }
 
@@ -562,7 +584,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -2532,39 +2554,226 @@ background:'crystal',
 text:text+'\n\n"Tomorrow, the two villas will reunite."\n\n"Every Islander must decide whether to return alone... or recouple."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 2.3.0</button>');
+choices('<button class="recoupleButton" onclick="startCasaRecoupling()">🔥 Continue to Casa Recoupling</button>');
+}
+
+function startCasaRecoupling(){
+if(recouplingComplete){
+showVersionComplete();
+return;
+}
+
+previousPartner=coupledWith;
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The two villas reunite beneath the Crystal Flame.\n\nEvery Islander stands around the Fire Pit.\n\n"Tonight, each couple must decide whether to stay together... or choose someone new."'
+});
+
+choices('<button class="recoupleButton" onclick="showPartnerReturn()">🔥 Begin the Recoupling</button>');
+}
+
+function showPartnerReturn(){
+const partnerName=characters[previousPartner].name;
+let returnText='';
+
+if(casaPartnerReaction==='loyal'){
+returnText=partnerName+' returns alone.\n\nYour partner chose loyalty.';
+}else if(casaPartnerReaction==='curious'){
+returnText=partnerName+' returns alone, but admits they explored another connection.';
+}else{
+returnText=partnerName+' returns with uncertainty in their eyes.\n\nSomething happened at the other villa.';
+}
+
+showScene({
+speaker:previousPartner,
+background:'night',
+text:returnText
+});
+
+choices('<button class="recoupleButton" onclick="showRecouplingChoice()">💔 Make Your Choice</button>');
+}
+
+function getRecouplingOptions(){
+const options=['valentina','lucas','maya','kai','isabella','ethan','sofia','noah','lisa']
+.filter(person=>
+person!==previousPartner &&
+person!==eliminatedPerson
+);
+
+return options.slice(0,4);
+}
+
+function showRecouplingChoice(){
+const partnerName=characters[previousPartner].name;
+const options=getRecouplingOptions();
+
+let buttons=
+'<div class="card recouplingCard"><h3>🔥 Casa Recoupling</h3>'+
+'<button class="stayButton" onclick="chooseRecoupling(\'stay\')">💚 Stay with '+partnerName+'</button>';
+
+options.forEach(person=>{
+buttons+='<button class="recoupleButton" onclick="chooseRecoupling(\''+person+'\')">❤️ Recouple with '+characters[person].name+'</button>';
+});
+
+buttons+='<button class="singleButton" onclick="chooseRecoupling(\'single\')">🌙 Return Single</button></div>';
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"'+playerName+', the decision is yours."\n\n"Will you stay loyal, choose someone new, or return single?"'
+});
+
+choices(buttons);
+}
+
+function chooseRecoupling(choice){
+if(recouplingChoice)return;
+
+recouplingChoice=choice;
+recouplingPartnerChoice=calculatePartnerRecouplingChoice();
+
+let text='';
+
+if(choice==='stay'){
+coupledWith=previousPartner;
+relationships[coupledWith]+=5;
+couplingTrust+=4;
+couplingRomance+=3;
+
+text='You choose to stay with '+characters[previousPartner].name+'.\n\nThe Fire Pit erupts with applause.\n\n❤️ Partner Connection +5\n💚 Couple Trust +4\n💕 Couple Romance +3';
+}else if(choice==='single'){
+coupledWith='';
+couplingTrust=Math.max(0,couplingTrust-2);
+
+text='You choose to return single.\n\nThe villa falls silent.\n\nYou are no longer officially coupled.\n\n💚 Couple Trust -2';
+}else{
+coupledWith=choice;
+relationships[choice]+=6;
+couplingRomance=3;
+couplingTrust=1;
+
+text='You choose to recouple with '+characters[choice].name+'.\n\nYour old partner looks stunned.\n\n❤️ New Partner Connection +6\n💕 Couple Romance reset to 3\n💚 Couple Trust reset to 1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:choice==='stay'?previousPartner:choice==='single'?'narrator':choice,
+background:'night',
+text:text
+});
+
+choices('<button class="recoupleButton" onclick="revealPartnerRecouplingChoice()">🔥 Reveal Your Former Partner’s Choice</button>');
+}
+
+function calculatePartnerRecouplingChoice(){
+if(casaPartnerReaction==='loyal'&&couplingTrust>=6){
+return 'stay';
+}
+
+if(casaPartnerReaction==='tempted'){
+return 'new';
+}
+
+return couplingTrust>=4?'stay':'new';
+}
+
+function revealPartnerRecouplingChoice(){
+const formerName=characters[previousPartner].name;
+let text='';
+
+if(recouplingPartnerChoice==='stay'){
+text=formerName+' chose to remain loyal to you.';
+}else{
+text=formerName+' chose to explore a new connection.';
+}
+
+showScene({
+speaker:previousPartner,
+background:'night',
+text:text
+});
+
+choices('<button class="recoupleButton" onclick="showRecouplingOutcome()">🔥 Continue</button>');
+}
+
+function showRecouplingOutcome(){
+const formerName=characters[previousPartner].name;
+let text='';
+
+if(recouplingChoice==='stay'&&recouplingPartnerChoice==='stay'){
+relationships[previousPartner]+=3;
+couplingTrust+=3;
+couplingRomance+=2;
+text='Both of you stayed loyal.\n\nYour couple survives Casa stronger than before.';
+}else if(recouplingChoice==='stay'&&recouplingPartnerChoice==='new'){
+coupledWith='';
+couplingTrust=0;
+text='You stayed loyal, but '+formerName+' chose someone new.\n\nYou are left single.';
+}else if(recouplingChoice!=='stay'&&recouplingPartnerChoice==='stay'){
+text=formerName+' stayed loyal while you chose another path.\n\nThe hurt is impossible to hide.';
+}else{
+text='Both of you chose new paths.\n\nYour original couple is officially over.';
+}
+
+recouplingComplete=true;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:text+'\n\n"The Casa Recoupling is complete."\n\n"Tomorrow, every decision will have consequences."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 2.4.0</button>');
 }
 
 function showVersionComplete(){
-const partnerName=characters[coupledWith].name;
+const currentPartner=coupledWith&&characters[coupledWith]
+?characters[coupledWith].name
+:'Single';
+
 autoSaveGame();
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.3.0 COMPLETE\n\nThe Casa-style loyalty test is complete.\n\nYour choice: '+formatCasaChoice(casaChoice)+'\n'+partnerName+' chose: '+formatCasaChoice(casaPartnerReaction)+'\nCouple Trust: '+couplingTrust+'\nValentina Connection: '+relationships.valentina+'\n\nThe Casa Recoupling begins next in Version 2.4.0.'
+text:'✅ VERSION 2.4.0 COMPLETE\n\nThe Casa Recoupling Ceremony is complete.\n\nPrevious Partner: '+characters[previousPartner].name+'\nCurrent Partner: '+currentPartner+'\nYour Choice: '+formatRecouplingChoice(recouplingChoice)+'\nFormer Partner Choice: '+formatPartnerRecouplingChoice(recouplingPartnerChoice)+'\n\nThe Fallout Day begins next in Version 2.5.0.'
 });
 
 choices(
-'<button onclick="showCasaSummary()">🏝️ View Casa Summary</button>'+
+'<button onclick="showRecouplingSummary()">🔥 View Recoupling Summary</button>'+
 '<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function formatCasaChoice(choice){
-if(choice==='loyal')return 'Stayed loyal';
-if(choice==='curious')return 'Explored a conversation';
-if(choice==='tempted')return 'Gave in to temptation';
+function formatRecouplingChoice(choice){
+if(choice==='stay')return 'Stayed loyal';
+if(choice==='single')return 'Returned single';
+if(choice&&characters[choice])return 'Recoupled with '+characters[choice].name;
 return 'Not decided';
 }
 
-function showCasaSummary(){
-const partnerName=characters[coupledWith].name;
+function formatPartnerRecouplingChoice(choice){
+if(choice==='stay')return 'Stayed loyal';
+if(choice==='new')return 'Chose a new connection';
+return 'Unknown';
+}
+
+function showRecouplingSummary(){
+const currentPartner=coupledWith&&characters[coupledWith]
+?characters[coupledWith].name
+:'Single';
 
 showScene({
 speaker:'host',
 background:'night',
-text:'🏝️ CASA SUMMARY\n\nYour Partner: '+partnerName+'\nYour Choice: '+formatCasaChoice(casaChoice)+'\nPartner Choice: '+formatCasaChoice(casaPartnerReaction)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nValentina Romance: '+valentinaStats.romance+'\n\nThe next decision will determine whether your couple survives.'
+text:'🔥 CASA RECOUPLING SUMMARY\n\nPrevious Partner: '+characters[previousPartner].name+'\nCurrent Partner: '+currentPartner+'\nYour Choice: '+formatRecouplingChoice(recouplingChoice)+'\nFormer Partner Choice: '+formatPartnerRecouplingChoice(recouplingPartnerChoice)+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe villa will react tomorrow.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
@@ -2578,7 +2787,7 @@ q('relationshipBox').innerHTML=
 '<br>&nbsp;&nbsp;💚 Couple Trust: '+couplingTrust+
 (challengeComplete?'<br>&nbsp;&nbsp;🏆 Challenge Score: '+challengeScore+' / 9':'')+
 '<br><br>'
-:'<strong>🔥 Official Couple: Not chosen yet</strong><br><br>')+
+:'<strong>🔥 Official Couple: Single</strong><br><br>')+
 (eliminatedPerson==='lucas'?'❌ Lucas — ELIMINATED':'❤️ Lucas Connection: '+relationships.lucas)+
 '<br>&nbsp;&nbsp;🤝 Friendship: '+lucasStats.friendship+
 '<br>&nbsp;&nbsp;❤️ Romance: '+lucasStats.romance+
