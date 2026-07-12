@@ -1,7 +1,5 @@
-'use strict';
-
-// The Island of Flames
-// Version 3.5.0b — Character data
+// Version 3.5.0b
+// Character data extracted from index.html
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 let lucasStats={friendship:0,romance:0,trust:0};
