@@ -66,6 +66,9 @@ background:#fff;
 .romanceButton{background:linear-gradient(90deg,#ff4d88,#d7265e)}
 .friendButton{background:linear-gradient(90deg,#36d1dc,#5b86e5)}
 .luxuryCard{border-left-color:#ff9966;background:rgba(255,249,244,.98)}
+.voteButton{background:linear-gradient(90deg,#434343,#000000)}
+.voteCard{border-left-color:#111;background:rgba(248,248,248,.98)}
+.vulnerableButton{background:linear-gradient(90deg,#b00020,#6a0012)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -79,7 +82,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.7.0 — Luxury Date</strong></p>
+<p><strong>Version 2.8.0 — Secret Vote</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -162,7 +165,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.7.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.8.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -279,7 +282,11 @@ compatibilityComplete,
 luxuryDateStarted,
 luxuryDateChoice,
 luxuryDateResult,
-luxuryDateComplete
+luxuryDateComplete,
+secretVoteStarted,
+secretVoteChoice,
+secretVoteResult,
+secretVoteComplete
 };
 }
 
@@ -343,6 +350,10 @@ luxuryDateStarted=Boolean(data.luxuryDateStarted);
 luxuryDateChoice=data.luxuryDateChoice||'';
 luxuryDateResult=data.luxuryDateResult||'';
 luxuryDateComplete=Boolean(data.luxuryDateComplete);
+secretVoteStarted=Boolean(data.secretVoteStarted);
+secretVoteChoice=data.secretVoteChoice||'';
+secretVoteResult=data.secretVoteResult||'';
+secretVoteComplete=Boolean(data.secretVoteComplete);
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -511,13 +522,23 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(secretVoteComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Secret Vote is complete.'
+});
+choices('<button onclick="showVersionComplete()">🗳️ View Vote Results</button>');
+return;
+}
+
 if(luxuryDateComplete){
 showScene({
 speaker:'narrator',
 background:'night',
 text:'💾 SAVE LOADED\n\nThe Luxury Date is complete.'
 });
-choices('<button onclick="showVersionComplete()">🌅 View Luxury Date Results</button>');
+choices('<button onclick="startSecretVote()">🗳️ Continue to Secret Vote</button>');
 return;
 }
 
@@ -649,7 +670,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;secretVoteStarted=false;secretVoteChoice='';secretVoteResult='';secretVoteComplete=false;
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -3467,34 +3488,168 @@ background:'crystal',
 text:'Every villa phone lights up.\n\n"Islanders, tomorrow you will vote in secret."\n\n"You must choose the couple you believe is least likely to survive outside Flame Cay."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 2.7.0</button>');
+choices('<button class="voteButton" onclick="startSecretVote()">🗳️ Continue to Secret Vote</button>');
+}
+
+function getActiveVoteCandidates(){
+return ['lucas','maya','kai','isabella','ethan','sofia','noah','lisa','valentina']
+.filter(person=>person!==eliminatedPerson&&person!==coupledWith);
+}
+
+function startSecretVote(){
+if(secretVoteComplete){
+showVersionComplete();
+return;
+}
+
+secretVoteStarted=true;
+autoSaveGame();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The villa lights dim.\n\nEvery Islander receives a private voting card.\n\n"Tonight, you must vote for the couple you believe is least likely to survive outside Flame Cay."'
+});
+
+choices('<button class="voteButton" onclick="showSecretVoteChoices()">🗳️ Enter the Voting Booth</button>');
+}
+
+function showSecretVoteChoices(){
+const candidates=getActiveVoteCandidates().slice(0,4);
+
+let html='<div class="card voteCard"><h3>🗳️ Secret Vote</h3>';
+
+candidates.forEach(person=>{
+html+='<button class="voteButton" onclick="castSecretVote(\''+person+'\')">Vote against '+characters[person].name+'</button>';
+});
+
+html+='</div>';
+
+showScene({
+speaker:'narrator',
+background:'night',
+text:'You enter the private booth.\n\nNo one will know who received your vote.'
+});
+
+choices(html);
+}
+
+function castSecretVote(person){
+if(secretVoteChoice)return;
+
+secretVoteChoice=person;
+secretVoteResult=calculateSecretVoteResult(person);
+secretVoteComplete=true;
+
+relationships[person]-=1;
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'night',
+text:'You secretly vote against '+characters[person].name+'.\n\n💔 Connection -1\n\nYour vote is locked.'
+});
+
+choices('<button class="voteButton" onclick="revealSecretVoteResult()">🔥 Reveal the Villa Result</button>');
+}
+
+function calculateSecretVoteResult(playerVote){
+const candidates=getActiveVoteCandidates();
+const scored=candidates.map(person=>{
+let score=0;
+
+score+=Math.max(0,6-relationships[person]);
+
+if(person===playerVote){
+score+=3;
+}
+
+if(person==='valentina'){
+score+=2;
+}
+
+if(person===savedPerson){
+score=Math.max(0,score-1);
+}
+
+return{person,score};
+});
+
+scored.sort((a,b)=>b.score-a.score);
+
+return scored[0]?.person||playerVote;
+}
+
+function revealSecretVoteResult(){
+const resultName=characters[secretVoteResult].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Crystal Flame turns red.\n\n"The Islander receiving the most votes is..."\n\n⚠️ '+resultName+'\n\n"They are now vulnerable at the next elimination."'
+});
+
+choices('<button class="vulnerableButton" onclick="showVoteReactions()">😮 See the Villa Reactions</button>');
+}
+
+function showVoteReactions(){
+const reactions={
+lucas:'Lucas looks disappointed but composed.\n\n"I thought people trusted me more than that."',
+maya:'Maya studies the room carefully.\n\n"Votes reveal fear more than truth."',
+kai:'Kai gives a tense smile.\n\n"Looks like I have something to prove."',
+isabella:'Isabella looks shocked.\n\n"I did not expect my name to come up."',
+ethan:'Ethan folds his arms.\n\n"Interesting. Now I know where I stand."',
+sofia:'Sofia looks hurt.\n\n"I wish people had spoken to me first."',
+noah:'Noah nods slowly.\n\n"I will face it with honesty."',
+lisa:'Lisa raises an eyebrow.\n\n"Someone clearly feels threatened."',
+valentina:'Valentina smiles without warmth.\n\n"Of course they voted for the Bombshell."'
+};
+
+showScene({
+speaker:secretVoteResult,
+background:'night',
+text:reactions[secretVoteResult]
+});
+
+choices('<button class="voteButton" onclick="showSecretVoteAftermath()">🔥 Continue</button>');
+}
+
+function showSecretVoteAftermath(){
+const vulnerableName=characters[secretVoteResult].name;
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'"'+vulnerableName+' is not eliminated tonight."\n\n"But they will enter the next ceremony at risk."\n\n"One more vote could end their time on Flame Cay."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 2.8.0</button>');
 }
 
 function showVersionComplete(){
-const partnerName=characters[compatibilityPartner].name;
-const dateType=compatibilityScore>=8?'Official Luxury Date':'Private Moonlight Cove Date';
+const votedName=characters[secretVoteChoice].name;
+const vulnerableName=characters[secretVoteResult].name;
 
 autoSaveGame();
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.7.0 COMPLETE\n\nThe Luxury Date is complete.\n\nDate Partner: '+partnerName+'\nDate Type: '+dateType+'\nResult: '+luxuryDateResult+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe Secret Vote begins next in Version 2.8.0.'
+text:'✅ VERSION 2.8.0 COMPLETE\n\nThe Secret Vote is complete.\n\nYour Vote: '+votedName+'\nMost Vulnerable: '+vulnerableName+'\n\nThe Second Elimination begins next in Version 2.9.0.'
 });
 
 choices(
-'<button onclick="showLuxuryDateSummary()">🌅 View Date Summary</button>'+
+'<button onclick="showSecretVoteSummary()">🗳️ View Vote Summary</button>'+
 '<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function showLuxuryDateSummary(){
-const partnerName=characters[compatibilityPartner].name;
-
+function showSecretVoteSummary(){
 showScene({
-speaker:compatibilityPartner,
+speaker:'host',
 background:'night',
-text:'🌅 LUXURY DATE SUMMARY\n\nPartner: '+partnerName+'\nCompatibility Score: '+compatibilityScore+' / 12\nDate Choice: '+luxuryDateChoice+'\nDate Result: '+luxuryDateResult+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe villa will vote next.'
+text:'🗳️ SECRET VOTE SUMMARY\n\nYour Vote: '+characters[secretVoteChoice].name+'\nMost Vulnerable: '+characters[secretVoteResult].name+'\nCurrent Partner: '+(coupledWith?characters[coupledWith].name:'Single')+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe vulnerable Islander will face the next elimination.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
