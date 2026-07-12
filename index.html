@@ -45,6 +45,8 @@ background:#fff;
 .saveButton{background:linear-gradient(90deg,#1877d2,#0d4f9c)}
 .loadButton{background:linear-gradient(90deg,#6750a4,#452b7a)}
 .afternoonButton{background:linear-gradient(90deg,#f28c28,#d95f02)}
+.dateButton{background:linear-gradient(90deg,#ff4d88,#b81d62)}
+.dateCard{border-left-color:#ff4d88;background:rgba(255,247,251,.97)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -58,7 +60,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.1.0 — Day 5 Afternoon</strong></p>
+<p><strong>Version 2.2.0 — Valentina’s First Date</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -141,7 +143,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.1.0';
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.2.0',dateInvitee='',dateChoice='',dateComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -235,7 +237,10 @@ bombshellComplete,
 eliminationComplete,
 eliminatedPerson,
 savedPerson,
-atRisk
+atRisk,
+dateInvitee,
+dateChoice,
+dateComplete
 };
 }
 
@@ -276,6 +281,9 @@ eliminationComplete=Boolean(data.eliminationComplete);
 eliminatedPerson=data.eliminatedPerson||'';
 savedPerson=data.savedPerson||'';
 atRisk=Array.isArray(data.atRisk)?data.atRisk:[];
+dateInvitee=data.dateInvitee||'';
+dateChoice=data.dateChoice||'';
+dateComplete=Boolean(data.dateComplete);
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -444,6 +452,16 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(dateComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nValentina’s first date is complete.'
+});
+choices('<button onclick="showVersionComplete()">💖 View Date Results</button>');
+return;
+}
+
 if(currentDay>=5&&eliminationComplete){
 showScene({
 speaker:'narrator',
@@ -522,7 +540,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -617,7 +635,7 @@ function getAdvanceButtonText(){
 if(currentDay===3&&currentTime==='Morning')return '🔥 Begin First Coupling Ceremony';
 if(currentDay===4&&currentTime==='Morning')return '🏆 Begin First Challenge';
 if(currentDay===5&&currentTime==='Morning')return '🌤️ Continue to Day 5 Afternoon';
-if(currentDay===5&&currentTime==='Afternoon')return '✅ Finish Version 2.1.0';
+if(currentDay===5&&currentTime==='Afternoon')return '💖 Begin Valentina’s First Date';
 return currentTime==='Morning'?'⏰ Continue to Afternoon':currentTime==='Afternoon'?'⏰ Continue to Evening':'🔥 Go to the Fire Pit';
 }
 
@@ -655,7 +673,7 @@ return;
 }
 
 if(currentDay===5&&currentTime==='Afternoon'){
-showVersionComplete();
+startValentinaDate();
 return;
 }
 
@@ -2141,32 +2159,232 @@ text:eliminatedPerson==='isabella'
 showCompletedButtons();
 }
 
-function showVersionComplete(){
+function chooseDateInvitee(){
+if(relationships.valentina>=5||valentinaStats.romance>=3){
+dateInvitee='player';
+return;
+}
+
+const candidates=['lucas','maya','kai','isabella','ethan','sofia','noah','lisa']
+.filter(person=>person!==coupledWith&&person!==eliminatedPerson);
+
+dateInvitee=candidates.sort((a,b)=>relationships[b]-relationships[a])[0]||savedPerson;
+}
+
+function startValentinaDate(){
+if(dateComplete){
+showVersionComplete();
+return;
+}
+
+chooseDateInvitee();
+
+showScene({
+speaker:'host',
+background:'night',
+text:'The villa phones light up at the same time.\n\n"Islanders... Valentina has made her first date choice."'
+});
+
+choices('<button class="dateButton" onclick="revealDateChoice()">💖 Reveal the Date Choice</button>');
+}
+
+function revealDateChoice(){
+if(dateInvitee==='player'){
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina steps forward holding the gold invitation.\n\n"'+playerName+', I choose you."\n\n"I want to know whether our connection is real... or just dangerous."'
+});
+choices('<button class="dateButton" onclick="beginPlayerDate()">🌙 Go on the Date</button>');
+return;
+}
+
+const inviteeName=characters[dateInvitee].name;
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina raises the gold invitation.\n\n"I choose '+inviteeName+'."\n\nShe glances at you before leaving the Fire Pit.'
+});
+
+choices('<button class="dateButton" onclick="watchOtherDate()">👀 Watch the Date Begin</button>');
+}
+
+function beginPlayerDate(){
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Moonlight Cove has been prepared with lanterns and a private table.\n\nValentina sits across from you.\n\n"Tell me the truth. What are you looking for on Flame Cay?"'
+});
+
+choices(
+'<div class="card dateCard"><h3>💖 Choose Your Date Answer</h3>'+
+'<button class="dateButton" onclick="finishPlayerDate(\'romance\')">❤️ Say you feel a real spark with her</button>'+
+'<button onclick="finishPlayerDate(\'honest\')">💬 Say you are curious but still committed</button>'+
+'<button onclick="finishPlayerDate(\'loyal\')">💚 Say your current partner comes first</button></div>'
+);
+}
+
+function finishPlayerDate(choice){
+if(dateChoice)return;
+dateChoice=choice;
+dateComplete=true;
+
+let result='';
+
+if(choice==='romance'){
+relationships.valentina+=5;
+valentinaStats.romance+=4;
+valentinaStats.boldness+=2;
+relationships[coupledWith]-=2;
+couplingTrust=Math.max(0,couplingTrust-2);
+
+result='You admit that the chemistry feels real.\n\nValentina smiles and reaches across the table.\n\n"I was hoping you would say that."\n\n❤️ Valentina Connection +5\n💕 Valentina Romance +4\n🔥 Valentina Boldness +2\n💔 Partner Connection -2\n💚 Couple Trust -2';
+}else if(choice==='honest'){
+relationships.valentina+=3;
+valentinaStats.friendship+=2;
+valentinaStats.romance+=1;
+couplingTrust+=1;
+
+result='You tell Valentina that you are curious, but you refuse to lie about your current relationship.\n\nShe respects the answer.\n\n"Honesty makes this more interesting."\n\n❤️ Valentina Connection +3\n🤝 Valentina Friendship +2\n💕 Valentina Romance +1\n💚 Couple Trust +1';
+}else{
+relationships[coupledWith]+=3;
+couplingTrust+=3;
+couplingRomance+=1;
+relationships.valentina+=1;
+
+result='You tell Valentina that your current partner comes first.\n\nShe studies you for a moment, then smiles.\n\n"Loyalty is rare here. I respect it."\n\n❤️ Partner Connection +3\n💚 Couple Trust +3\n💕 Couple Romance +1\n❤️ Valentina Connection +1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:result
+});
+
+choices('<button class="dateButton" onclick="showDateAftermath()">🌙 Return to the Villa</button>');
+}
+
+function watchOtherDate(){
+const inviteeName=characters[dateInvitee].name;
+
+showScene({
+speaker:dateInvitee,
+background:'night',
+text:inviteeName+' joins Valentina at Moonlight Cove.\n\nThey laugh together as the lanterns glow.\n\nFrom the villa, you cannot hear what they are saying.'
+});
+
+choices(
+'<button class="dateButton" onclick="reactToOtherDate(\'jealous\')">😠 Admit You Feel Jealous</button>'+
+'<button onclick="reactToOtherDate(\'calm\')">🙂 Stay Calm and Trust Your Partner</button>'+
+'<button onclick="reactToOtherDate(\'relieved\')">😌 Feel Relieved It Was Not You</button>'
+);
+}
+
+function reactToOtherDate(choice){
+if(dateChoice)return;
+dateChoice=choice;
+dateComplete=true;
+
+let result='';
+
+if(choice==='jealous'){
+relationships.valentina+=2;
+valentinaStats.boldness+=2;
+couplingTrust=Math.max(0,couplingTrust-1);
+
+result='You realize Valentina’s choice bothers you more than expected.\n\nYour partner notices your reaction.\n\n❤️ Valentina Connection +2\n🔥 Valentina Boldness +2\n💚 Couple Trust -1';
+}else if(choice==='calm'){
+relationships[coupledWith]+=2;
+couplingTrust+=2;
+result='You choose not to create drama before knowing the truth.\n\nYour partner appreciates your calm reaction.\n\n❤️ Partner Connection +2\n💚 Couple Trust +2';
+}else{
+relationships[coupledWith]+=1;
+couplingRomance+=1;
+result='You feel relieved that the date did not test your couple directly.\n\nYour partner smiles when you say so.\n\n❤️ Partner Connection +1\n💕 Couple Romance +1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:coupledWith,
+background:'night',
+text:result
+});
+
+choices('<button class="dateButton" onclick="showDateAftermath()">🌙 Wait for Valentina to Return</button>');
+}
+
+function showDateAftermath(){
 const partnerName=characters[coupledWith].name;
-const savedName=characters[savedPerson].name;
-const eliminatedName=characters[eliminatedPerson].name;
+
+if(dateInvitee==='player'){
+showScene({
+speaker:coupledWith,
+background:'night',
+text:partnerName+' waits for you near the villa entrance.\n\n"How was the date?"\n\nThe answer hangs between you.'
+});
+choices('<button class="dateButton" onclick="finishDateAftermath()">💬 Tell the Truth About the Date</button>');
+return;
+}
+
+showScene({
+speaker:'valentina',
+background:'night',
+text:'Valentina returns from Moonlight Cove with '+characters[dateInvitee].name+'.\n\nShe gives nothing away.\n\n"That was useful," she says.'
+});
+choices('<button class="dateButton" onclick="finishDateAftermath()">🔥 Continue</button>');
+}
+
+function finishDateAftermath(){
+if(dateInvitee==='player'){
+if(dateChoice==='romance'){
+couplingTrust=Math.max(0,couplingTrust-1);
+}else{
+couplingTrust+=1;
+}
+updateRelationships();
+autoSaveGame();
+}
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'The Crystal Flame glows above the villa.\n\n"One date can create a connection... or expose a weakness."\n\n"Tomorrow, everyone will learn what changed tonight."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 2.2.0</button>');
+}
+
+function showVersionComplete(){
+const inviteeName=dateInvitee==='player'?playerName:characters[dateInvitee].name;
+const partnerName=characters[coupledWith].name;
 
 autoSaveGame();
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.1.0 COMPLETE\n\nYou finished Day 5 Afternoon.\n\nPartner: '+partnerName+'\nSaved Islander: '+savedName+'\nEliminated Islander: '+eliminatedName+'\nValentina Connection: '+relationships.valentina+'\n\nValentina’s First Date begins next in Version 2.2.0.'
+text:'✅ VERSION 2.2.0 COMPLETE\n\nValentina completed her first date.\n\nDate Invitee: '+inviteeName+'\nYour Partner: '+partnerName+'\nValentina Connection: '+relationships.valentina+'\nCouple Trust: '+couplingTrust+'\n\nThe morning-after reactions begin next in Version 2.2.1.'
 });
 
 choices(
-'<button onclick="showDayFiveAfternoonSummary()">🌤️ View Afternoon Summary</button>'+
-'<button onclick="openIslandMap()">🗺️ Return to Day 5 Afternoon</button>'
+'<button onclick="showDateSummary()">💖 View Date Summary</button>'+
+'<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function showDayFiveAfternoonSummary(){
-const upsetPerson=getUpsetIslander();
+function showDateSummary(){
+const inviteeName=dateInvitee==='player'?playerName:characters[dateInvitee].name;
 
 showScene({
-speaker:'host',
+speaker:'valentina',
 background:'night',
-text:'🌤️ DAY 5 AFTERNOON SUMMARY\n\nOfficial Partner: '+characters[coupledWith].name+'\nValentina Connection: '+relationships.valentina+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\nVilla tension: '+characters[upsetPerson].name+'\n\nValentina will choose her first date next.'
+text:'💖 FIRST DATE SUMMARY\n\nDate Invitee: '+inviteeName+'\nDate Choice: '+dateChoice+'\nValentina Connection: '+relationships.valentina+'\nValentina Friendship: '+valentinaStats.friendship+'\nValentina Romance: '+valentinaStats.romance+'\nValentina Boldness: '+valentinaStats.boldness+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
