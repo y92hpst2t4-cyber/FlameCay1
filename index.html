@@ -62,6 +62,10 @@ background:#fff;
 .compatibilityButton{background:linear-gradient(90deg,#00b09b,#96c93d)}
 .compatibilityCard{border-left-color:#00b09b;background:rgba(244,255,250,.98)}
 .scoreBox{text-align:center;font-size:24px;font-weight:700;color:#176b3a;padding:12px}
+.luxuryButton{background:linear-gradient(90deg,#ff9966,#ff5e62)}
+.romanceButton{background:linear-gradient(90deg,#ff4d88,#d7265e)}
+.friendButton{background:linear-gradient(90deg,#36d1dc,#5b86e5)}
+.luxuryCard{border-left-color:#ff9966;background:rgba(255,249,244,.98)}
 .deleteButton{background:linear-gradient(90deg,#a61b1b,#6d0d0d)}
 .slotCard{background:rgba(255,255,255,.97);padding:14px;border-radius:12px;margin:10px 0;border-left:5px solid #6750a4}
 .slotCard p{margin:5px 0;line-height:1.4}
@@ -75,7 +79,7 @@ background:#fff;
 <section id="menu">
 <h1>🔥 The Island of Flames</h1>
 <h2>Season 1 — The Crystal Awakens</h2>
-<p><strong>Version 2.6.0 — Compatibility Challenge</strong></p>
+<p><strong>Version 2.7.0 — Luxury Date</strong></p>
 <input id="playerName" placeholder="Enter your name">
 <button onclick="startGame()">▶ New Game</button>
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">▶ Continue Latest Save</button>
@@ -158,7 +162,7 @@ background:#fff;
 </main>
 
 <script>
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.6.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false;
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='2.7.0',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false;
 let menuBackground='villa',menuBack='openIslandMap';
 
 let relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
@@ -271,7 +275,11 @@ compatibilityStarted,
 compatibilityScore,
 compatibilityQuestion,
 compatibilityPartner,
-compatibilityComplete
+compatibilityComplete,
+luxuryDateStarted,
+luxuryDateChoice,
+luxuryDateResult,
+luxuryDateComplete
 };
 }
 
@@ -331,6 +339,10 @@ compatibilityScore=Number(data.compatibilityScore||0);
 compatibilityQuestion=Number(data.compatibilityQuestion||0);
 compatibilityPartner=data.compatibilityPartner||'';
 compatibilityComplete=Boolean(data.compatibilityComplete);
+luxuryDateStarted=Boolean(data.luxuryDateStarted);
+luxuryDateChoice=data.luxuryDateChoice||'';
+luxuryDateResult=data.luxuryDateResult||'';
+luxuryDateComplete=Boolean(data.luxuryDateComplete);
 lastSaveTime=data.savedAt||'';
 
 q('playerName').value=playerName;
@@ -499,13 +511,23 @@ q('inGameLoadMenu').classList.add('hidden');
 function resumeSavedProgress(){
 ['choices','islandMap','walkingScreen','dialogueCard','portraitBox'].forEach(id=>q(id).classList.add('hidden'));
 
+if(luxuryDateComplete){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe Luxury Date is complete.'
+});
+choices('<button onclick="showVersionComplete()">🌅 View Luxury Date Results</button>');
+return;
+}
+
 if(compatibilityComplete){
 showScene({
 speaker:'narrator',
 background:'night',
 text:'💾 SAVE LOADED\n\nThe Compatibility Challenge is complete.'
 });
-choices('<button onclick="showVersionComplete()">🏆 View Challenge Results</button>');
+choices('<button onclick="startLuxuryDate()">🌅 Continue to Luxury Date</button>');
 return;
 }
 
@@ -627,7 +649,7 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
-dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;
+dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;
 relationships={lucas:0,maya:0,kai:0,isabella:0,ethan:0,sofia:0,noah:0,lisa:0,valentina:0};
 lucasStats={friendship:0,romance:0,trust:0};
 mayaStats={friendship:0,trust:0,mystery:0};
@@ -3255,34 +3277,224 @@ text:wonDate
 :'"Your score was not high enough for the luxury date."\n\n"The lowest-scoring couple will become vulnerable in the next vote."'
 });
 
-choices('<button onclick="showVersionComplete()">✅ Finish Version 2.6.0</button>');
+choices('<button class="luxuryButton" onclick="startLuxuryDate()">🌅 Continue to Luxury Date</button>');
+}
+
+function startLuxuryDate(){
+if(luxuryDateComplete){
+showVersionComplete();
+return;
+}
+
+luxuryDateStarted=true;
+autoSaveGame();
+
+const wonDate=compatibilityScore>=8;
+const partnerName=characters[compatibilityPartner].name;
+
+if(wonDate){
+showScene({
+speaker:'host',
+background:'afternoon',
+text:'A private boat waits at Arrival Beach.\n\n"'+playerName+' and '+partnerName+', your Compatibility Challenge victory has earned you a luxury date."\n\n"Enjoy the sunset... and decide what this connection really means."'
+});
+
+choices('<button class="luxuryButton" onclick="beginLuxuryDateScene()">🌅 Leave for the Date</button>');
+return;
+}
+
+showScene({
+speaker:'host',
+background:'night',
+text:'Your Compatibility Challenge score was not high enough to win the official luxury date.\n\nBut '+partnerName+' asks to spend private time with you at Moonlight Cove anyway.'
+});
+
+choices('<button class="luxuryButton" onclick="beginPrivateCoveScene()">🌙 Meet at Moonlight Cove</button>');
+}
+
+function beginLuxuryDateScene(){
+showScene({
+speaker:'narrator',
+background:'afternoon',
+text:'The boat carries you to a quiet beach beyond the villa.\n\nA table waits beneath hanging lanterns. The ocean turns gold as the sun begins to set.'
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateConversation()">❤️ Sit Down Together</button>');
+}
+
+function beginPrivateCoveScene(){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'Moonlight Cove is empty except for two chairs beside the water.\n\nIt is not the official luxury date, but the moment feels private and honest.'
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateConversation()">💬 Start the Conversation</button>');
+}
+
+function showLuxuryDateConversation(){
+const partnerName=characters[compatibilityPartner].name;
+
+showScene({
+speaker:compatibilityPartner,
+background:compatibilityScore>=8?'afternoon':'night',
+text:partnerName+' looks across the table at you.\n\n"After everything that happened in Casa and the recoupling... what do you want from us now?"'
+});
+
+choices(
+'<div class="card luxuryCard"><h3>🌅 Luxury Date Choice</h3>'+
+'<button class="romanceButton" onclick="chooseLuxuryDatePath(\'romance\')">❤️ Say you want something real</button>'+
+'<button class="friendButton" onclick="chooseLuxuryDatePath(\'friendship\')">🤝 Say you want to build trust slowly</button>'+
+'<button class="luxuryButton" onclick="chooseLuxuryDatePath(\'uncertain\')">💬 Admit you are still unsure</button></div>'
+);
+}
+
+function chooseLuxuryDatePath(choice){
+if(luxuryDateChoice)return;
+
+luxuryDateChoice=choice;
+let result='';
+
+if(choice==='romance'){
+relationships[compatibilityPartner]+=5;
+couplingRomance+=4;
+couplingTrust+=2;
+luxuryDateResult='Romantic connection strengthened';
+
+result='You tell '+characters[compatibilityPartner].name+' that you want to explore a real relationship.\n\nThe tension disappears from their face.\n\n❤️ Partner Connection +5\n💕 Couple Romance +4\n💚 Couple Trust +2';
+}else if(choice==='friendship'){
+relationships[compatibilityPartner]+=3;
+couplingTrust+=4;
+addFriendshipPoint(compatibilityPartner);
+luxuryDateResult='Trust and friendship strengthened';
+
+result='You explain that trust matters more than rushing into romance.\n\nYour partner respects the honesty.\n\n❤️ Partner Connection +3\n💚 Couple Trust +4\n🤝 Friendship +1';
+}else{
+relationships[compatibilityPartner]+=1;
+couplingTrust=Math.max(0,couplingTrust-1);
+luxuryDateResult='Relationship remains uncertain';
+
+result='You admit that you still do not know what you want.\n\nThe answer is honest, but it creates distance.\n\n❤️ Partner Connection +1\n💚 Couple Trust -1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:compatibilityPartner,
+background:compatibilityScore>=8?'afternoon':'night',
+text:result
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateMoment()">🌅 Continue the Date</button>');
+}
+
+function showLuxuryDateMoment(){
+const partnerName=characters[compatibilityPartner].name;
+
+showScene({
+speaker:compatibilityPartner,
+background:'night',
+text:'The sun disappears and the lanterns glow brighter.\n\n'+partnerName+' reaches across the table.\n\n"One more question. How should this date end?"'
+});
+
+choices(
+'<button class="romanceButton" onclick="finishLuxuryDate(\'kiss\')">❤️ Share a kiss</button>'+
+'<button class="luxuryButton" onclick="finishLuxuryDate(\'hands\')">🤝 Hold hands</button>'+
+'<button class="friendButton" onclick="finishLuxuryDate(\'friendzone\')">🙂 End as friends</button>'
+);
+}
+
+function finishLuxuryDate(ending){
+if(luxuryDateComplete)return;
+
+luxuryDateComplete=true;
+let result='';
+
+if(ending==='kiss'){
+relationships[compatibilityPartner]+=4;
+couplingRomance+=4;
+couplingTrust+=1;
+luxuryDateResult+='; ended with a kiss';
+
+result='You lean closer and share a quiet kiss beneath the lanterns.\n\n❤️ Partner Connection +4\n💕 Couple Romance +4\n💚 Couple Trust +1';
+}else if(ending==='hands'){
+relationships[compatibilityPartner]+=2;
+couplingRomance+=2;
+couplingTrust+=2;
+luxuryDateResult+='; ended holding hands';
+
+result='You sit together in silence, holding hands as the waves move below.\n\n❤️ Partner Connection +2\n💕 Couple Romance +2\n💚 Couple Trust +2';
+}else{
+relationships[compatibilityPartner]+=1;
+addFriendshipPoint(compatibilityPartner);
+luxuryDateResult+='; ended as friends';
+
+result='You choose not to force romance and end the evening with a warm hug.\n\n❤️ Partner Connection +1\n🤝 Friendship +1';
+}
+
+updateRelationships();
+autoSaveGame();
+
+showScene({
+speaker:compatibilityPartner,
+background:'night',
+text:result
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateAftermath()">🏡 Return to the Villa</button>');
+}
+
+function showLuxuryDateAftermath(){
+const partnerName=characters[compatibilityPartner].name;
+const official=compatibilityScore>=8
+?'The villa watches as you return from the official luxury date.'
+:'The villa notices that you and '+partnerName+' disappeared together.';
+
+showScene({
+speaker:'narrator',
+background:'villa',
+text:official+'\n\nWhispers begin immediately.\n\nSome Islanders are happy for you. Others look worried about what your growing connection means.'
+});
+
+choices('<button class="luxuryButton" onclick="showLuxuryDateAnnouncement()">📱 Read the New Message</button>');
+}
+
+function showLuxuryDateAnnouncement(){
+showScene({
+speaker:'host',
+background:'crystal',
+text:'Every villa phone lights up.\n\n"Islanders, tomorrow you will vote in secret."\n\n"You must choose the couple you believe is least likely to survive outside Flame Cay."'
+});
+
+choices('<button onclick="showVersionComplete()">✅ Finish Version 2.7.0</button>');
 }
 
 function showVersionComplete(){
 const partnerName=characters[compatibilityPartner].name;
-const wonDate=compatibilityScore>=8?'Yes':'No';
+const dateType=compatibilityScore>=8?'Official Luxury Date':'Private Moonlight Cove Date';
 
 autoSaveGame();
 
 showScene({
 speaker:'narrator',
 background:'crystal',
-text:'✅ VERSION 2.6.0 COMPLETE\n\nThe Compatibility Challenge is complete.\n\nChallenge Partner: '+partnerName+'\nScore: '+compatibilityScore+' / 12\nLuxury Date Won: '+wonDate+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe Luxury Date begins next in Version 2.7.0.'
+text:'✅ VERSION 2.7.0 COMPLETE\n\nThe Luxury Date is complete.\n\nDate Partner: '+partnerName+'\nDate Type: '+dateType+'\nResult: '+luxuryDateResult+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe Secret Vote begins next in Version 2.8.0.'
 });
 
 choices(
-'<button onclick="showCompatibilitySummary()">🏆 View Challenge Summary</button>'+
+'<button onclick="showLuxuryDateSummary()">🌅 View Date Summary</button>'+
 '<button onclick="showVersionComplete()">🔄 Stay on This Screen</button>'
 );
 }
 
-function showCompatibilitySummary(){
+function showLuxuryDateSummary(){
 const partnerName=characters[compatibilityPartner].name;
 
 showScene({
-speaker:'host',
+speaker:compatibilityPartner,
 background:'night',
-text:'🏆 COMPATIBILITY SUMMARY\n\nPartner: '+partnerName+'\nFinal Score: '+compatibilityScore+' / 12\nLuxury Date: '+(compatibilityScore>=8?'Unlocked':'Not unlocked')+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nYour score will affect the next episode.'
+text:'🌅 LUXURY DATE SUMMARY\n\nPartner: '+partnerName+'\nCompatibility Score: '+compatibilityScore+' / 12\nDate Choice: '+luxuryDateChoice+'\nDate Result: '+luxuryDateResult+'\nCouple Romance: '+couplingRomance+'\nCouple Trust: '+couplingTrust+'\n\nThe villa will vote next.'
 });
 
 choices('<button onclick="showVersionComplete()">⬅ Back</button>');
