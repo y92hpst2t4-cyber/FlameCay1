@@ -1,247 +1,253 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.6.3 — Clean Dynamic Background Manager
-// Uses exact clean filenames and currentLocation + currentTime.
+// Version 3.6.4 — Background System Fix
+
+const BACKGROUND_VERSION = '364';
 
 const REAL_BACKGROUND_FILES = {
-arrival: {
-morning: 'backgrounds/arrival_morning.png',
-afternoon: 'backgrounds/arrival_afternoon.png',
-sunset: 'backgrounds/arrival_sunset.png',
-night: 'backgrounds/arrival_night.png'
-},
+  arrival: {
+    morning: 'backgrounds/051FD550-8E9A-4166-BEC1-AE5773E97D21.png',
+    afternoon: 'backgrounds/051FD550-8E9A-4166-BEC1-AE5773E97D21.png',
+    sunset: 'backgrounds/051FD550-8E9A-4166-BEC1-AE5773E97D21.png',
+    night: 'backgrounds/051FD550-8E9A-4166-BEC1-AE5773E97D21.png'
+  },
 
-villa: {
-morning: 'backgrounds/82BCE9AD-51C2-4745-9124-CC87E94CF7C8.png',
-afternoon: 'backgrounds/10855D6D-50D2-4CBD-A735-9B4EB6EFA2A8.png',
-sunset: 'backgrounds/4CFBDC17-4DA6-4D70-9C02-31A7430D16F2.png',
-night: 'backgrounds/424BF254-B34F-4989-8DE9-C725F5F62FEE.png'
-},
+  villa: {
+    morning: 'backgrounds/051FD550-8E9A-4166-BEC1-AE5773E97D21.png',
+    afternoon: 'backgrounds/10855D6D-50D2-4CBD-A735-9B4EB6EFA2A8.png',
+    sunset: 'backgrounds/4CFBDC17-4DA6-4D70-9C02-31A7430D16F2.png',
+    night: 'backgrounds/424BF254-B34F-4989-8DE9-C725F5F62FEE.png'
+  },
 
-pool: {
-morning: 'backgrounds/pool_morning.png',
-afternoon: 'backgrounds/pool_afternoon.png',
-sunset: 'backgrounds/pool_sunset.png',
-night: 'backgrounds/pool_night.png'
-},
-
-firepit: {
-morning: 'backgrounds/firepit_morning.png',
-afternoon: 'backgrounds/firepit_afternoon.png',
-sunset: 'backgrounds/firepit_sunset.png',
-night: 'backgrounds/firepit_night.png'
-}
+  pool: {
+    morning: 'backgrounds/IMG_2354.jpeg',
+    afternoon: 'backgrounds/IMG_2354.jpeg',
+    sunset: 'backgrounds/IMG_2355.jpeg',
+    night: 'backgrounds/IMG_2355.jpeg'
+  }
 };
 
-const LOCATION_BACKGROUND_MAP = {
-arrival: 'arrival',
-beach: 'arrival',
+const LOCATION_ALIASES = {
+  arrival: 'arrival',
+  'arrival beach': 'arrival',
+  beach: 'arrival',
 
-villa: 'villa',
-kitchen: 'villa',
-gym: 'villa',
+  villa: 'villa',
+  'main villa': 'villa',
+  lounge: 'villa',
+  kitchen: 'villa',
+  gym: 'villa',
 
-pool: 'pool',
-
-firepit: 'firepit'
-};
-
-const SCENE_LOCATION_MAP = {
-arrival: 'arrival',
-beach: 'arrival',
-villa: 'villa',
-pool: 'pool',
-firepit: 'firepit'
+  pool: 'pool',
+  'infinity pool': 'pool'
 };
 
 let currentBackgroundFile = '';
 let backgroundRequestNumber = 0;
 
+function normalizeLocation(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ');
+}
+
 function getBackgroundTime(scene) {
-const sceneKey = String(scene || '').toLowerCase();
+  const sceneKey = normalizeLocation(scene);
 
-if (sceneKey === 'night') {
-return 'night';
-}
+  if (sceneKey.includes('sunset')) {
+    return 'sunset';
+  }
 
-if (sceneKey === 'sunset') {
-return 'sunset';
-}
+  if (sceneKey.includes('night')) {
+    return 'night';
+  }
 
-if (typeof currentTime !== 'string') {
-return 'morning';
-}
+  if (sceneKey.includes('afternoon')) {
+    return 'afternoon';
+  }
 
-if (currentTime === 'Morning') {
-return 'morning';
-}
+  if (sceneKey.includes('morning')) {
+    return 'morning';
+  }
 
-if (currentTime === 'Afternoon') {
-return 'afternoon';
-}
+  const timeKey = normalizeLocation(
+    typeof currentTime === 'string' ? currentTime : 'morning'
+  );
 
-if (currentTime === 'Evening') {
-return 'night';
-}
+  if (timeKey === 'afternoon') {
+    return 'afternoon';
+  }
 
-return 'morning';
+  if (timeKey === 'evening' || timeKey === 'night') {
+    return 'night';
+  }
+
+  return 'morning';
 }
 
 function getBackgroundLocation(scene) {
-const sceneKey = String(scene || '').toLowerCase();
+  const sceneKey = normalizeLocation(scene);
+  const locationKey = normalizeLocation(
+    typeof currentLocation === 'string' ? currentLocation : ''
+  );
 
-const locationKey = String(
-typeof currentLocation === 'string'
-? currentLocation
-: ''
-).toLowerCase();
+  if (LOCATION_ALIASES[sceneKey]) {
+    return LOCATION_ALIASES[sceneKey];
+  }
 
-/*
-An explicit scene location wins first.
-This lets the opening Arrival Beach scene work even though
-new games begin with currentLocation set to villa.
-*/
-if (SCENE_LOCATION_MAP[sceneKey]) {
-return SCENE_LOCATION_MAP[sceneKey];
-}
+  for (const alias of Object.keys(LOCATION_ALIASES)) {
+    if (sceneKey.includes(alias)) {
+      return LOCATION_ALIASES[alias];
+    }
+  }
 
-/*
-Generic scene labels such as afternoon and night use the
-player's real map location.
-*/
-if (LOCATION_BACKGROUND_MAP[locationKey]) {
-return LOCATION_BACKGROUND_MAP[locationKey];
-}
+  if (LOCATION_ALIASES[locationKey]) {
+    return LOCATION_ALIASES[locationKey];
+  }
 
-return null;
+  return null;
 }
 
 function preloadBackground(src) {
-return new Promise((resolve, reject) => {
-const image = new Image();
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const cacheSafeSrc = `${src}?v=${BACKGROUND_VERSION}`;
 
-image.onload = () => resolve(src);
-image.onerror = () => reject(
-new Error('Background image could not be loaded: ' + src)
-);
+    image.onload = () => resolve(cacheSafeSrc);
+    image.onerror = () => {
+      reject(new Error(`Background could not load: ${src}`));
+    };
 
-image.src = src + '?v=363';
-});
+    image.src = cacheSafeSrc;
+  });
 }
 
-function applyBackgroundImage(src) {
-const cacheSafeSrc = src + '?v=363';
+function applyBackgroundImage(src, loadedSrc) {
+  document.body.style.backgroundImage =
+    `linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.25)), url("${loadedSrc}")`;
 
-document.body.style.backgroundImage =
-'linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.22)), url("' +
-cacheSafeSrc +
-'")';
+  document.body.style.backgroundSize = 'cover';
+  document.body.style.backgroundPosition = 'center top';
+  document.body.style.backgroundRepeat = 'no-repeat';
+  document.body.style.backgroundAttachment = 'fixed';
 
-document.body.style.backgroundSize = 'cover';
-document.body.style.backgroundPosition = 'center top';
-document.body.style.backgroundRepeat = 'no-repeat';
-document.body.style.backgroundAttachment = 'fixed';
+  document.body.classList.add('has-real-background');
 
-document.body.classList.add('has-real-background');
-currentBackgroundFile = src;
+  currentBackgroundFile = src;
 }
 
 function showFallbackBackground(scene) {
-document.body.classList.remove('has-real-background');
+  document.body.classList.remove('has-real-background');
 
-document.body.style.backgroundImage =
-'linear-gradient(180deg,#70d8ff,#08657e)';
+  document.body.style.backgroundImage =
+    'linear-gradient(180deg, #70d8ff 0%, #238fb7 45%, #08657e 100%)';
 
-document.body.style.backgroundSize = 'cover';
-document.body.style.backgroundPosition = 'center';
-document.body.style.backgroundRepeat = 'no-repeat';
-document.body.style.backgroundAttachment = 'fixed';
+  document.body.style.backgroundSize = 'cover';
+  document.body.style.backgroundPosition = 'center';
+  document.body.style.backgroundRepeat = 'no-repeat';
+  document.body.style.backgroundAttachment = 'fixed';
 
-document.body.dataset.background =
-String(scene || 'villa').toLowerCase();
+  document.body.dataset.background =
+    normalizeLocation(scene) || 'unknown';
 
-currentBackgroundFile = '';
+  currentBackgroundFile = '';
 }
 
 async function changeBackground(scene) {
-const locationKey = getBackgroundLocation(scene);
-const timeKey = getBackgroundTime(scene);
-const requestNumber = ++backgroundRequestNumber;
+  const locationKey = getBackgroundLocation(scene);
+  const timeKey = getBackgroundTime(scene);
+  const requestNumber = ++backgroundRequestNumber;
 
-if (
-!locationKey ||
-!REAL_BACKGROUND_FILES[locationKey] ||
-!REAL_BACKGROUND_FILES[locationKey][timeKey]
-) {
-showFallbackBackground(scene);
-return;
-}
+  if (!locationKey || !REAL_BACKGROUND_FILES[locationKey]) {
+    console.warn('No background location found for:', scene);
+    showFallbackBackground(scene);
+    return;
+  }
 
-const src = REAL_BACKGROUND_FILES[locationKey][timeKey];
+  const locationBackgrounds = REAL_BACKGROUND_FILES[locationKey];
 
-if (currentBackgroundFile === src) {
-return;
-}
+  const src =
+    locationBackgrounds[timeKey] ||
+    locationBackgrounds.morning ||
+    Object.values(locationBackgrounds)[0];
 
-try {
-await preloadBackground(src);
+  if (!src) {
+    showFallbackBackground(scene);
+    return;
+  }
 
-if (requestNumber !== backgroundRequestNumber) {
-return;
-}
+  if (currentBackgroundFile === src) {
+    return;
+  }
 
-applyBackgroundImage(src);
+  try {
+    const loadedSrc = await preloadBackground(src);
 
-console.log(
-'Background loaded:',
-locationKey,
-timeKey,
-src
-);
-} catch (error) {
-if (requestNumber !== backgroundRequestNumber) {
-return;
-}
+    if (requestNumber !== backgroundRequestNumber) {
+      return;
+    }
 
-console.warn(error.message);
-showFallbackBackground(scene);
-}
+    applyBackgroundImage(src, loadedSrc);
+
+    console.log('Background loaded:', {
+      location: locationKey,
+      time: timeKey,
+      file: src
+    });
+  } catch (error) {
+    if (requestNumber !== backgroundRequestNumber) {
+      return;
+    }
+
+    console.warn(error.message);
+    showFallbackBackground(scene);
+  }
 }
 
 function refreshBackgroundForTime() {
-changeBackground(
-typeof currentLocation === 'string'
-? currentLocation
-: 'villa'
-);
+  changeBackground(
+    typeof currentLocation === 'string'
+      ? currentLocation
+      : 'villa'
+  );
 }
 
 function preloadBackgroundPack() {
-Object.values(REAL_BACKGROUND_FILES).forEach(locationSet => {
-Object.values(locationSet).forEach(src => {
-const image = new Image();
-image.src = src + '?v=363';
-});
-});
+  const uniqueFiles = new Set();
+
+  Object.values(REAL_BACKGROUND_FILES).forEach(locationSet => {
+    Object.values(locationSet).forEach(src => {
+      if (src) {
+        uniqueFiles.add(src);
+      }
+    });
+  });
+
+  uniqueFiles.forEach(src => {
+    const image = new Image();
+    image.src = `${src}?v=${BACKGROUND_VERSION}`;
+  });
 }
 
 function initializeBackgroundSystem() {
-changeBackground(
-typeof currentLocation === 'string'
-? currentLocation
-: 'arrival'
-);
+  changeBackground(
+    typeof currentLocation === 'string'
+      ? currentLocation
+      : 'arrival'
+  );
 
-setTimeout(preloadBackgroundPack, 800);
+  window.setTimeout(preloadBackgroundPack, 800);
 }
 
 if (document.readyState === 'loading') {
-document.addEventListener(
-'DOMContentLoaded',
-initializeBackgroundSystem,
-{ once: true }
-);
+  document.addEventListener(
+    'DOMContentLoaded',
+    initializeBackgroundSystem,
+    { once: true }
+  );
 } else {
-initializeBackgroundSystem();
+  initializeBackgroundSystem();
 }
