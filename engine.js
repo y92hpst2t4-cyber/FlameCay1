@@ -1201,8 +1201,19 @@ visitDayFiveAfternoonLocation(loc);
 return;
 }
 
-({beach:visitBeach,villa:visitVilla,shrine:visitShrine,jungle:visitJungle,gym:visitGym,kitchen:visitKitchen,pool:visitPool,firepit:visitFirePit,cove:visitCove,volcano:visitVolcano}[loc]||visitVilla)();
-}
+({
+beach:visitBeach,
+villa:visitVilla,
+village:visitVillage,
+shrine:visitShrine,
+jungle:visitJungle,
+gym:visitGym,
+kitchen:visitKitchen,
+pool:visitPool,
+firepit:visitFirePit,
+cove:visitCove,
+volcano:visitVolcano
+}[loc]||visitVilla)();
 
 /* DAY 1 + DAY 2 + DAY 3 MORNING + DAY 4 MORNING SCHEDULES */
 
