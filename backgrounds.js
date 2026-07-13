@@ -31,6 +31,13 @@ morning: 'backgrounds/firepit_morning.png',
 afternoon: 'backgrounds/firepit_afternoon.png',
 sunset: 'backgrounds/firepit_sunset.png',
 night: 'backgrounds/firepit_night.png'
+},
+
+village: {
+morning: 'backgrounds/7527C11C-3A72-4DE6-9D90-E061A897CE73.png',
+afternoon: 'backgrounds/7527C11C-3A72-4DE6-9D90-E061A897CE73.png',
+sunset: 'backgrounds/7527C11C-3A72-4DE6-9D90-E061A897CE73.png',
+night: 'backgrounds/7527C11C-3A72-4DE6-9D90-E061A897CE73.png'
 }
 };
 
@@ -44,7 +51,9 @@ gym: 'villa',
 
 pool: 'pool',
 
-firepit: 'firepit'
+firepit: 'firepit',
+
+village: 'village'
 };
 
 const SCENE_LOCATION_MAP = {
@@ -52,7 +61,8 @@ arrival: 'arrival',
 beach: 'arrival',
 villa: 'villa',
 pool: 'pool',
-firepit: 'firepit'
+firepit: 'firepit',
+village: 'village'
 };
 
 let currentBackgroundFile = '';
