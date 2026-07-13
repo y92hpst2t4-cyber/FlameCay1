@@ -1060,8 +1060,16 @@ ethanStats={friendship:0,romance:0,strategy:0};
 sofiaStats={friendship:0,romance:0,openness:0};
 noahStats={friendship:0,romance:0,courage:0};
 lisaStats={friendship:0,romance:0,honesty:0};
-q('continueButton').style.display='block';
-['choices','islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
+q('continueButton').style.display = 'block';
+q('continueButton').disabled = false;
+q('continueButton').textContent = '⏩ Finish Text';
+
+['choices', 'islandMap', 'walkingScreen'].forEach(id => {
+  q(id).classList.add('hidden');
+});
+
+q('dialogueCard').classList.remove('hidden');
+
 showScene(introDialogue[0]);
 initializeRelationshipSystem();
 initializeChoiceConsequences();
@@ -1072,16 +1080,33 @@ updateReputationSummary();
 updateConsequenceSummary();
 }
 
-function nextDialogue(){
-dialogueIndex++;
-if(dialogueIndex<introDialogue.length)showScene(introDialogue[dialogueIndex]);
-else{q('continueButton').style.display='none';openIslandMap()}
+function nextDialogue() {
+  /*
+    First tap while text is typing:
+    immediately finishes the current sentence.
+
+    Second tap:
+    moves to the next dialogue scene.
+  */
+  if (isTyping) {
+    finishTypingImmediately();
+    return;
+  }
+
+  dialogueIndex++;
+
+  if (dialogueIndex < introDialogue.length) {
+    q('choices').classList.add('hidden');
+    showScene(introDialogue[dialogueIndex]);
+    return;
+  }
+
+  q('continueButton').style.display = 'none';
+  q('dialogueCard').classList.add('hidden');
+  q('portraitBox').classList.add('hidden');
+
+  openIslandMap();
 }
-
-
-
-
-
 
 function openIslandMap(){
 ['choices','walkingScreen','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
