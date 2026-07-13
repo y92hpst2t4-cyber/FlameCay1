@@ -106,3 +106,271 @@ background:#fff;
 #saveStatus{font-weight:700;color:#3c2b73}
 #savePanel{border-left-color:#1877d2}
 @keyframes characterEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* =====================================
+   VERSION 3.6.0
+   Animated Background System
+===================================== */
+
+:root{
+--scene-top:#72ddff;
+--scene-middle:#1f9fc2;
+--scene-bottom:#07566d;
+--scene-glow:rgba(255,224,135,.42);
+--scene-accent:rgba(255,255,255,.28);
+}
+
+body.game-background{
+position:relative;
+isolation:isolate;
+overflow-x:hidden;
+background:
+linear-gradient(
+180deg,
+var(--scene-top) 0%,
+var(--scene-middle) 52%,
+var(--scene-bottom) 100%
+);
+background-attachment:fixed;
+transition:background 1s ease;
+}
+
+body.game-background::before,
+body.game-background::after{
+content:"";
+position:fixed;
+inset:-18%;
+pointer-events:none;
+z-index:-1;
+will-change:transform,opacity;
+}
+
+body.game-background::before{
+background:
+radial-gradient(circle at 18% 20%,var(--scene-glow),transparent 28%),
+radial-gradient(circle at 76% 28%,var(--scene-accent),transparent 22%),
+linear-gradient(115deg,transparent 25%,rgba(255,255,255,.12) 48%,transparent 70%);
+opacity:.75;
+animation:sceneDrift 16s ease-in-out infinite alternate;
+}
+
+body.game-background::after{
+background:
+radial-gradient(ellipse at 50% 100%,var(--scene-glow),transparent 45%),
+repeating-radial-gradient(circle at 40% 30%,rgba(255,255,255,.16) 0 1px,transparent 1px 34px);
+opacity:.42;
+animation:scenePulse 7s ease-in-out infinite;
+}
+
+.screen{
+position:relative;
+z-index:1;
+}
+
+body[data-motion="ocean"]::before,
+body[data-motion="water"]::before{
+background:
+radial-gradient(circle at 16% 18%,var(--scene-glow),transparent 27%),
+repeating-linear-gradient(
+175deg,
+transparent 0 28px,
+rgba(255,255,255,.12) 29px 31px,
+transparent 32px 58px
+);
+animation:oceanFlow 12s linear infinite;
+}
+
+body[data-motion="stars"]::after,
+body[data-motion="moon"]::after{
+background:
+radial-gradient(circle at 78% 16%,rgba(255,255,225,.72) 0 2%,transparent 6%),
+repeating-radial-gradient(circle,rgba(255,255,255,.7) 0 1px,transparent 1px 30px);
+opacity:.46;
+animation:starTwinkle 5s ease-in-out infinite alternate;
+}
+
+body[data-motion="crystal"]::before{
+background:
+conic-gradient(
+from 30deg at 50% 55%,
+transparent,
+rgba(126,232,255,.18),
+rgba(170,78,255,.28),
+transparent 55%
+);
+animation:crystalRotate 18s linear infinite;
+}
+
+body[data-motion="crystal"]::after{
+background:
+radial-gradient(circle at 50% 58%,rgba(146,72,255,.55),transparent 22%),
+repeating-linear-gradient(
+60deg,
+transparent 0 35px,
+rgba(118,230,255,.12) 36px 38px,
+transparent 39px 74px
+);
+animation:crystalPulse 4s ease-in-out infinite;
+}
+
+body[data-motion="leaves"]::before{
+background:
+radial-gradient(ellipse at 15% 30%,rgba(224,255,213,.18),transparent 17%),
+radial-gradient(ellipse at 75% 44%,rgba(195,255,178,.15),transparent 20%),
+repeating-linear-gradient(
+125deg,
+transparent 0 42px,
+rgba(20,70,36,.16) 43px 51px,
+transparent 52px 86px
+);
+animation:leafSway 10s ease-in-out infinite alternate;
+}
+
+body[data-motion="embers"]::after{
+background:
+radial-gradient(circle,rgba(255,204,120,.75) 0 1px,transparent 2px);
+background-size:38px 38px;
+opacity:.35;
+animation:emberRise 9s linear infinite;
+}
+
+body[data-motion="sunset"]::before{
+animation:sunsetGlow 8s ease-in-out infinite alternate;
+}
+
+body[data-motion="breeze"]::before{
+animation:breezeDrift 14s ease-in-out infinite alternate;
+}
+
+@keyframes sceneDrift{
+from{transform:translate3d(-2%,-1%,0) scale(1)}
+to{transform:translate3d(3%,2%,0) scale(1.08)}
+}
+
+@keyframes scenePulse{
+0%,100%{opacity:.3;transform:scale(1)}
+50%{opacity:.52;transform:scale(1.05)}
+}
+
+@keyframes oceanFlow{
+from{transform:translate3d(-4%,0,0)}
+to{transform:translate3d(4%,2%,0)}
+}
+
+@keyframes starTwinkle{
+from{opacity:.25;transform:scale(1)}
+to{opacity:.55;transform:scale(1.03)}
+}
+
+@keyframes crystalRotate{
+from{transform:rotate(0deg) scale(1.05)}
+to{transform:rotate(360deg) scale(1.05)}
+}
+
+@keyframes crystalPulse{
+0%,100%{opacity:.3;transform:scale(.96)}
+50%{opacity:.62;transform:scale(1.08)}
+}
+
+@keyframes leafSway{
+from{transform:translateX(-2%) rotate(-1deg)}
+to{transform:translateX(3%) rotate(1deg)}
+}
+
+@keyframes emberRise{
+from{transform:translateY(8%)}
+to{transform:translateY(-8%)}
+}
+
+@keyframes sunsetGlow{
+from{transform:translateX(-3%) scale(1);opacity:.55}
+to{transform:translateX(4%) scale(1.08);opacity:.88}
+}
+
+@keyframes breezeDrift{
+from{transform:translate3d(-3%,0,0)}
+to{transform:translate3d(3%,1%,0)}
+}
+
+@media (prefers-reduced-motion:reduce){
+body.game-background::before,
+body.game-background::after{
+animation:none!important;
+}
+}
+
+/* =====================================
+   VERSION 3.6.2
+   Dynamic Real Background Manager
+===================================== */
+
+.realSceneBackground{
+position:fixed;
+inset:0;
+z-index:-3;
+background-position:center center;
+background-repeat:no-repeat;
+background-size:cover;
+opacity:0;
+transform:scale(1.025);
+transition:
+opacity .85s ease,
+transform 5s ease;
+pointer-events:none;
+will-change:opacity,transform;
+}
+
+.realSceneBackground.active{
+opacity:1;
+transform:scale(1);
+}
+
+body.has-real-background{
+background:var(--scene-bottom);
+}
+
+body.has-real-background::before{
+z-index:-2;
+background:
+linear-gradient(
+180deg,
+rgba(3,12,24,.08) 0%,
+rgba(3,12,24,.03) 35%,
+rgba(3,12,24,.32) 100%
+);
+opacity:1;
+animation:none;
+}
+
+body.has-real-background::after{
+z-index:-1;
+background:
+linear-gradient(
+90deg,
+rgba(0,0,0,.12),
+transparent 18%,
+transparent 82%,
+rgba(0,0,0,.12)
+);
+opacity:1;
+animation:none;
+}
+
+body.has-real-background .card{
+backdrop-filter:blur(9px);
+-webkit-backdrop-filter:blur(9px);
+}
+
+@media (max-width:600px){
+.realSceneBackground{
+background-position:center center;
+}
+}
+
+@media (prefers-reduced-motion:reduce){
+.realSceneBackground{
+transition:opacity .2s linear;
+transform:none!important;
+}
+}
+
