@@ -1,7 +1,7 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.5.0d — Story System
+// Version 3.6.3 — Story System
 // Contains Season 1 dialogue data, location story scenes,
 // ceremonies, dates, eliminations, Casa events, and the finale.
 
