@@ -2,7 +2,7 @@
 
 // The Island of Flames
 // Version 3.6.2 — Dynamic Background Manager
-// Patch: Safari-safe image persistence and reliable scene switching
+// Patch: verified Villa image files load before incorrectly named duplicates
 
 const BACKGROUND_SCENES = {
 arrival:{top:'#72ddff',middle:'#1f9fc2',bottom:'#07566d',glow:'rgba(255,224,135,.42)',accent:'rgba(255,255,255,.28)',motion:'ocean'},
@@ -49,20 +49,20 @@ night:[
 },
 villa:{
 morning:[
-'backgrounds/villa_morning.png',
-'backgrounds/82BCE9AD-51C2-47A5-9124-CC87E94CF7C8.png'
+'backgrounds/82BCE9AD-51C2-47A5-9124-CC87E94CF7C8.png',
+'backgrounds/villa_morning.png'
 ],
 afternoon:[
-'backgrounds/villa_afternoon.png',
-'backgrounds/10855D6D-50D2-4CBD-A735-9B4EB6EFA2A8.png'
+'backgrounds/10855D6D-50D2-4CBD-A735-9B4EB6EFA2A8.png',
+'backgrounds/villa_afternoon.png'
 ],
 sunset:[
-'backgrounds/villa_sunset.png',
-'backgrounds/4CFBDC17-4DA6-4D70-9C02-31A7430D16F2.png'
+'backgrounds/4CFBDC17-4DA6-4D70-9C02-31A7430D16F2.png',
+'backgrounds/villa_sunset.png'
 ],
 night:[
-'backgrounds/villa_night.png',
-'backgrounds/424BF254-B34F-4989-8DE9-C725F5F62FEE.png'
+'backgrounds/424BF254-B34F-4989-8DE9-C725F5F62FEE.png',
+'backgrounds/villa_night.png'
 ]
 },
 pool:{
