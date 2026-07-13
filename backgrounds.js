@@ -2,6 +2,7 @@
 
 // The Island of Flames
 // Version 3.6.2 — Dynamic Background Manager
+// Patch: Main Villa morning background priority fix
 
 const BACKGROUND_SCENES = {
 arrival:{top:'#72ddff',middle:'#1f9fc2',bottom:'#07566d',glow:'rgba(255,224,135,.42)',accent:'rgba(255,255,255,.28)',motion:'ocean'},
@@ -129,11 +130,17 @@ const currentKey=String(
 typeof currentLocation==='string'?currentLocation:''
 ).toLowerCase();
 
+// Use the scene requested by showScene first.
+if(PACKED_LOCATION_ALIASES[sceneKey]){
+return PACKED_LOCATION_ALIASES[sceneKey];
+}
+
+// Fall back to the player's current map location.
 if(PACKED_LOCATION_ALIASES[currentKey]){
 return PACKED_LOCATION_ALIASES[currentKey];
 }
 
-return PACKED_LOCATION_ALIASES[sceneKey]||null;
+return null;
 }
 
 function getBackgroundTime(scene){
