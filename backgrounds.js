@@ -2,7 +2,7 @@
 
 // The Island of Flames
 // Version 3.6.2 — Dynamic Background Manager
-// Patch: correct map-location priority for Villa, Pool, Fire Pit, and Arrival Beach
+// Patch: Safari-safe image persistence and reliable scene switching
 
 const BACKGROUND_SCENES = {
 arrival:{top:'#72ddff',middle:'#1f9fc2',bottom:'#07566d',glow:'rgba(255,224,135,.42)',accent:'rgba(255,255,255,.28)',motion:'ocean'},
@@ -216,12 +216,15 @@ return;
 }
 
 const src=candidates[index];
+const cacheSafeSrc=src+(src.includes('?')?'&':'?')+'v=3628';
 const image=new Image();
 
 image.onload=()=>{
 loadedBackgroundCache.add(src);
-const separator=src.includes('?')?'&':'?';
-resolve(src+separator+'v=3627');
+resolve({
+original:src,
+cacheSafe:cacheSafeSrc
+});
 };
 
 image.onerror=()=>{
@@ -230,34 +233,68 @@ loadFirstAvailableBackground(candidates,index+1)
 .catch(reject);
 };
 
-const separator=src.includes('?')?'&':'?';
-image.src=src+separator+'v=3627';
+image.src=cacheSafeSrc;
 });
 }
 
-function crossfadeToBackground(src){
+function crossfadeToBackground(backgroundFile){
 ensureBackgroundLayers();
+
+const src=
+typeof backgroundFile==='string'
+?backgroundFile
+:backgroundFile.cacheSafe;
+
+const original=
+typeof backgroundFile==='string'
+?backgroundFile
+:backgroundFile.original;
 
 const first=document.getElementById('realBackgroundA');
 const second=document.getElementById('realBackgroundB');
 const active=first.classList.contains('active')?first:second;
 const incoming=active===first?second:first;
 
-if(currentRealBackground===src)return;
+if(currentRealBackground===original)return;
+
+/*
+Safari fallback:
+Apply the image directly to the body too.
+This prevents the page from returning to the blue gradient.
+*/
+document.body.style.backgroundImage=
+`linear-gradient(rgba(2,10,20,.10),rgba(2,10,20,.28)),url("${src}")`;
+document.body.style.backgroundSize='cover';
+document.body.style.backgroundPosition='center top';
+document.body.style.backgroundRepeat='no-repeat';
+document.body.style.backgroundAttachment='fixed';
 
 incoming.style.backgroundImage=`url("${src}")`;
 incoming.style.backgroundPosition='center top';
 incoming.classList.add('active');
 active.classList.remove('active');
 
-currentRealBackground=src;
+currentRealBackground=original;
 document.body.classList.add('has-real-background');
 }
 
-function clearRealBackground(){
+function clearRealBackground(force=false){
+/*
+Do not erase a working background just because the next
+requested image is still loading or temporarily unavailable.
+*/
+if(!force&&currentRealBackground)return;
+
 ensureBackgroundLayers();
 document.getElementById('realBackgroundA').classList.remove('active');
 document.getElementById('realBackgroundB').classList.remove('active');
+
+document.body.style.backgroundImage='';
+document.body.style.backgroundSize='';
+document.body.style.backgroundPosition='';
+document.body.style.backgroundRepeat='';
+document.body.style.backgroundAttachment='';
+
 currentRealBackground='';
 document.body.classList.remove('has-real-background');
 }
@@ -280,7 +317,16 @@ if(requestId!==backgroundRequestId)return;
 crossfadeToBackground(src);
 }catch(error){
 if(requestId!==backgroundRequestId)return;
-clearRealBackground();
+
+/*
+Keep the previous successful image visible.
+The animated gradient remains the fallback only when
+no real image has ever loaded.
+*/
+if(!currentRealBackground){
+clearRealBackground(true);
+}
+
 console.warn(
 `Background missing for ${packedLocation} ${timeKey}.`,
 candidates
