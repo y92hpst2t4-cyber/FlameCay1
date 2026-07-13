@@ -1,7 +1,7 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.6.2 — Simplified Dynamic Background Manager
+// Version 3.6.3 — Clean Dynamic Background Manager
 // Uses exact clean filenames and currentLocation + currentTime.
 
 const REAL_BACKGROUND_FILES = {
@@ -13,10 +13,10 @@ night: 'backgrounds/arrival_night.png'
 },
 
 villa: {
-morning: 'backgrounds/villa_morning.png',
-afternoon: 'backgrounds/villa_afternoon.png',
-sunset: 'backgrounds/villa_sunset.png',
-night: 'backgrounds/villa_night.png'
+morning: 'backgrounds/82BCE9AD-51C2-4745-9124-CC87E94CF7C8.png',
+afternoon: 'backgrounds/10855D6D-50D2-4CBD-A735-9B4EB6EFA2A8.png',
+sunset: 'backgrounds/4CFBDC17-4DA6-4D70-9C02-31A7430D16F2.png',
+night: 'backgrounds/424BF254-B34F-4989-8DE9-C725F5F62FEE.png'
 },
 
 pool: {
@@ -98,18 +98,20 @@ typeof currentLocation === 'string'
 ).toLowerCase();
 
 /*
-The real map location always wins.
-This prevents Main Villa from showing Arrival Beach.
-*/
-if (LOCATION_BACKGROUND_MAP[locationKey]) {
-return LOCATION_BACKGROUND_MAP[locationKey];
-}
-
-/*
-Use the scene name only when there is no known map location.
+An explicit scene location wins first.
+This lets the opening Arrival Beach scene work even though
+new games begin with currentLocation set to villa.
 */
 if (SCENE_LOCATION_MAP[sceneKey]) {
 return SCENE_LOCATION_MAP[sceneKey];
+}
+
+/*
+Generic scene labels such as afternoon and night use the
+player's real map location.
+*/
+if (LOCATION_BACKGROUND_MAP[locationKey]) {
+return LOCATION_BACKGROUND_MAP[locationKey];
 }
 
 return null;
@@ -124,12 +126,12 @@ image.onerror = () => reject(
 new Error('Background image could not be loaded: ' + src)
 );
 
-image.src = src + '?v=3632';
+image.src = src + '?v=363';
 });
 }
 
 function applyBackgroundImage(src) {
-const cacheSafeSrc = src + '?v=3632';
+const cacheSafeSrc = src + '?v=363';
 
 document.body.style.backgroundImage =
 'linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.22)), url("' +
@@ -219,7 +221,7 @@ function preloadBackgroundPack() {
 Object.values(REAL_BACKGROUND_FILES).forEach(locationSet => {
 Object.values(locationSet).forEach(src => {
 const image = new Image();
-image.src = src + '?v=3632';
+image.src = src + '?v=363';
 });
 });
 }
