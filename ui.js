@@ -260,11 +260,109 @@ typeText(s.text);
 
 // Animated background rendering is loaded from backgrounds.js
 
-function typeText(t){
-if(typingTimer)clearTimeout(typingTimer);
-q('story').innerHTML='';
-let i=0;
-(function go(){if(i<t.length){q('story').innerHTML+=t[i]==='\n'?'<br>':t[i];i++;typingTimer=setTimeout(go,20)}})();
+let isTyping = false;
+let currentTypingText = '';
+let currentTypingIndex = 0;
+
+function formatDialogueText(text) {
+  return String(text || '')
+    .replace(/\{\{playerName\}\}/g, playerName)
+    .replace(/\{playerName\}/g, playerName);
+}
+
+function typeText(text) {
+  if (typingTimer) {
+    clearTimeout(typingTimer);
+  }
+
+  currentTypingText = formatDialogueText(text);
+  currentTypingIndex = 0;
+  isTyping = true;
+
+  q('story').innerHTML = '';
+
+  const continueButton = q('continueButton');
+
+  if (continueButton && continueButton.style.display !== 'none') {
+    continueButton.disabled = false;
+    continueButton.textContent = '⏩ Finish Text';
+  }
+
+  function typeNextCharacter() {
+    if (currentTypingIndex >= currentTypingText.length) {
+      finishTypingNormally();
+      return;
+    }
+
+    const character = currentTypingText[currentTypingIndex];
+
+    if (character === '\n') {
+      q('story').insertAdjacentHTML('beforeend', '<br>');
+    } else {
+      q('story').append(document.createTextNode(character));
+    }
+
+    currentTypingIndex++;
+
+    const delay =
+      character === '.' || character === '!' || character === '?'
+        ? 120
+        : character === ',' || character === ':'
+        ? 60
+        : 20;
+
+    typingTimer = setTimeout(typeNextCharacter, delay);
+  }
+
+  typeNextCharacter();
+}
+
+function finishTypingNormally() {
+  if (typingTimer) {
+    clearTimeout(typingTimer);
+  }
+
+  typingTimer = null;
+  isTyping = false;
+  currentTypingIndex = currentTypingText.length;
+
+  const continueButton = q('continueButton');
+
+  if (continueButton && continueButton.style.display !== 'none') {
+    continueButton.disabled = false;
+    continueButton.textContent = '▶ Continue';
+  }
+}
+
+function finishTypingImmediately() {
+  if (!isTyping) {
+    return;
+  }
+
+  if (typingTimer) {
+    clearTimeout(typingTimer);
+  }
+
+  typingTimer = null;
+  isTyping = false;
+  currentTypingIndex = currentTypingText.length;
+
+  q('story').innerHTML = '';
+
+  currentTypingText.split('\n').forEach((line, index, lines) => {
+    q('story').append(document.createTextNode(line));
+
+    if (index < lines.length - 1) {
+      q('story').append(document.createElement('br'));
+    }
+  });
+
+  const continueButton = q('continueButton');
+
+  if (continueButton && continueButton.style.display !== 'none') {
+    continueButton.disabled = false;
+    continueButton.textContent = '▶ Continue';
+  }
 }
 
 function updateTimeDisplay(){
