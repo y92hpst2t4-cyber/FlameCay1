@@ -20,9 +20,102 @@ const introDialogue=[
 {speaker:'narrator',background:'crystal',text:'Deep inside the jungle...\n\nThe Crystal Flame begins to glow.'},
 {speaker:'narrator',background:'villa',text:'Your first day begins now.\n\nChoose one main activity during each part of the day.'}
 ];
+const locationNames={
+volcano:'Volcano Peak',
+jungle:'Whispering Jungle',
+shrine:'Crystal Shrine',
+beach:'Arrival Beach',
+villa:'Main Villa',
+village:'Flame Village',
+gym:'Gym',
+kitchen:'Kitchen',
+pool:'Infinity Pool',
+firepit:'Fire Pit',
+cove:'Moonlight Cove'
+};
 
-const locationNames={volcano:'Volcano Peak',jungle:'Whispering Jungle',shrine:'Crystal Shrine',beach:'Arrival Beach',villa:'Main Villa',gym:'Gym',kitchen:'Kitchen',pool:'Infinity Pool',firepit:'Fire Pit',cove:'Moonlight Cove'};
+function visitVillage(){
+if(currentTime==='Evening'){
+showEmpty(
+'🏝️ Flame Village',
+'The village lanterns glow, but the Islanders have returned to the Fire Pit.',
+'village'
+);
+return;
+}
 
+if(currentDay===1&&currentTime==='Morning'){
+showScene({
+speaker:'lucas',
+background:'village',
+text:'You enter Flame Village for the first time.\n\nWooden homes and glowing flame lanterns line the stone path.\n\nLucas stands near the village fountain, speaking with one of the residents.'
+});
+
+choices(
+'<button onclick="openLucasVillageMenu()">🏝️ Talk to Lucas</button>'+
+backMap()
+);
+return;
+}
+
+if(currentDay===1&&currentTime==='Afternoon'){
+showScene({
+speaker:'lucas',
+background:'village',
+text:'Lucas walks through the village carrying a basket of supplies.\n\n"I promised I would help before returning to the villa," he says.'
+});
+
+choices(
+'<button onclick="openLucasVillageMenu()">🔥 Help Lucas</button>'+
+backMap()
+);
+return;
+}
+
+if(currentDay===2){
+showScene({
+speaker:'lucas',
+background:'village',
+text:'Lucas waits beside a small house near the edge of Flame Village.\n\n"I used to visit this place before the show began."\n\n"There is something about the village I have not told anyone."'
+});
+
+choices(
+'<button onclick="openLucasVillageMenu()">❓ Ask Lucas about the village</button>'+
+backMap()
+);
+return;
+}
+
+if(currentDay===3&&currentTime==='Morning'){
+showScene({
+speaker:'lucas',
+background:'village',
+text:'Lucas studies a flame-shaped symbol carved into an old village wall.\n\n"It looks exactly like the symbol near the Crystal Shrine."'
+});
+
+choices(
+'<button onclick="openLucasVillageMenu()">🔥 Investigate with Lucas</button>'+
+backMap()
+);
+return;
+}
+
+if(currentDay===4&&currentTime==='Morning'){
+partnerMorningScene(
+'lucas',
+'Lucas is helping the villagers prepare lanterns for the evening.',
+'village',
+'visitVillage'
+);
+return;
+}
+
+showEmpty(
+'🏝️ Flame Village',
+'The village is peaceful. Flame lanterns flicker along the stone paths.',
+'village'
+);
+}
 function partnerMorningScene(person,locationText,bg,back){
 const isPartner=coupledWith===person;
 const opening=isPartner
@@ -34,7 +127,7 @@ choices('<button onclick="'+getPartnerMenuFunction(person,bg,back)+'">❤️ Tal
 
 function getPartnerMenuFunction(person,bg,back){
 const map={
-lucas:'openLucasMenu()',
+lucas:bg==='village'?'openLucasVillageMenu()':'openLucasMenu()',
 maya:'openMayaMenuFrom(\''+bg+'\',\''+back+'\')',
 kai:'openKaiMenu(\''+bg+'\',\''+back+'\')',
 isabella:'openIsabellaMenu(\''+bg+'\',\''+back+'\')',
@@ -315,9 +408,28 @@ showScene({speaker:'narrator',background:bg,text:title+'\n\n'+text});
 choices(backMap());
 }
 
-/* CONVERSATION MENUS */
+function openLucasVillageMenu(){
+if(actionAlreadyUsed())return;
+
+menuBackground='village';
+menuBack='visitVillage';
+
+showScene({
+speaker:'lucas',
+background:'village',
+text:'Lucas looks around Flame Village before turning toward you.\n\n"What do you want to know?"'
+});
+
+choices(
+'<button onclick="specialTalk(\'lucas\',\'friendship\',\'Lucas tells you that the village reminds him of home.\\n\\nHe enjoys helping the residents when the cameras are not following him.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">😊 Ask why he helps here</button>'+
+'<button onclick="specialTalk(\'lucas\',\'romance\',\'You tell Lucas that seeing this side of him makes him even more attractive.\\n\\nHe smiles and looks away for a moment.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Share a romantic moment</button>'+
+'<button onclick="specialTalk(\'lucas\',\'trust\',\'Lucas admits that strange lights appear beneath the village after dark.\\n\\nHe asks you not to tell the others yet.\\n\\n💚 Trust +1\\n❤️ Connection +1\')">🔥 Ask about the hidden flames</button>'+
+'<button onclick="visitVillage()">⬅ Back</button>'
+);
+}
 
 function openLucasMenu(){
+
 if(actionAlreadyUsed())return;
 menuBackground=currentTime==='Afternoon'?'afternoon':'villa';
 menuBack='visitVilla';
