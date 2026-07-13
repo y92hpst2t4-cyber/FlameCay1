@@ -1,397 +1,245 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.6.2 — Dynamic Background Manager
-// Patch: verified Villa image files load before incorrectly named duplicates
+// Version 3.6.2 — Simplified Dynamic Background Manager
+// Uses exact clean filenames and currentLocation + currentTime.
 
-const BACKGROUND_SCENES = {
-arrival:{top:'#72ddff',middle:'#1f9fc2',bottom:'#07566d',glow:'rgba(255,224,135,.42)',accent:'rgba(255,255,255,.28)',motion:'ocean'},
-beach:{top:'#83ecff',middle:'#37b9d3',bottom:'#1383a0',glow:'rgba(255,225,132,.5)',accent:'rgba(255,255,255,.34)',motion:'ocean'},
-villa:{top:'#65d6ef',middle:'#1d9fb9',bottom:'#08677e',glow:'rgba(255,205,128,.35)',accent:'rgba(255,255,255,.24)',motion:'breeze'},
-afternoon:{top:'#ffc36f',middle:'#e98767',bottom:'#267b91',glow:'rgba(255,236,170,.48)',accent:'rgba(255,255,255,.22)',motion:'sunset'},
-night:{top:'#273a77',middle:'#111d48',bottom:'#040711',glow:'rgba(124,145,255,.3)',accent:'rgba(255,255,255,.42)',motion:'stars'},
-crystal:{top:'#263f78',middle:'#10214b',bottom:'#050b17',glow:'rgba(160,91,255,.5)',accent:'rgba(112,233,255,.42)',motion:'crystal'},
-jungle:{top:'#4d9e64',middle:'#286843',bottom:'#123721',glow:'rgba(170,255,160,.22)',accent:'rgba(222,255,208,.25)',motion:'leaves'},
-volcano:{top:'#994c36',middle:'#56271e',bottom:'#1f0b08',glow:'rgba(255,93,45,.5)',accent:'rgba(255,195,120,.25)',motion:'embers'},
-firepit:{top:'#34305c',middle:'#1a1833',bottom:'#08070f',glow:'rgba(255,109,45,.5)',accent:'rgba(255,204,145,.25)',motion:'embers'},
-pool:{top:'#72e6f2',middle:'#32b4c8',bottom:'#08758d',glow:'rgba(255,244,183,.38)',accent:'rgba(255,255,255,.32)',motion:'water'},
-cove:{top:'#344a85',middle:'#16285b',bottom:'#060b19',glow:'rgba(103,205,255,.32)',accent:'rgba(223,244,255,.34)',motion:'moon'},
-gym:{top:'#688798',middle:'#385363',bottom:'#18282f',glow:'rgba(255,182,98,.22)',accent:'rgba(255,255,255,.15)',motion:'breeze'},
-kitchen:{top:'#f0c989',middle:'#b87d59',bottom:'#654436',glow:'rgba(255,235,187,.35)',accent:'rgba(255,255,255,.18)',motion:'breeze'}
-};
-
-const BACKGROUND_ALIASES = {
-shrine:'crystal',
-moonlight:'cove',
-sunset:'afternoon',
-evening:'night'
-};
-
-// First choice = clean filename.
-// Later choices = random filenames already uploaded to GitHub.
 const REAL_BACKGROUND_FILES = {
-arrival:{
-morning:[
-'backgrounds/arrival_morning.png',
-'backgrounds/051FD550-8E9A-4166-BEC1-AE5773E97D21.png'
-],
-afternoon:[
-'backgrounds/arrival_afternoon.png'
-],
-sunset:[
-'backgrounds/arrival_sunset.png',
-'backgrounds/4C553CF9-D16E-4E9C-B2E9-80DA04217A46.png'
-],
-night:[
-'backgrounds/arrival_night.png',
-'backgrounds/2F6337BF-6798-4B05-8970-834F817D4BDC.png'
-]
+arrival: {
+morning: 'backgrounds/arrival_morning.png',
+afternoon: 'backgrounds/arrival_afternoon.png',
+sunset: 'backgrounds/arrival_sunset.png',
+night: 'backgrounds/arrival_night.png'
 },
-villa:{
-morning:[
-'backgrounds/82BCE9AD-51C2-47A5-9124-CC87E94CF7C8.png',
-'backgrounds/villa_morning.png'
-],
-afternoon:[
-'backgrounds/10855D6D-50D2-4CBD-A735-9B4EB6EFA2A8.png',
-'backgrounds/villa_afternoon.png'
-],
-sunset:[
-'backgrounds/4CFBDC17-4DA6-4D70-9C02-31A7430D16F2.png',
-'backgrounds/villa_sunset.png'
-],
-night:[
-'backgrounds/424BF254-B34F-4989-8DE9-C725F5F62FEE.png',
-'backgrounds/villa_night.png'
-]
+
+villa: {
+morning: 'backgrounds/villa_morning.png',
+afternoon: 'backgrounds/villa_afternoon.png',
+sunset: 'backgrounds/villa_sunset.png',
+night: 'backgrounds/villa_night.png'
 },
-pool:{
-morning:[
-'backgrounds/pool_morning.png',
-'backgrounds/IMG_2354.jpeg'
-],
-afternoon:[
-'backgrounds/pool_afternoon.png'
-],
-sunset:[
-'backgrounds/pool_sunset.png',
-'backgrounds/IMG_2355.jpeg'
-],
-night:[
-'backgrounds/pool_night.png',
-'backgrounds/IMG_2356.jpeg'
-]
+
+pool: {
+morning: 'backgrounds/pool_morning.png',
+afternoon: 'backgrounds/pool_afternoon.png',
+sunset: 'backgrounds/pool_sunset.png',
+night: 'backgrounds/pool_night.png'
 },
-firepit:{
-morning:[
-'backgrounds/firepit_morning.png',
-'backgrounds/IMG_2358.jpeg'
-],
-afternoon:[
-'backgrounds/firepit_afternoon.png',
-'backgrounds/IMG_2359.jpeg'
-],
-sunset:[
-'backgrounds/firepit_sunset.png',
-'backgrounds/IMG_2360.jpeg'
-],
-night:[
-'backgrounds/firepit_night.png',
-'backgrounds/IMG_2361.jpeg'
-]
+
+firepit: {
+morning: 'backgrounds/firepit_morning.png',
+afternoon: 'backgrounds/firepit_afternoon.png',
+sunset: 'backgrounds/firepit_sunset.png',
+night: 'backgrounds/firepit_night.png'
 }
 };
 
-const PACKED_LOCATION_ALIASES = {
-arrival:'arrival',
-beach:'arrival',
-villa:'villa',
-kitchen:'villa',
-gym:'villa',
-pool:'pool',
-firepit:'firepit'
+const LOCATION_BACKGROUND_MAP = {
+arrival: 'arrival',
+beach: 'arrival',
+
+villa: 'villa',
+kitchen: 'villa',
+gym: 'villa',
+
+pool: 'pool',
+
+firepit: 'firepit'
 };
 
-let currentBackgroundScene='arrival';
-let currentRealBackground='';
-let backgroundRequestId=0;
-const loadedBackgroundCache=new Set();
+const SCENE_LOCATION_MAP = {
+arrival: 'arrival',
+beach: 'arrival',
+villa: 'villa',
+pool: 'pool',
+firepit: 'firepit'
+};
 
-function normalizeBackgroundScene(scene){
-const requested=String(scene||'villa').toLowerCase();
-return BACKGROUND_SCENES[requested]
-?requested
-:(BACKGROUND_ALIASES[requested]||'villa');
+let currentBackgroundFile = '';
+let backgroundRequestNumber = 0;
+
+function getBackgroundTime(scene) {
+const sceneKey = String(scene || '').toLowerCase();
+
+if (sceneKey === 'night') {
+return 'night';
 }
 
-function getPackedLocation(scene){
-const sceneKey=String(scene||'').toLowerCase();
-const currentKey=String(
-typeof currentLocation==='string'?currentLocation:''
+if (sceneKey === 'sunset') {
+return 'sunset';
+}
+
+if (typeof currentTime !== 'string') {
+return 'morning';
+}
+
+if (currentTime === 'Morning') {
+return 'morning';
+}
+
+if (currentTime === 'Afternoon') {
+return 'afternoon';
+}
+
+if (currentTime === 'Evening') {
+return 'night';
+}
+
+return 'morning';
+}
+
+function getBackgroundLocation(scene) {
+const sceneKey = String(scene || '').toLowerCase();
+
+const locationKey = String(
+typeof currentLocation === 'string'
+? currentLocation
+: ''
 ).toLowerCase();
 
 /*
-Use the real map location for Pool and Fire Pit.
-Their story scenes sometimes use generic labels such as
-"beach", "afternoon", or "night".
+The real map location always wins.
+This prevents Main Villa from showing Arrival Beach.
 */
-if(currentKey==='pool')return 'pool';
-if(currentKey==='firepit')return 'firepit';
-
-/*
-Arrival Beach must keep its own art while the player is there.
-*/
-if(currentKey==='beach')return 'arrival';
-
-/*
-During the opening, currentLocation begins as "villa",
-but the story is showing Arrival Beach. Let the explicit
-Arrival/Beach scene win in that situation.
-*/
-if(sceneKey==='arrival'||sceneKey==='beach')return 'arrival';
-
-/*
-Use Villa art for Villa, Kitchen, and Gym scenes.
-*/
-if(
-currentKey==='villa'||
-currentKey==='kitchen'||
-currentKey==='gym'
-){
-return 'villa';
+if (LOCATION_BACKGROUND_MAP[locationKey]) {
+return LOCATION_BACKGROUND_MAP[locationKey];
 }
 
 /*
-Use any other explicit supported scene.
+Use the scene name only when there is no known map location.
 */
-if(PACKED_LOCATION_ALIASES[sceneKey]){
-return PACKED_LOCATION_ALIASES[sceneKey];
-}
-
-/*
-Final fallback to the current location.
-*/
-if(PACKED_LOCATION_ALIASES[currentKey]){
-return PACKED_LOCATION_ALIASES[currentKey];
+if (SCENE_LOCATION_MAP[sceneKey]) {
+return SCENE_LOCATION_MAP[sceneKey];
 }
 
 return null;
 }
 
-function getBackgroundTime(scene){
-const sceneKey=String(scene||'').toLowerCase();
+function preloadBackground(src) {
+return new Promise((resolve, reject) => {
+const image = new Image();
 
-if(sceneKey==='night')return 'night';
-if(sceneKey==='sunset')return 'sunset';
+image.onload = () => resolve(src);
+image.onerror = () => reject(
+new Error('Background image could not be loaded: ' + src)
+);
 
-const time=typeof currentTime==='string'?currentTime:'Morning';
-
-if(time==='Morning')return 'morning';
-if(time==='Afternoon')return 'afternoon';
-if(time==='Evening')return 'night';
-
-return 'morning';
-}
-
-function ensureBackgroundLayers(){
-if(document.getElementById('realBackgroundA'))return;
-
-const layerA=document.createElement('div');
-const layerB=document.createElement('div');
-
-layerA.id='realBackgroundA';
-layerB.id='realBackgroundB';
-layerA.className='realSceneBackground active';
-layerB.className='realSceneBackground';
-
-document.body.prepend(layerB);
-document.body.prepend(layerA);
-}
-
-function loadFirstAvailableBackground(candidates,index=0){
-return new Promise((resolve,reject)=>{
-if(!Array.isArray(candidates)||index>=candidates.length){
-reject(new Error('No background file found.'));
-return;
-}
-
-const src=candidates[index];
-const cacheSafeSrc=src+(src.includes('?')?'&':'?')+'v=3628';
-const image=new Image();
-
-image.onload=()=>{
-loadedBackgroundCache.add(src);
-resolve({
-original:src,
-cacheSafe:cacheSafeSrc
-});
-};
-
-image.onerror=()=>{
-loadFirstAvailableBackground(candidates,index+1)
-.then(resolve)
-.catch(reject);
-};
-
-image.src=cacheSafeSrc;
+image.src = src + '?v=3632';
 });
 }
 
-function crossfadeToBackground(backgroundFile){
-ensureBackgroundLayers();
+function applyBackgroundImage(src) {
+const cacheSafeSrc = src + '?v=3632';
 
-const src=
-typeof backgroundFile==='string'
-?backgroundFile
-:backgroundFile.cacheSafe;
+document.body.style.backgroundImage =
+'linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.22)), url("' +
+cacheSafeSrc +
+'")';
 
-const original=
-typeof backgroundFile==='string'
-?backgroundFile
-:backgroundFile.original;
+document.body.style.backgroundSize = 'cover';
+document.body.style.backgroundPosition = 'center top';
+document.body.style.backgroundRepeat = 'no-repeat';
+document.body.style.backgroundAttachment = 'fixed';
 
-const first=document.getElementById('realBackgroundA');
-const second=document.getElementById('realBackgroundB');
-const active=first.classList.contains('active')?first:second;
-const incoming=active===first?second:first;
-
-if(currentRealBackground===original)return;
-
-/*
-Safari fallback:
-Apply the image directly to the body too.
-This prevents the page from returning to the blue gradient.
-*/
-document.body.style.backgroundImage=
-`linear-gradient(rgba(2,10,20,.10),rgba(2,10,20,.28)),url("${src}")`;
-document.body.style.backgroundSize='cover';
-document.body.style.backgroundPosition='center top';
-document.body.style.backgroundRepeat='no-repeat';
-document.body.style.backgroundAttachment='fixed';
-
-incoming.style.backgroundImage=`url("${src}")`;
-incoming.style.backgroundPosition='center top';
-incoming.classList.add('active');
-active.classList.remove('active');
-
-currentRealBackground=original;
 document.body.classList.add('has-real-background');
+currentBackgroundFile = src;
 }
 
-function clearRealBackground(force=false){
-/*
-Do not erase a working background just because the next
-requested image is still loading or temporarily unavailable.
-*/
-if(!force&&currentRealBackground)return;
-
-ensureBackgroundLayers();
-document.getElementById('realBackgroundA').classList.remove('active');
-document.getElementById('realBackgroundB').classList.remove('active');
-
-document.body.style.backgroundImage='';
-document.body.style.backgroundSize='';
-document.body.style.backgroundPosition='';
-document.body.style.backgroundRepeat='';
-document.body.style.backgroundAttachment='';
-
-currentRealBackground='';
+function showFallbackBackground(scene) {
 document.body.classList.remove('has-real-background');
+
+document.body.style.backgroundImage =
+'linear-gradient(180deg,#70d8ff,#08657e)';
+
+document.body.style.backgroundSize = 'cover';
+document.body.style.backgroundPosition = 'center';
+document.body.style.backgroundRepeat = 'no-repeat';
+document.body.style.backgroundAttachment = 'fixed';
+
+document.body.dataset.background =
+String(scene || 'villa').toLowerCase();
+
+currentBackgroundFile = '';
 }
 
-async function applyRealBackground(scene){
-const packedLocation=getPackedLocation(scene);
+async function changeBackground(scene) {
+const locationKey = getBackgroundLocation(scene);
+const timeKey = getBackgroundTime(scene);
+const requestNumber = ++backgroundRequestNumber;
 
-if(!packedLocation||!REAL_BACKGROUND_FILES[packedLocation]){
-clearRealBackground();
+if (
+!locationKey ||
+!REAL_BACKGROUND_FILES[locationKey] ||
+!REAL_BACKGROUND_FILES[locationKey][timeKey]
+) {
+showFallbackBackground(scene);
 return;
 }
 
-const timeKey=getBackgroundTime(scene);
-const candidates=REAL_BACKGROUND_FILES[packedLocation][timeKey];
-const requestId=++backgroundRequestId;
+const src = REAL_BACKGROUND_FILES[locationKey][timeKey];
 
-try{
-const src=await loadFirstAvailableBackground(candidates);
-if(requestId!==backgroundRequestId)return;
-crossfadeToBackground(src);
-}catch(error){
-if(requestId!==backgroundRequestId)return;
-
-/*
-Keep the previous successful image visible.
-The animated gradient remains the fallback only when
-no real image has ever loaded.
-*/
-if(!currentRealBackground){
-clearRealBackground(true);
+if (currentBackgroundFile === src) {
+return;
 }
 
-console.warn(
-`Background missing for ${packedLocation} ${timeKey}.`,
-candidates
+try {
+await preloadBackground(src);
+
+if (requestNumber !== backgroundRequestNumber) {
+return;
+}
+
+applyBackgroundImage(src);
+
+console.log(
+'Background loaded:',
+locationKey,
+timeKey,
+src
 );
+} catch (error) {
+if (requestNumber !== backgroundRequestNumber) {
+return;
+}
+
+console.warn(error.message);
+showFallbackBackground(scene);
 }
 }
 
-function changeBackground(scene){
-const key=normalizeBackgroundScene(scene);
-const config=BACKGROUND_SCENES[key];
-const body=document.body;
-
-currentBackgroundScene=key;
-
-body.classList.add('game-background');
-body.dataset.background=key;
-body.dataset.motion=config.motion;
-
-body.style.setProperty('--scene-top',config.top);
-body.style.setProperty('--scene-middle',config.middle);
-body.style.setProperty('--scene-bottom',config.bottom);
-body.style.setProperty('--scene-glow',config.glow);
-body.style.setProperty('--scene-accent',config.accent);
-
-applyRealBackground(scene);
-}
-
-function refreshBackgroundForTime(){
+function refreshBackgroundForTime() {
 changeBackground(
-typeof currentLocation==='string'&&currentLocation
-?currentLocation
-:'villa'
+typeof currentLocation === 'string'
+? currentLocation
+: 'villa'
 );
 }
 
-function preloadBackgroundPack(){
-const important=[
-REAL_BACKGROUND_FILES.arrival.morning,
-REAL_BACKGROUND_FILES.villa.morning,
-REAL_BACKGROUND_FILES.pool.afternoon,
-REAL_BACKGROUND_FILES.firepit.night
-];
-
-important.forEach(candidates=>{
-loadFirstAvailableBackground(candidates).catch(()=>{});
+function preloadBackgroundPack() {
+Object.values(REAL_BACKGROUND_FILES).forEach(locationSet => {
+Object.values(locationSet).forEach(src => {
+const image = new Image();
+image.src = src + '?v=3632';
+});
 });
 }
 
-function initializeBackgroundSystem(){
-ensureBackgroundLayers();
-changeBackground('arrival');
+function initializeBackgroundSystem() {
+changeBackground(
+typeof currentLocation === 'string'
+? currentLocation
+: 'arrival'
+);
 
-if('requestIdleCallback' in window){
-requestIdleCallback(preloadBackgroundPack,{timeout:2500});
-}else{
-setTimeout(preloadBackgroundPack,1200);
-}
+setTimeout(preloadBackgroundPack, 800);
 }
 
-if(document.readyState==='loading'){
+if (document.readyState === 'loading') {
 document.addEventListener(
 'DOMContentLoaded',
 initializeBackgroundSystem,
-{once:true}
+{ once: true }
 );
-}else{
+} else {
 initializeBackgroundSystem();
 }
