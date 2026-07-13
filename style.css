@@ -164,7 +164,7 @@ animation:scenePulse 7s ease-in-out infinite;
 
 .screen{
 position:relative;
-z-index:1;
+z-index:5;
 }
 
 body[data-motion="ocean"]::before,
@@ -307,7 +307,7 @@ animation:none!important;
 .realSceneBackground{
 position:fixed;
 inset:0;
-z-index:-3;
+z-index:0;
 background-position:center center;
 background-repeat:no-repeat;
 background-size:cover;
@@ -330,7 +330,7 @@ background:var(--scene-bottom);
 }
 
 body.has-real-background::before{
-z-index:-2;
+z-index:1;
 background:
 linear-gradient(
 180deg,
@@ -343,7 +343,7 @@ animation:none;
 }
 
 body.has-real-background::after{
-z-index:-1;
+z-index:2;
 background:
 linear-gradient(
 90deg,
@@ -374,3 +374,18 @@ transform:none!important;
 }
 }
 
+
+
+/* Safari stacking fix for real background images */
+body.game-background{
+isolation:isolate;
+}
+
+body.game-background > .realSceneBackground{
+pointer-events:none;
+}
+
+body.game-background > main.screen{
+position:relative;
+z-index:5;
+}
