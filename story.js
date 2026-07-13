@@ -437,6 +437,26 @@ showScene({speaker:'lucas',background:menuBackground,text:'"What do you want to 
 choices('<button onclick="specialTalk(\'lucas\',\'friendship\',\'You ask Lucas about life outside Flame Cay.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">😊 Get to know Lucas</button><button onclick="specialTalk(\'lucas\',\'romance\',\'You flirt with Lucas and he smiles.\\n\\n❤️ Romance +1\\n❤️ Connection +1\')">❤️ Flirt with Lucas</button><button onclick="specialTalk(\'lucas\',\'trust\',\'Lucas tells you about a strange light in the jungle.\\n\\n💚 Trust +1\\n❤️ Connection +1\')">❓ Ask about Flame Cay</button><button onclick="visitVilla()">⬅ Back</button>');
 }
 
+function openMayaJungleMenu(){
+if(actionAlreadyUsed())return;
+
+menuBackground='jungle';
+menuBack='visitJungle';
+
+showScene({
+speaker:'maya',
+background:'jungle',
+text:'Maya brushes leaves away from a narrow trail.\n\n"The jungle is hiding something today."\n\n"What should we do?"'
+});
+
+choices(
+'<button onclick="specialTalk(\'maya\',\'friendship\',\'You help Maya clear the path and search the area together.\\n\\nShe enjoys having someone she can depend on.\\n\\n🤝 Friendship +1\\n❤️ Connection +1\')">🌿 Help clear the trail</button>'+
+'<button onclick="specialTalk(\'maya\',\'trust\',\'Maya admits she has been following strange glowing footprints.\\n\\nShe asks you to keep the discovery secret.\\n\\n💚 Trust +1\\n❤️ Connection +1\')">💚 Ask what she discovered</button>'+
+'<button onclick="specialTalk(\'maya\',\'mystery\',\'You and Maya follow the glowing footprints deeper into the jungle.\\n\\nThey lead toward an ancient stone marked with the Crystal Flame symbol.\\n\\n🔥 Mystery +1\\n❤️ Connection +1\')">🔥 Follow the glowing footprints</button>'+
+'<button onclick="visitJungle()">⬅ Back</button>'
+);
+}
+
 function openMayaMenu(){
 openMayaMenuFrom('crystal','visitShrine');
 }
