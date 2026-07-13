@@ -233,7 +233,7 @@ if(currentTime==='Evening'){showEmpty('🌿 Whispering Jungle','The jungle is to
 
 if(currentDay===1){
 showScene({speaker:'maya',background:'jungle',text:'Maya follows a narrow trail through the jungle.'});
-choices('<button onclick="openMayaMenuFrom(\'jungle\',\'visitJungle\')">🌿 Talk to Maya</button>'+backMap());
+choices('<button onclick="openMayaJungleMenu()">🌴 Explore with Maya</button>'+backMap());
 return;
 }
 if(currentDay===2){
