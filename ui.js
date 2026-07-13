@@ -1,7 +1,8 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.6.0 — UI System
+// Version 3.6.2 — UI System
+// Background rendering is controlled only by backgrounds.js
 // Contains portrait rendering, dialogue display, typewriter text,
 // HUD updates, relationship dashboards, choices, and UI summaries.
 
