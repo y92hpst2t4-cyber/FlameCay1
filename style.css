@@ -389,3 +389,11 @@ body.game-background > main.screen{
 position:relative;
 z-index:5;
 }
+
+
+/* VERSION 3.6.3 — CLEAN RESET */
+html,body{min-height:100%}
+body{display:block;background-color:#08657e}
+.screen{position:relative;z-index:2;margin:0 auto;min-height:100vh}
+#story{font-size:17px;line-height:1.6;min-height:40px}
+@media(max-width:600px){body{background-attachment:scroll!important}.screen{padding:18px}}
