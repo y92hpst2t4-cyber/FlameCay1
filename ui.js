@@ -1,7 +1,7 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.5.0f — UI System
+// Version 3.6.0 — UI System
 // Contains portrait rendering, dialogue display, typewriter text,
 // HUD updates, relationship dashboards, choices, and UI summaries.
 
@@ -257,10 +257,7 @@ q('portrait').textContent=c.emoji;
 typeText(s.text);
 }
 
-function changeBackground(s){
-const b={arrival:'linear-gradient(180deg,#70d8ff,#08657e)',villa:'linear-gradient(180deg,#58c7e8,#0b718c)',beach:'linear-gradient(180deg,#7ee8ff,#167c99)',crystal:'linear-gradient(180deg,#1b335f,#061322)',jungle:'linear-gradient(180deg,#3d8b55,#153f2b)',volcano:'linear-gradient(180deg,#7f3b2f,#25100d)',afternoon:'linear-gradient(180deg,#ffbf69,#267b91)',night:'linear-gradient(180deg,#182650,#050812)'};
-document.body.style.background=b[s]||b.villa;
-}
+// Animated background rendering is loaded from backgrounds.js
 
 function typeText(t){
 if(typingTimer)clearTimeout(typingTimer);
