@@ -2,7 +2,7 @@
 
 // The Island of Flames
 // Version 3.6.2 — Dynamic Background Manager
-// Patch: Main Villa morning background priority fix
+// Patch: correct map-location priority for Villa, Pool, Fire Pit, and Arrival Beach
 
 const BACKGROUND_SCENES = {
 arrival:{top:'#72ddff',middle:'#1f9fc2',bottom:'#07566d',glow:'rgba(255,224,135,.42)',accent:'rgba(255,255,255,.28)',motion:'ocean'},
@@ -130,12 +130,47 @@ const currentKey=String(
 typeof currentLocation==='string'?currentLocation:''
 ).toLowerCase();
 
-// Use the scene requested by showScene first.
+/*
+Use the real map location for Pool and Fire Pit.
+Their story scenes sometimes use generic labels such as
+"beach", "afternoon", or "night".
+*/
+if(currentKey==='pool')return 'pool';
+if(currentKey==='firepit')return 'firepit';
+
+/*
+Arrival Beach must keep its own art while the player is there.
+*/
+if(currentKey==='beach')return 'arrival';
+
+/*
+During the opening, currentLocation begins as "villa",
+but the story is showing Arrival Beach. Let the explicit
+Arrival/Beach scene win in that situation.
+*/
+if(sceneKey==='arrival'||sceneKey==='beach')return 'arrival';
+
+/*
+Use Villa art for Villa, Kitchen, and Gym scenes.
+*/
+if(
+currentKey==='villa'||
+currentKey==='kitchen'||
+currentKey==='gym'
+){
+return 'villa';
+}
+
+/*
+Use any other explicit supported scene.
+*/
 if(PACKED_LOCATION_ALIASES[sceneKey]){
 return PACKED_LOCATION_ALIASES[sceneKey];
 }
 
-// Fall back to the player's current map location.
+/*
+Final fallback to the current location.
+*/
 if(PACKED_LOCATION_ALIASES[currentKey]){
 return PACKED_LOCATION_ALIASES[currentKey];
 }
@@ -185,7 +220,8 @@ const image=new Image();
 
 image.onload=()=>{
 loadedBackgroundCache.add(src);
-resolve(src);
+const separator=src.includes('?')?'&':'?';
+resolve(src+separator+'v=3627');
 };
 
 image.onerror=()=>{
@@ -194,7 +230,8 @@ loadFirstAvailableBackground(candidates,index+1)
 .catch(reject);
 };
 
-image.src=src;
+const separator=src.includes('?')?'&':'?';
+image.src=src+separator+'v=3627';
 });
 }
 
@@ -209,6 +246,7 @@ const incoming=active===first?second:first;
 if(currentRealBackground===src)return;
 
 incoming.style.backgroundImage=`url("${src}")`;
+incoming.style.backgroundPosition='center top';
 incoming.classList.add('active');
 active.classList.remove('active');
 
