@@ -1,17 +1,14 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.6.3 — Clean Reset Core Engine
+// Version 3.6.4 — Clean Reset Core Engine
 // Contains game state, scene rendering, navigation, relationship systems,
 // villa-life systems, consequence systems, and HUD updates.
 
-let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='3.5.0e',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false,secondEliminationStarted=false,secondEliminationSaved='',secondEliminatedPerson='',secondEliminationComplete=false,finalWeekStarted=false,familyMessageChoice='',finalWeekChoice='',finalWeekComplete=false,finalDateStarted=false,finalDatePartner='',finalDateChoice='',finalDatePromise='',finalDateComplete=false,finaleStarted=false,finalSpeechChoice='',finaleScore=0,finaleEnding='',finaleWinner=false,keeperChosen=false,finaleComplete=false,villaLifeVisits=0,villaLifeEventIndex=0,villaLifeLastLocation='',villaLifeGossip=[],villaLifeMemories={},attractionStats={},jealousyStats={},characterMoods={},playerReputation=0,reputationHistory=[],relationshipHistory=[],storyFlags={},choiceHistory=[],pendingConsequences=[],resolvedConsequences=[];
+let playerName='Player',dialogueIndex=0,typingTimer=null,pendingLocation='',currentLocation='villa',currentDay=1,currentTime='Morning',actionUsed=false,eveningEventDone=false,coupledWith='',couplingRomance=0,couplingTrust=0,ceremonyComplete=false,challengeScore=0,challengeQuestion=0,challengeComplete=false,bombshellChoice='',bombshellComplete=false,eliminationComplete=false,eliminatedPerson='',savedPerson='',atRisk=[],currentSaveSlot=0,lastSaveTime='',saveVersion='3.6.4',dateInvitee='',dateChoice='',dateComplete=false,casaStarted=false,casaChoice='',casaPartnerReaction='',casaComplete=false,recouplingChoice='',recouplingPartnerChoice='',recouplingComplete=false,previousPartner='',falloutStarted=false,falloutChoice='',falloutComplete=false,compatibilityStarted=false,compatibilityScore=0,compatibilityQuestion=0,compatibilityPartner='',compatibilityComplete=false,luxuryDateStarted=false,luxuryDateChoice='',luxuryDateResult='',luxuryDateComplete=false,secretVoteStarted=false,secretVoteChoice='',secretVoteResult='',secretVoteComplete=false,secondEliminationStarted=false,secondEliminationSaved='',secondEliminatedPerson='',secondEliminationComplete=false,finalWeekStarted=false,familyMessageChoice='',finalWeekChoice='',finalWeekComplete=false,finalDateStarted=false,finalDatePartner='',finalDateChoice='',finalDatePromise='',finalDateComplete=false,finaleStarted=false,finalSpeechChoice='',finaleScore=0,finaleEnding='',finaleWinner=false,keeperChosen=false,finaleComplete=false,villaLifeVisits=0,villaLifeEventIndex=0,villaLifeLastLocation='',villaLifeGossip=[],villaLifeMemories={},attractionStats={},jealousyStats={},characterMoods={},playerReputation=0,reputationHistory=[],relationshipHistory=[],storyFlags={},choiceHistory=[],pendingConsequences=[],resolvedConsequences=[];
 let menuBackground='villa',menuBack='openIslandMap';
 
 // Character data loaded from characters.js
-
-
-
 
 // Story data loaded from story.js
 
@@ -198,9 +195,6 @@ text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+' has been restor
 choices('<button onclick="openIslandMap()">🗺️ Continue Game</button>');
 }
 
-
-
-
 function initializeChoiceConsequences(){
 const defaults={
 flirtedOutsideCouple:false,
@@ -354,7 +348,6 @@ return true;
 
 function getConsequenceTitle(){
 const total=choiceHistory.length;
-const unresolved=pendingConsequences.length;
 
 if(total>=20)return 'Choices Shape Everything';
 if(total>=10)return 'Your Story Is Changing';
@@ -1043,7 +1036,6 @@ updateVillaLifeStatus();
 resumeSavedProgress();
 }
 
-
 function startGame(){
 preloadPortraits();
 playerName=q('playerName').value.trim()||'Player';
@@ -1081,13 +1073,6 @@ updateConsequenceSummary();
 }
 
 function nextDialogue() {
-  /*
-    First tap while text is typing:
-    immediately finishes the current sentence.
-
-    Second tap:
-    moves to the next dialogue scene.
-  */
   if (isTyping) {
     finishTypingImmediately();
     return;
@@ -1214,6 +1199,7 @@ firepit:visitFirePit,
 cove:visitCove,
 volcano:visitVolcano
 }[loc]||visitVilla)();
+}
 
 /* DAY 1 + DAY 2 + DAY 3 MORNING + DAY 4 MORNING SCHEDULES */
 
