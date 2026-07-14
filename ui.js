@@ -1,7 +1,7 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.6.3 — Clean Reset UI System
+// Version 3.6.4 — Episode 1 Progress UI System
 // Background rendering is controlled only by backgrounds.js
 // Contains portrait rendering, dialogue display, typewriter text,
 // HUD updates, relationship dashboards, choices, and UI summaries.
@@ -260,6 +260,7 @@ typeText(s.text);
 
 // Animated background rendering is loaded from backgrounds.js
 
+let typingTimer = null;
 let isTyping = false;
 let currentTypingText = '';
 let currentTypingIndex = 0;
