@@ -3,8 +3,8 @@
 // The Island of Flames
 // Version 3.6.4 — Episode 1 Progress UI System
 // Background rendering is controlled only by backgrounds.js
-// Contains portrait rendering, dialogue display, typewriter text,
-// HUD updates, relationship dashboards, choices, and UI summaries.
+// Contains portrait rendering, dialogue display, HUD updates,
+// relationship dashboards, choices, and UI summaries.
 
 const portraitCache={};
 
@@ -211,7 +211,13 @@ function choices(html){q('choices').innerHTML=html;q('choices').classList.remove
 function backMap(){return '<button onclick="openIslandMap()">⬅ Back to Map</button>'}
 
 function showScene(s){
-const c=characters[s.speaker];
+const c=characters[s.speaker]||{
+name:'Narrator',
+title:'The Story Begins',
+emoji:'🌴',
+image:''
+};
+
 changeBackground(s.background);
 q('dialogueCard').classList.remove('hidden');
 q('portraitBox').classList.remove('hidden');
@@ -255,114 +261,74 @@ portraitImg.style.display='none';
 q('portrait').style.display='flex';
 q('portrait').textContent=c.emoji;
 }
+
 typeText(s.text);
 }
 
 // Animated background rendering is loaded from backgrounds.js
 
-let isTyping = false;
-let currentTypingText = '';
-let currentTypingIndex = 0;
+let isTyping=false;
+let currentTypingText='';
+let currentTypingIndex=0;
 
-function formatDialogueText(text) {
-  return String(text || '')
-    .replace(/\{\{playerName\}\}/g, playerName)
-    .replace(/\{playerName\}/g, playerName);
+function formatDialogueText(text){
+return String(text||'')
+.replace(/\{\{playerName\}\}/g,playerName)
+.replace(/\{playerName\}/g,playerName);
 }
 
-function typeText(text) {
-  if (typingTimer) {
-    clearTimeout(typingTimer);
-  }
-
-  currentTypingText = formatDialogueText(text);
-  currentTypingIndex = 0;
-  isTyping = true;
-
-  q('story').innerHTML = '';
-
-  const continueButton = q('continueButton');
-
-  if (continueButton && continueButton.style.display !== 'none') {
-    continueButton.disabled = false;
-    continueButton.textContent = '⏩ Finish Text';
-  }
-
-  function typeNextCharacter() {
-    if (currentTypingIndex >= currentTypingText.length) {
-      finishTypingNormally();
-      return;
-    }
-
-    const character = currentTypingText[currentTypingIndex];
-
-    if (character === '\n') {
-      q('story').insertAdjacentHTML('beforeend', '<br>');
-    } else {
-      q('story').append(document.createTextNode(character));
-    }
-
-    currentTypingIndex++;
-
-    const delay =
-      character === '.' || character === '!' || character === '?'
-        ? 120
-        : character === ',' || character === ':'
-        ? 60
-        : 20;
-
-    typingTimer = setTimeout(typeNextCharacter, delay);
-  }
-
-  typeNextCharacter();
+// Stable dialogue display.
+// The full text appears immediately so the story cannot get stuck.
+function typeText(text){
+if(typeof typingTimer!=='undefined'&&typingTimer){
+clearTimeout(typingTimer);
 }
 
-function finishTypingNormally() {
-  if (typingTimer) {
-    clearTimeout(typingTimer);
-  }
-
-  typingTimer = null;
-  isTyping = false;
-  currentTypingIndex = currentTypingText.length;
-
-  const continueButton = q('continueButton');
-
-  if (continueButton && continueButton.style.display !== 'none') {
-    continueButton.disabled = false;
-    continueButton.textContent = '▶ Continue';
-  }
+if(typeof typingTimer!=='undefined'){
+typingTimer=null;
 }
 
-function finishTypingImmediately() {
-  if (!isTyping) {
-    return;
-  }
+isTyping=false;
+currentTypingText=formatDialogueText(text);
+currentTypingIndex=currentTypingText.length;
 
-  if (typingTimer) {
-    clearTimeout(typingTimer);
-  }
+const story=q('story');
 
-  typingTimer = null;
-  isTyping = false;
-  currentTypingIndex = currentTypingText.length;
+if(!story)return;
 
-  q('story').innerHTML = '';
+story.innerHTML='';
 
-  currentTypingText.split('\n').forEach((line, index, lines) => {
-    q('story').append(document.createTextNode(line));
+currentTypingText.split('\n').forEach((line,index,lines)=>{
+story.appendChild(document.createTextNode(line));
 
-    if (index < lines.length - 1) {
-      q('story').append(document.createElement('br'));
-    }
-  });
+if(index<lines.length-1){
+story.appendChild(document.createElement('br'));
+}
+});
 
-  const continueButton = q('continueButton');
+const continueButton=q('continueButton');
 
-  if (continueButton && continueButton.style.display !== 'none') {
-    continueButton.disabled = false;
-    continueButton.textContent = '▶ Continue';
-  }
+if(continueButton&&continueButton.style.display!=='none'){
+continueButton.disabled=false;
+continueButton.textContent='▶ Continue';
+}
+}
+
+function finishTypingNormally(){
+isTyping=false;
+currentTypingIndex=currentTypingText.length;
+
+const continueButton=q('continueButton');
+
+if(continueButton&&continueButton.style.display!=='none'){
+continueButton.disabled=false;
+continueButton.textContent='▶ Continue';
+}
+}
+
+function finishTypingImmediately(){
+if(!isTyping)return;
+typeText(currentTypingText);
 }
 
 function updateTimeDisplay(){
