@@ -1,7 +1,7 @@
 'use strict';
 
 // The Island of Flames
-// Version 3.6.3 — Story System
+// Version 3.6.4 — Story System
 // Contains Season 1 dialogue data, location story scenes,
 // ceremonies, dates, eliminations, Casa events, and the finale.
 
@@ -212,12 +212,12 @@ showEmpty('🏡 Main Villa','The villa is quiet right now.','villa');
 function visitShrine(){
 if(currentTime==='Evening'){
 showScene({speaker:'maya',background:'crystal',text:'Maya stands inside the glowing shrine.\n\n"The Flame is stronger tonight," she whispers.'});
-choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the Crystal Flame</button>'+backMap());
+choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="openCrystalRouteMenu()">🔥 Follow the Crystal Route</button>'+backMap());
 return;
 }
 if(currentDay===3&&currentTime==='Morning'){
 showScene({speaker:'maya',background:'crystal',text:'Maya has uncovered a new symbol inside the shrine.\n\nIt looks like two flames joining together.'});
-choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the new symbol</button>'+backMap());
+choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="openCrystalRouteMenu()">🔥 Follow the new Crystal Route</button>'+backMap());
 return;
 }
 if(currentDay===4&&currentTime==='Morning'){
@@ -225,7 +225,7 @@ partnerMorningScene('maya','Maya is comparing the new symbol with an old carving
 return;
 }
 showScene({speaker:'maya',background:'crystal',text:'Maya studies the glowing symbols carved into the shrine.'});
-choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="examineCrystal()">🔥 Examine the Crystal Flame</button>'+backMap());
+choices('<button onclick="openMayaMenu()">🌿 Talk to Maya</button><button onclick="openCrystalRouteMenu()">🔥 Follow the Crystal Route</button>'+backMap());
 }
 
 function visitJungle(){
@@ -588,6 +588,56 @@ showCompletedButtons();
 
 function showCompletedButtons(){
 choices('<button onclick="openIslandMap()">🗺️ Return to Map</button><button onclick="advanceTime()">'+getAdvanceButtonText()+'</button>');
+}
+
+function openCrystalRouteMenu(){
+if(actionAlreadyUsed())return;
+
+menuBackground='crystal';
+menuBack='visitShrine';
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The Crystal Flame pulses brighter as you step closer.\n\nThree glowing symbols appear around the shrine.\n\nWhich path will you follow?'
+});
+
+choices(
+'<button onclick="completeCrystalRoute(\'love\')">❤️ Follow the symbol of love</button>'+
+'<button onclick="completeCrystalRoute(\'truth\')">💎 Follow the symbol of truth</button>'+
+'<button onclick="completeCrystalRoute(\'courage\')">🔥 Follow the symbol of courage</button>'+
+'<button onclick="visitShrine()">⬅ Back</button>'
+);
+}
+
+function completeCrystalRoute(path){
+if(actionAlreadyUsed())return;
+
+let text='';
+
+if(path==='love'){
+text='The Crystal Flame shows two figures standing together beneath the Fire Pit.\n\nA whisper says: "The strongest flame is shared."\n\n❤️ Connection with your partner +1';
+if(coupledWith&&relationships[coupledWith]!==undefined){
+relationships[coupledWith]++;
+}
+}else if(path==='truth'){
+text='The Crystal Flame reveals a hidden mark beneath the shrine floor.\n\nA whisper says: "Every secret leaves a shadow."\n\n🔥 Mystery +1';
+mayaStats.mystery++;
+}else{
+text='The Crystal Flame burns brighter without harming you.\n\nA whisper says: "Courage is choosing before the ending is known."\n\n🔥 Reputation +1';
+changeReputation(1,'Followed the Crystal path of courage');
+}
+
+completeAction();
+updateRelationships();
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:text+'\n\n✅ Activity complete.'
+});
+
+showCompletedButtons();
 }
 
 function examineCrystal(){
