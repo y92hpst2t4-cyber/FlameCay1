@@ -1,19 +1,31 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>The Island of Flames</title>
-<link rel="stylesheet" href="style.css?v=364">
+
+<link rel="stylesheet" href="style.css?v=3648">
+
 </head>
 
 <body>
+
 <main class="screen">
 
 <section id="menu">
+
 <button id="soundToggle" onclick="toggleSound()">🔊 Sound On</button>
+
 <h1>🔥 The Island of Flames</h1>
+
 <h2>Season 1 — The Crystal Awakens</h2>
+
 <p><strong>Version 3.6.4 — Episode 1 Progress Build</strong></p>
 
 <input id="playerName" placeholder="Enter your name">
@@ -21,117 +33,193 @@
 <button onclick="startGame()">▶ New Game</button>
 
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">
+
 ▶ Continue Latest Save
+
 </button>
 
 <button class="loadButton" onclick="openLoadMenu()">📂 Load Game</button>
 
 <div id="loadMenu" class="card hidden">
+
 <h3>📂 Load Game</h3>
+
 <div id="loadSlotList"></div>
+
 <button onclick="closeLoadMenu()">⬅ Back</button>
+
 </div>
+
 </section>
 
 <section id="game" class="hidden">
+
 <h2 id="welcome">Welcome to Flame Cay</h2>
 
 <div class="card">
+
 <h3>📅 Day <span id="dayNumber">1</span></h3>
+
 <h3><span id="timeIcon">☀️</span> <span id="timePeriod">Morning</span></h3>
+
 <p id="actionStatus">⭐ One activity available</p>
+
 </div>
 
 <div id="portraitBox" class="hidden">
+
 <img id="portraitImage" alt="Character Portrait">
+
 <div id="portrait">🌴</div>
+
 <div>
+
 <h3 id="speakerName" style="margin:0">Narrator</h3>
+
 <p id="speakerTitle" style="margin:0;color:#666">The Story Begins</p>
+
 </div>
+
 </div>
 
 <div id="dialogueCard" class="card">
+
 <p id="story" style="font-size:17px;line-height:1.6;min-height:40px"></p>
+
 <button id="continueButton" onclick="nextDialogue()">▶ Continue</button>
+
 </div>
 
 <div id="choices" class="hidden"></div>
 
 <section id="walkingScreen" class="hidden">
+
 <div class="card">
+
 <h2 id="walkingTitle">🚶 Exploring Flame Cay</h2>
+
 <p id="walkingText"></p>
+
 <button onclick="finishWalking()">Continue Walking ➜</button>
+
 </div>
+
 </section>
 
 <section id="islandMap" class="hidden">
+
 <div class="card">
+
 <h2>🗺️ Flame Cay Map</h2>
+
 <p id="mapTimeText"></p>
+
 <p id="mapActionText"></p>
+
 <button onclick="startWalking('volcano')">🌋 Volcano Peak</button>
+
 <button onclick="startWalking('jungle')">🌿 Whispering Jungle</button>
+
 <button onclick="startWalking('shrine')">💎 Crystal Shrine</button>
+
 <button onclick="startWalking('beach')">🏖 Arrival Beach</button>
+
 <button onclick="startWalking('villa')">🏡 Main Villa</button>
+
 <button onclick="startWalking('village')">🏝️ Flame Village</button>
+
 <button onclick="startWalking('gym')">💪 Gym</button>
+
 <button onclick="startWalking('kitchen')">🍳 Kitchen</button>
+
 <button onclick="startWalking('pool')">🏊 Infinity Pool</button>
+
 <button onclick="startWalking('firepit')">🔥 Fire Pit</button>
+
 <button onclick="startWalking('cove')">🌙 Moonlight Cove</button>
+
 <button id="advanceTimeButton" onclick="advanceTime()">⏰ Skip This Time Period</button>
+
 </div>
+
 </section>
 
 <div class="card" id="savePanel">
+
 <h3>💾 Save Game</h3>
+
 <p id="saveStatus">Choose a save slot.</p>
+
 <button class="saveButton" onclick="saveGame(1)">💾 Save Slot 1</button>
+
 <button class="saveButton" onclick="saveGame(2)">💾 Save Slot 2</button>
+
 <button class="saveButton" onclick="saveGame(3)">💾 Save Slot 3</button>
+
 <button class="loadButton" onclick="openInGameLoadMenu()">📂 Load Another Save</button>
+
 <div id="inGameLoadMenu" class="hidden">
+
 <div id="inGameLoadSlotList"></div>
+
 <button onclick="closeInGameLoadMenu()">⬅ Close Load Menu</button>
+
 </div>
+
 </div>
 
 <div class="card consequenceCard" id="choiceConsequencesPanel">
+
 <h3>🧭 Choice Consequences</h3>
+
 <p id="consequenceSummary">Your important decisions are remembered.</p>
+
 <button class="consequenceButton" onclick="openChoiceConsequencesDashboard()">📜 View Consequences</button>
+
 </div>
 
 <div class="card relationshipCard" id="relationshipSystemPanel">
+
 <h3>❤️ Relationship System 2.0</h3>
+
 <p id="reputationSummary" class="reputationBox">Reputation: New Arrival</p>
+
 <button class="relationshipButton" onclick="openRelationshipDashboard()">📊 Open Relationship Dashboard</button>
+
 </div>
 
 <div class="card" id="villaLifePanel">
+
 <h3>🏡 Better Villa Life</h3>
+
 <p>See what the Islanders are doing between major story scenes.</p>
+
 <button class="villaLifeButton" onclick="openVillaLifeHub()">👀 Explore Living Villa</button>
+
 <p id="villaLifeStatus" class="memoryNote">NPC conversations, gossip, and changing daily schedules are active.</p>
+
 </div>
 
 <div class="card" id="relationshipBox"></div>
+
 </section>
 
 </main>
 
-<script src="characters.js?v=364"></script>
-<script src="story.js?v=364"></script>
-<script src="save.js?v=364"></script>
-<script src="backgrounds.js?v=364"></script>
-<script src="ui.js?v=364"></script>
-<script src="engine.js?v=364"></script>
-<script src="sound-system.js?v=364"></script>
+<script src="characters.js?v=3648"></script>
+
+<script src="story.js?v=3648"></script>
+
+<script src="save.js?v=3648"></script>
+
+<script src="backgrounds.js?v=3648"></script>
+
+<script src="ui.js?v=3648"></script>
+
+<script src="engine.js?v=3648"></script>
+
+<script src="sound-system.js?v=3648"></script>
 
 </body>
+
 </html>
-
-
