@@ -787,6 +787,12 @@ eveningEventDone=false;
 currentLocation='villa';
 pendingLocation='';
 updateTimeDisplay();
+autoSaveGame();
+
+if(currentDay===2){
+startDayTwoOpening();
+return;
+}
 
 showScene({
 speaker:'narrator',
@@ -798,6 +804,81 @@ text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+
 choices(
 '<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>'
 );
+}
+
+function startDayTwoOpening(){
+['islandMap','walkingScreen'].forEach(id=>{
+q(id).classList.add('hidden');
+});
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'🌅 DAY 2 — THE FIRST BOND\n\nMorning sunlight spreads across Flame Cay.\n\nBefore anyone can leave the villa, every phone begins to glow with the Crystal Flame symbol.'
+});
+
+choices(
+'<button onclick="showDayTwoHostMessage()">📱 Read the Morning Message</button>'
+);
+}
+
+function showDayTwoHostMessage(){
+showScene({
+speaker:'host',
+background:'villa',
+text:'“Good morning, Islanders.”\n\n“Last night, the Crystal Flame watched your first choices.”\n\n“Today, it will test whether your strongest connection can survive honesty, pressure, and temptation.”'
+});
+
+choices(
+'<button onclick="showDayTwoCrystalWarning()">🔥 Continue</button>'
+);
+}
+
+function showDayTwoCrystalWarning(){
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+const chosenPerson=episodeOneProgress.relationshipChoice;
+const chosenName=chosenPerson&&characters[chosenPerson]
+?characters[chosenPerson].name
+:'No one';
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The Crystal Flame flashes beneath the villa.\n\nClosest connection: '+closestName+
+'\nYour first relationship choice: '+chosenName+
+'\n\nA whisper moves through the room:\n\n“The bond you began yesterday will be tested today.”'
+});
+
+choices(
+'<button onclick="showDayTwoConnectionScene()">❤️ See Who Finds You First</button>'
+);
+}
+
+function showDayTwoConnectionScene(){
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+const sameChoice=episodeOneProgress.relationshipChoice===closestPerson;
+
+showScene({
+speaker:closestPerson,
+background:'villa',
+text:closestName+' finds you near the villa entrance.\n\n'+
+(sameChoice
+?'“I keep thinking about our conversation yesterday,” they say.\n\n“Maybe the Crystal Flame noticed something real.”'
+:'“The island keeps pushing people together,” they say.\n\n“I want to know whether our connection could become something more.”')
+});
+
+choices(
+'<button onclick="finishDayTwoOpening()">🗺️ Begin Day 2</button>'
+);
+}
+
+function finishDayTwoOpening(){
+autoSaveGame();
+q('dialogueCard').classList.add('hidden');
+q('portraitBox').classList.add('hidden');
+openIslandMap();
 }
 
 function startCouplingCeremony(){
