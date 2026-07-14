@@ -40,6 +40,65 @@ episodeOneProgress.relationshipChoice!==''
 );
 }
 
+function getEpisodeOneClosestConnection(){
+const people=[
+'lucas',
+'maya',
+'kai',
+'isabella',
+'ethan',
+'sofia',
+'noah',
+'lisa'
+];
+
+return people.sort((a,b)=>relationships[b]-relationships[a])[0]||'maya';
+}
+
+function showEpisodeOneEnding(){
+if(episodeOneProgress.cliffhangerComplete)return;
+
+episodeOneProgress.cliffhangerComplete=true;
+
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+
+autoSaveGame();
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'🔥 EPISODE 1 COMPLETE\n\n'+
+'Closest connection: '+closestName+'\n'+
+'Crystal clues found: '+(episodeOneProgress.crystalClueFound?'1':'0')+'\n'+
+'Relationship choice: '+(
+episodeOneProgress.relationshipChoice
+?characters[episodeOneProgress.relationshipChoice].name
+:'None'
+)+
+'\n\nThe Crystal Flame suddenly flashes beneath the island.\n\n'+
+'A voice whispers:\n\n"The first bond has been chosen."\n\n'+
+'Your choices will affect Episode 2.'
+});
+
+choices(
+'<button onclick="endNight()">🌅 Continue to Episode 2</button>'
+);
+}
+
+function checkEpisodeOneEnding(){
+if(
+currentDay===1 &&
+currentTime==='Evening' &&
+episodeOneReadyForCliffhanger()
+){
+showEpisodeOneEnding();
+return true;
+}
+
+return false;
+}
+
 const introDialogue=[
 {speaker:'narrator',background:'arrival',text:'🔥 THE ISLAND OF FLAMES\n\nSeason 1\nEpisode 1 — The Arrival'},
 {speaker:'narrator',background:'arrival',text:'The sun rises over the ocean.\n\nYour boat moves toward Flame Cay.'},
@@ -696,9 +755,15 @@ showCompletedButtons();
 
 function firePitEvent(){
 if(eveningEventDone)return;
+
+if(checkEpisodeOneEnding()){
+return;
+}
+
 eveningEventDone=true;
 actionUsed=true;
 updateTimeDisplay();
+
 showScene({
 speaker:'host',
 background:'night',
@@ -706,6 +771,7 @@ text:currentDay===1
 ?'"Every choice you made today has been seen."\n\n"Rest now. Tomorrow, your next test begins."'
 :'"Day 2 draws to a close."\n\n"The island is beginning to remember your strongest connections."'
 });
+
 choices('<button onclick="endNight()">🌙 End the Night</button>');
 }
 
