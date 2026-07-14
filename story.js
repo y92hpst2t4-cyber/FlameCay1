@@ -558,6 +558,15 @@ choices('<button onclick="specialTalk(\'lisa\',\'friendship\',\'You ask Lisa wha
 
 function specialTalk(person,stat,text){
 if(actionAlreadyUsed())return;
+markCharacterMet(person);
+
+if(currentDay===1){
+markEpisodeActivity();
+}
+
+if(stat==='romance'||stat==='trust'||stat==='honesty'||stat==='openness'){
+markRelationshipChoice(person);
+}
 relationships[person]++;
 initializeRelationshipSystem();
 
@@ -647,6 +656,8 @@ choices(
 
 function completeCrystalRoute(path){
 if(actionAlreadyUsed())return;
+
+markCrystalClue();
 
 let text='';
 
