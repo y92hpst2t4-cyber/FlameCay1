@@ -260,7 +260,6 @@ typeText(s.text);
 
 // Animated background rendering is loaded from backgrounds.js
 
-let typingTimer = null;
 let isTyping = false;
 let currentTypingText = '';
 let currentTypingIndex = 0;
