@@ -1037,6 +1037,7 @@ resumeSavedProgress();
 }
 
 function startGame(){
+localStorage.removeItem(AUTO_SAVE_KEY);
 preloadPortraits();
 playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
