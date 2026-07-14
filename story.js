@@ -779,21 +779,6 @@ text:currentDay===1
 choices('<button onclick="endNight()">🌙 End the Night</button>');
 }
 
-eveningEventDone=true;
-actionUsed=true;
-updateTimeDisplay();
-
-showScene({
-speaker:'host',
-background:'night',
-text:currentDay===1
-?'"Every choice you made today has been seen."\n\n"Rest now. Tomorrow, your next test begins."'
-:'"Day 2 draws to a close."\n\n"The island is beginning to remember your strongest connections."'
-});
-
-choices('<button onclick="endNight()">🌙 End the Night</button>');
-}
-
 function endNight(){
 currentDay++;
 currentTime='Morning';
@@ -802,19 +787,38 @@ eveningEventDone=false;
 currentLocation='villa';
 pendingLocation='';
 updateTimeDisplay();
-showScene({speaker:'narrator',background:'arrival',text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+'\n☀️ Morning\n\n⭐ One new activity is available.'});
-choices('<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>');
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+
+'\n☀️ Morning\n\n⭐ One new activity is available.'
+});
+
+choices(
+'<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>'
+);
 }
 
 function startCouplingCeremony(){
-if(ceremonyComplete){showVersionComplete();return}
-['islandMap','walkingScreen'].forEach(x=>q(x).classList.add('hidden'));
+if(ceremonyComplete){
+showVersionComplete();
+return;
+}
+
+['islandMap','walkingScreen'].forEach(id=>{
+q(id).classList.add('hidden');
+});
+
 showScene({
 speaker:'host',
 background:'night',
 text:'The sky darkens as every Islander gathers around the Fire Pit.\n\nThe Crystal Flame rises higher than before.\n\n"Islanders... tonight, you will make your first choice."'
 });
-choices('<button class="ceremonyButton" onclick="showCouplingChoices()">🔥 Continue to the Ceremony</button>');
+
+choices(
+'<button class="ceremonyButton" onclick="showCouplingChoices()">🔥 Continue to the Ceremony</button>'
+);
 }
 
 function showCouplingChoices(){
@@ -823,6 +827,7 @@ speaker:'host',
 background:'night',
 text:'"Choose the person you want to couple with."\n\n"Your decision will change your relationships and the future of Flame Cay."'
 });
+
 choices(
 '<div class="card"><h3 class="couplingTitle">❤️ Choose Your First Partner</h3>'+
 '<button class="couplingChoice" onclick="chooseCouple(\'lucas\')">🏊 Couple with Lucas</button>'+
@@ -832,10 +837,10 @@ choices(
 '<button class="couplingChoice" onclick="chooseCouple(\'ethan\')">💼 Couple with Ethan</button>'+
 '<button class="couplingChoice" onclick="chooseCouple(\'sofia\')">🌹 Couple with Sofia</button>'+
 '<button class="couplingChoice" onclick="chooseCouple(\'noah\')">🚒 Couple with Noah</button>'+
-'<button class="couplingChoice" onclick="chooseCouple(\'lisa\')">💖 Couple with Lisa</button></div>'
+'<button class="couplingChoice" onclick="chooseCouple(\'lisa\')">💖 Couple with Lisa</button>'+
+'</div>'
 );
 }
-
 function chooseCouple(person){
 if(coupledWith)return;
 coupledWith=person;
