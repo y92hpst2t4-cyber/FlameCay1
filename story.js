@@ -114,6 +114,10 @@ const introDialogue=[
 {speaker:'narrator',background:'crystal',text:'Deep inside the jungle...\n\nThe Crystal Flame begins to glow.'},
 {speaker:'narrator',background:'villa',text:'Your first day begins now.\n\nChoose one main activity during each part of the day.'}
 ];
+markCharacterMet('lucas');
+markCharacterMet('kai');
+markCharacterMet('maya');
+
 const locationNames={
 volcano:'Volcano Peak',
 jungle:'Whispering Jungle',
@@ -756,8 +760,23 @@ showCompletedButtons();
 function firePitEvent(){
 if(eveningEventDone)return;
 
-if(checkEpisodeOneEnding()){
+if(currentDay===1&&checkEpisodeOneEnding()){
 return;
+}
+
+eveningEventDone=true;
+actionUsed=true;
+updateTimeDisplay();
+
+showScene({
+speaker:'host',
+background:'night',
+text:currentDay===1
+?'"Every choice you made today has been seen."\n\n"Rest now. Tomorrow, your next test begins."'
+:'"Day 2 draws to a close."\n\n"The island is beginning to remember your strongest connections."'
+});
+
+choices('<button onclick="endNight()">🌙 End the Night</button>');
 }
 
 eveningEventDone=true;
