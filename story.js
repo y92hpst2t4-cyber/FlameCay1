@@ -5,6 +5,41 @@
 // Contains Season 1 dialogue data, location story scenes,
 // ceremonies, dates, eliminations, Casa events, and the finale.
 
+const episodeOneProgress={
+charactersMet:[],
+activityComplete:false,
+crystalClueFound:false,
+relationshipChoice:'',
+cliffhangerComplete:false
+};
+
+function markCharacterMet(person){
+if(!episodeOneProgress.charactersMet.includes(person)){
+episodeOneProgress.charactersMet.push(person);
+}
+}
+
+function markEpisodeActivity(){
+episodeOneProgress.activityComplete=true;
+}
+
+function markCrystalClue(){
+episodeOneProgress.crystalClueFound=true;
+}
+
+function markRelationshipChoice(person){
+episodeOneProgress.relationshipChoice=person;
+}
+
+function episodeOneReadyForCliffhanger(){
+return(
+episodeOneProgress.charactersMet.length>=3 &&
+episodeOneProgress.activityComplete &&
+episodeOneProgress.crystalClueFound &&
+episodeOneProgress.relationshipChoice!==''
+);
+}
+
 const introDialogue=[
 {speaker:'narrator',background:'arrival',text:'🔥 THE ISLAND OF FLAMES\n\nSeason 1\nEpisode 1 — The Arrival'},
 {speaker:'narrator',background:'arrival',text:'The sun rises over the ocean.\n\nYour boat moves toward Flame Cay.'},
