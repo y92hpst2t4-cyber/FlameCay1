@@ -786,11 +786,17 @@ actionUsed=false;
 eveningEventDone=false;
 currentLocation='villa';
 pendingLocation='';
-updateTimeDisplay();
-autoSaveGame();
 
 if(currentDay===2){
 startDayTwoOpening();
+
+try{
+updateTimeDisplay();
+autoSaveGame();
+}catch(error){
+console.error('Day 2 save error:',error);
+}
+
 return;
 }
 
@@ -804,6 +810,13 @@ text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+
 choices(
 '<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>'
 );
+
+try{
+updateTimeDisplay();
+autoSaveGame();
+}catch(error){
+console.error('End night error:',error);
+}
 }
 
 function startDayTwoOpening(){
