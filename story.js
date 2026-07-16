@@ -330,6 +330,143 @@ text:result+'\n\n✅ Day 2 morning activity complete.'
 
 showCompletedButtons();
 }
+
+function getDayTwoPressureIslander(closestPerson){
+const order=['lisa','kai','isabella','ethan','sofia','noah','maya','lucas'];
+const candidates=order.filter(person=>person!==closestPerson);
+
+return candidates.sort((a,b)=>{
+const difference=(relationships[b]||0)-(relationships[a]||0);
+if(difference!==0)return difference;
+return order.indexOf(a)-order.indexOf(b);
+})[0]||'lisa';
+}
+
+function showDayTwoAfternoonPressureEvent(){
+const closestPerson=getEpisodeOneClosestConnection();
+const otherPerson=getDayTwoPressureIslander(closestPerson);
+const closestName=characters[closestPerson].name;
+const otherName=characters[otherPerson].name;
+
+if(hasStoryFlag('dayTwoAfternoonPressureComplete')){
+showScene({
+speaker:closestPerson,
+background:'afternoon',
+text:closestName+' is still beside the Infinity Pool.\n\nThe Crystal Flame pressure test has already been completed.'
+});
+
+choices(
+'<button onclick="openIslandMap()">🗺️ Return to Map</button>'+ 
+'<button onclick="advanceTime()">'+getAdvanceButtonText()+'</button>'
+);
+return;
+}
+
+if(actionAlreadyUsed())return;
+
+showScene({
+speaker:otherPerson,
+background:'afternoon',
+text:otherName+' starts a playful conversation with you beside the Infinity Pool.\n\n'+
+closestName+' is nearby and notices the attention.\n\n'+
+'Every phone flashes with a Crystal Flame message:\n\n'+
+'“A strong bond must survive attention from someone new.”'
+});
+
+choices(
+'<button onclick="chooseDayTwoAfternoonPressure(\'reassure\')">💚 Reassure '+closestName.split(' ')[0]+'</button>'+ 
+'<button onclick="chooseDayTwoAfternoonPressure(\'friendly\')">🙂 Keep the conversation friendly</button>'+ 
+'<button onclick="chooseDayTwoAfternoonPressure(\'flirt\')">😏 Flirt with '+otherName.split(' ')[0]+'</button>'+ 
+backMap()
+);
+}
+
+function chooseDayTwoAfternoonPressure(choice){
+if(actionAlreadyUsed()||hasStoryFlag('dayTwoAfternoonPressureComplete'))return;
+
+const closestPerson=getEpisodeOneClosestConnection();
+const otherPerson=getDayTwoPressureIslander(closestPerson);
+const closestName=characters[closestPerson].name;
+const otherName=characters[otherPerson].name;
+let result='';
+let effects={};
+
+if(choice==='reassure'){
+relationships[closestPerson]+=2;
+addDayTwoTrust(closestPerson,2);
+changeJealousy(closestPerson,-2,'Reassured during the Day 2 pressure test');
+changeReputation(2,'Protected the first bond under pressure');
+
+result='You include '+closestName+' in the conversation and make your intentions clear.\n\n'+
+closestName+' relaxes when they realize you are not hiding anything.\n\n'+
+'❤️ '+closestName.split(' ')[0]+' Connection +2\n💚 Trust +2\n⚠️ Jealousy -2';
+effects={connection:{[closestPerson]:2},jealousy:{[closestPerson]:-2}};
+}else if(choice==='friendly'){
+relationships[closestPerson]+=1;
+relationships[otherPerson]+=1;
+changeJealousy(closestPerson,-1,'The player kept the pressure-test conversation friendly');
+changeAttraction(otherPerson,1,'Friendly Day 2 pool conversation');
+changeReputation(1,'Handled attention respectfully');
+
+result='You keep the conversation warm but clearly friendly.\n\n'+
+otherName+' respects the boundary, and '+closestName+' appreciates your honesty.\n\n'+
+'❤️ '+closestName.split(' ')[0]+' Connection +1\n❤️ '+otherName.split(' ')[0]+' Connection +1';
+effects={connection:{[closestPerson]:1,[otherPerson]:1}};
+}else{
+relationships[otherPerson]+=2;
+relationships[closestPerson]=Math.max(0,relationships[closestPerson]-1);
+changeAttraction(otherPerson,7,'Flirted during the Day 2 pressure test');
+changeJealousy(closestPerson,8,'Saw the player flirt during the Day 2 pressure test');
+changeReputation(-2,'Flirted during the first bond pressure test');
+setStoryFlag('dayTwoPressureFlirt',true,'Flirted with '+otherName+' during the Day 2 pressure test');
+
+scheduleConsequence(
+'day_two_pressure_flirt_consequence',
+'The Pool Flirtation Is Remembered',
+closestName+' remembers seeing you flirt with '+otherName+' during the First Bond Test.',
+'dayTwoPressureFlirt',
+1,
+{jealousy:{[closestPerson]:5},connection:{[closestPerson]:-1}}
+);
+
+result='You match '+otherName+'’s energy and flirt openly.\n\n'+
+closestName+' becomes quiet as the Crystal Flame turns red.\n\n'+
+'❤️ '+otherName.split(' ')[0]+' Connection +2\n🔥 Attraction +7\n💔 '+closestName.split(' ')[0]+' Connection -1\n⚠️ Jealousy +8';
+effects={connection:{[otherPerson]:2,[closestPerson]:-1},jealousy:{[closestPerson]:8}};
+}
+
+setStoryFlag(
+'dayTwoAfternoonPressureComplete',
+true,
+'Completed the Day 2 afternoon Pressure Test with '+closestName+' and '+otherName
+);
+
+recordChoice(
+'day_two_afternoon_'+choice,
+'Day 2 Pressure Test',
+'You chose to '+(choice==='reassure'?'reassure '+closestName:choice==='friendly'?'keep the conversation friendly':'flirt with '+otherName)+'.',
+effects
+);
+
+actionUsed=true;
+updateTimeDisplay();
+updateRelationships();
+
+try{
+autoSaveGame();
+}catch(error){
+console.error('Day 2 afternoon autosave error:',error);
+}
+
+showScene({
+speaker:choice==='flirt'?otherPerson:closestPerson,
+background:'afternoon',
+text:result+'\n\n✅ Day 2 afternoon activity complete.'
+});
+
+showCompletedButtons();
+}
+
 function partnerMorningScene(person,locationText,bg,back){
 const isPartner=coupledWith===person;
 const opening=isPartner
@@ -526,8 +663,7 @@ choices('<button onclick="openKaiMenu(\'afternoon\',\'visitPool\')">🌊 Talk to
 return;
 }
 if(currentDay===2&&currentTime==='Afternoon'){
-showScene({speaker:'noah',background:'afternoon',text:'Noah and Sofia are splashing each other in the pool.'});
-choices('<button onclick="openNoahMenu(\'afternoon\',\'visitPool\')">🚒 Talk to Noah</button><button onclick="openSofiaMenu(\'afternoon\',\'visitPool\')">🌹 Talk to Sofia</button>'+backMap());
+showDayTwoAfternoonPressureEvent();
 return;
 }
 if(currentDay===3&&currentTime==='Morning'){
