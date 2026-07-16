@@ -299,6 +299,8 @@ closestName+' notices that you avoided the question.\n\n'+
 '💔 Connection -1\n⚠️ Jealousy +4';
 }
 
+setStoryFlag('dayTwoMorningChoice_'+choice,true,'Day 2 morning choice: '+choice);
+
 setStoryFlag(
 'dayTwoMorningBondComplete',
 true,
@@ -434,6 +436,8 @@ closestName+' becomes quiet as the Crystal Flame turns red.\n\n'+
 '❤️ '+otherName.split(' ')[0]+' Connection +2\n🔥 Attraction +7\n💔 '+closestName.split(' ')[0]+' Connection -1\n⚠️ Jealousy +8';
 effects={connection:{[otherPerson]:2,[closestPerson]:-1},jealousy:{[closestPerson]:8}};
 }
+
+setStoryFlag('dayTwoAfternoonChoice_'+choice,true,'Day 2 afternoon choice: '+choice);
 
 setStoryFlag(
 'dayTwoAfternoonPressureComplete',
@@ -1009,10 +1013,168 @@ showScene({speaker:'narrator',background:'crystal',text:crystalText});
 showCompletedButtons();
 }
 
+function getDayTwoBondJudgment(){
+const honest=hasStoryFlag('dayTwoMorningChoice_honest');
+const small=hasStoryFlag('dayTwoMorningChoice_small');
+const avoided=hasStoryFlag('dayTwoMorningChoice_avoid');
+const reassured=hasStoryFlag('dayTwoAfternoonChoice_reassure');
+const friendly=hasStoryFlag('dayTwoAfternoonChoice_friendly');
+const flirted=hasStoryFlag('dayTwoAfternoonChoice_flirt');
+
+if(honest&&reassured)return 'strong';
+if(avoided||flirted)return 'tense';
+if((honest&&friendly)||(small&&reassured))return 'growing';
+return 'uncertain';
+}
+
+function startDayTwoEveningJudgment(){
+if(hasStoryFlag('dayTwoEveningJudgmentComplete')){
+showScene({
+speaker:'host',
+background:'night',
+text:'The First Bond Judgment has already been completed.\n\nThe Crystal Flame waits for the next morning.'
+});
+choices('<button onclick="endNight()">🌙 End the Night</button>');
+return;
+}
+
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+const result=getDayTwoBondJudgment();
+
+let title='';
+let judgment='';
+
+if(result==='strong'){
+title='🔥 STRONG FIRST BOND';
+judgment='The Crystal Flame turns gold between you and '+closestName+'.\n\n"Honesty was protected under pressure."';
+}else if(result==='growing'){
+title='❤️ GROWING FIRST BOND';
+judgment='The Crystal Flame glows steadily between you and '+closestName+'.\n\n"This bond is growing, but it still needs courage."';
+}else if(result==='tense'){
+title='⚠️ FIRST BOND UNDER PRESSURE';
+judgment='The Crystal Flame flashes red between you and '+closestName+'.\n\n"Avoided truths and divided attention leave shadows."';
+}else{
+title='💬 UNCERTAIN FIRST BOND';
+judgment='The Crystal Flame flickers between you and '+closestName+'.\n\n"The connection remains, but its future is undecided."';
+}
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'Every Islander gathers around the Fire Pit.\n\n"Tonight, the Crystal Flame will judge the first bond."\n\n'+title+'\n\n'+judgment
+});
+
+choices('<button onclick="showDayTwoClosestReaction()">❤️ Hear '+closestName.split(' ')[0]+'’s Reaction</button>');
+}
+
+function showDayTwoClosestReaction(){
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+const result=getDayTwoBondJudgment();
+let text='';
+
+if(result==='strong'){
+text='"You were honest with me, and you made me feel secure when it mattered," '+closestName+' says.\n\n"I want to keep building this."';
+}else if(result==='growing'){
+text='"Today was not perfect, but I felt something real," '+closestName+' says.\n\n"I think this connection deserves another chance."';
+}else if(result==='tense'){
+text='"I cannot ignore what happened today," '+closestName+' says.\n\n"I need to know whether I can trust you."';
+}else{
+text='"I still do not know where we stand," '+closestName+' says.\n\n"Tomorrow may give us an answer."';
+}
+
+showScene({speaker:closestPerson,background:'night',text:text});
+choices(
+'<button onclick="finishDayTwoJudgment(\'commit\')">💚 Promise to protect the bond</button>'+ 
+'<button onclick="finishDayTwoJudgment(\'honest\')">💬 Promise complete honesty</button>'+ 
+'<button onclick="finishDayTwoJudgment(\'space\')">🌙 Ask for time and space</button>'
+);
+}
+
+function finishDayTwoJudgment(choice){
+if(hasStoryFlag('dayTwoEveningJudgmentComplete'))return;
+
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+const result=getDayTwoBondJudgment();
+let reward='';
+
+if(result==='strong'){
+relationships[closestPerson]+=3;
+addDayTwoTrust(closestPerson,2);
+changeJealousy(closestPerson,-3,'Strong Day 2 bond judgment');
+reward='❤️ Connection +3\n💚 Trust +2\n⚠️ Jealousy -3';
+}else if(result==='growing'){
+relationships[closestPerson]+=2;
+addDayTwoTrust(closestPerson,1);
+changeJealousy(closestPerson,-1,'Growing Day 2 bond judgment');
+reward='❤️ Connection +2\n💚 Trust +1\n⚠️ Jealousy -1';
+}else if(result==='tense'){
+relationships[closestPerson]=Math.max(0,relationships[closestPerson]-1);
+changeJealousy(closestPerson,4,'Tense Day 2 bond judgment');
+reward='💔 Connection -1\n⚠️ Jealousy +4';
+}else{
+relationships[closestPerson]+=1;
+reward='❤️ Connection +1';
+}
+
+if(choice==='commit'){
+relationships[closestPerson]+=2;
+addDayTwoTrust(closestPerson,1);
+changeReputation(1,'Committed to protecting the first bond');
+reward+='\n❤️ Final promise Connection +2\n💚 Final promise Trust +1';
+}else if(choice==='honest'){
+relationships[closestPerson]+=1;
+addDayTwoTrust(closestPerson,2);
+changeJealousy(closestPerson,-2,'Promised complete honesty');
+changeReputation(2,'Promised complete honesty after the First Bond Judgment');
+reward+='\n❤️ Final promise Connection +1\n💚 Final promise Trust +2\n⚠️ Jealousy -2';
+}else{
+changeJealousy(closestPerson,2,'Asked for space after the First Bond Judgment');
+reward+='\n⚠️ Jealousy +2';
+}
+
+setStoryFlag('dayTwoEveningJudgmentComplete',true,'Completed the Day 2 First Bond Judgment with '+closestName);
+setStoryFlag('dayTwoEveningResult_'+result,true,'Day 2 bond result: '+result);
+setStoryFlag('dayTwoEveningPromise_'+choice,true,'Day 2 final promise: '+choice);
+
+recordChoice(
+'day_two_evening_'+result+'_'+choice,
+'Day 2 First Bond Judgment',
+'Your bond with '+closestName+' was judged as '+result+', and you chose '+choice+'.',
+{connection:{[closestPerson]:result==='strong'?3:result==='growing'?2:result==='tense'?-1:1}}
+);
+
+eveningEventDone=true;
+actionUsed=true;
+updateTimeDisplay();
+updateRelationships();
+
+try{
+autoSaveGame();
+}catch(error){
+console.error('Day 2 evening autosave error:',error);
+}
+
+showScene({
+speaker:'host',
+background:'crystal',
+text:'🔥 DAY 2 COMPLETE\n\nThe First Bond Judgment is finished.\n\n'+reward+'\n\nTomorrow, the island will begin preparing for its first major choice.'
+});
+
+choices('<button onclick="endNight()">🌙 End the Night</button>');
+}
+
 function firePitEvent(){
 if(eveningEventDone)return;
 
 if(currentDay===1&&checkEpisodeOneEnding()){
+return;
+}
+
+if(currentDay===2){
+startDayTwoEveningJudgment();
 return;
 }
 
@@ -1023,9 +1185,7 @@ updateTimeDisplay();
 showScene({
 speaker:'host',
 background:'night',
-text:currentDay===1
-?'"Every choice you made today has been seen."\n\n"Rest now. Tomorrow, your next test begins."'
-:'"Day 2 draws to a close."\n\n"The island is beginning to remember your strongest connections."'
+text:'The Islanders gather around the glowing Fire Pit.\n\n"Another day on Flame Cay has reached its end."'
 });
 
 choices('<button onclick="endNight()">🌙 End the Night</button>');
