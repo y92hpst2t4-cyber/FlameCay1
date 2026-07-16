@@ -1466,6 +1466,7 @@ function startFirstChallenge(){
 currentTime='Afternoon';
 actionUsed=false;
 updateTimeDisplay();
+
 if(challengeComplete){showVersionComplete();return}
 challengeScore=0;
 challengeQuestion=0;
