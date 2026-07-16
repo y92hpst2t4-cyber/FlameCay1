@@ -1041,7 +1041,6 @@ return;
 const closestPerson=getEpisodeOneClosestConnection();
 const closestName=characters[closestPerson].name;
 const result=getDayTwoBondJudgment();
-
 let title='';
 let judgment='';
 
@@ -1064,7 +1063,6 @@ speaker:'host',
 background:'crystal',
 text:'Every Islander gathers around the Fire Pit.\n\n"Tonight, the Crystal Flame will judge the first bond."\n\n'+title+'\n\n'+judgment
 });
-
 choices('<button onclick="showDayTwoClosestReaction()">❤️ Hear '+closestName.split(' ')[0]+'’s Reaction</button>');
 }
 
@@ -1084,10 +1082,10 @@ text='"I cannot ignore what happened today," '+closestName+' says.\n\n"I need to
 text='"I still do not know where we stand," '+closestName+' says.\n\n"Tomorrow may give us an answer."';
 }
 
-showScene({speaker:closestPerson,background:'night',text:text});
+showScene({speaker:closestPerson,background:'night',text});
 choices(
-'<button onclick="finishDayTwoJudgment(\'commit\')">💚 Promise to protect the bond</button>'+ 
-'<button onclick="finishDayTwoJudgment(\'honest\')">💬 Promise complete honesty</button>'+ 
+'<button onclick="finishDayTwoJudgment(\'commit\')">💚 Promise to protect the bond</button>'+
+'<button onclick="finishDayTwoJudgment(\'honest\')">💬 Promise complete honesty</button>'+
 '<button onclick="finishDayTwoJudgment(\'space\')">🌙 Ask for time and space</button>'
 );
 }
@@ -1151,43 +1149,26 @@ actionUsed=true;
 updateTimeDisplay();
 updateRelationships();
 
-try{
-autoSaveGame();
-}catch(error){
-console.error('Day 2 evening autosave error:',error);
-}
+try{autoSaveGame();}catch(error){console.error('Day 2 evening autosave error:',error);}
 
 showScene({
 speaker:'host',
 background:'crystal',
 text:'🔥 DAY 2 COMPLETE\n\nThe First Bond Judgment is finished.\n\n'+reward+'\n\nTomorrow, the island will begin preparing for its first major choice.'
 });
-
 choices('<button onclick="endNight()">🌙 End the Night</button>');
 }
 
 function firePitEvent(){
 if(eveningEventDone)return;
 
-if(currentDay===1&&checkEpisodeOneEnding()){
-return;
-}
-
-if(currentDay===2){
-startDayTwoEveningJudgment();
-return;
-}
+if(currentDay===1&&checkEpisodeOneEnding())return;
+if(currentDay===2){startDayTwoEveningJudgment();return;}
 
 eveningEventDone=true;
 actionUsed=true;
 updateTimeDisplay();
-
-showScene({
-speaker:'host',
-background:'night',
-text:'The Islanders gather around the glowing Fire Pit.\n\n"Another day on Flame Cay has reached its end."'
-});
-
+showScene({speaker:'host',background:'night',text:'The Islanders gather around the glowing Fire Pit.\n\n"Another day on Flame Cay has reached its end."'});
 choices('<button onclick="endNight()">🌙 End the Night</button>');
 }
 
@@ -1201,34 +1182,101 @@ pendingLocation='';
 
 if(currentDay===2){
 startDayTwoOpening();
-
-try{
-updateTimeDisplay();
-autoSaveGame();
-}catch(error){
-console.error('Day 2 save error:',error);
+try{updateTimeDisplay();autoSaveGame();}catch(error){console.error('Day 2 save error:',error);}
+return;
 }
 
+if(currentDay===3){
+startDayThreeOpening();
+try{updateTimeDisplay();autoSaveGame();}catch(error){console.error('Day 3 save error:',error);}
 return;
 }
 
 showScene({
 speaker:'narrator',
 background:'arrival',
-text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+
-'\n☀️ Morning\n\n⭐ One new activity is available.'
+text:'Morning sunlight spreads across Flame Cay.\n\n📅 Day '+currentDay+'\n☀️ Morning\n\n⭐ One new activity is available.'
 });
-
-choices(
-'<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>'
-);
-
-try{
-updateTimeDisplay();
-autoSaveGame();
-}catch(error){
-console.error('End night error:',error);
+choices('<button onclick="openIslandMap()">🗺️ Begin Day '+currentDay+'</button>');
+try{updateTimeDisplay();autoSaveGame();}catch(error){console.error('End night error:',error);}
 }
+
+function getDayTwoOpeningResult(){
+if(hasStoryFlag('dayTwoEveningResult_strong'))return 'strong';
+if(hasStoryFlag('dayTwoEveningResult_growing'))return 'growing';
+if(hasStoryFlag('dayTwoEveningResult_tense'))return 'tense';
+return 'uncertain';
+}
+
+function startDayThreeOpening(){
+['islandMap','walkingScreen'].forEach(id=>q(id).classList.add('hidden'));
+setStoryFlag('dayThreeOpeningStarted',true,'Day 3 opening began');
+
+showScene({
+speaker:'narrator',
+background:'arrival',
+text:'🔥 DAY 3 — THE FIRST CHOICE\n\nMorning sunlight reaches the villa, but nobody is relaxed.\n\nEvery phone begins flashing with a new Crystal Flame warning.'
+});
+choices('<button onclick="showDayThreeCouplingAnnouncement()">📱 Read the Day 3 Message</button>');
+try{autoSaveGame();}catch(error){console.error('Day 3 opening autosave error:',error);}
+}
+
+function showDayThreeCouplingAnnouncement(){
+showScene({
+speaker:'host',
+background:'villa',
+text:'“Good morning, Islanders.”\n\n“Tonight, the first coupling ceremony will take place at the Fire Pit.”\n\n“Your strongest connection may expect your choice, but nothing is guaranteed.”\n\n“Today’s final conversations can still change everything.”'
+});
+choices('<button onclick="showDayThreeCrystalChoiceWarning()">🔥 Continue</button>');
+try{autoSaveGame();}catch(error){console.error('Day 3 announcement autosave error:',error);}
+}
+
+function showDayThreeCrystalChoiceWarning(){
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+const result=getDayTwoOpeningResult();
+let message='';
+
+if(result==='strong')message='Your bond survived honesty and pressure. '+closestName+' believes you may choose them tonight.';
+else if(result==='growing')message='Your bond grew yesterday, but '+closestName+' still needs reassurance before the ceremony.';
+else if(result==='tense')message='Yesterday left tension between you and '+closestName+'. The ceremony may be your final chance to repair it—or choose a new path.';
+else message='Your connection with '+closestName+' remains uncertain. Today may reveal where your heart truly belongs.';
+
+showScene({
+speaker:'narrator',
+background:'crystal',
+text:'The Crystal Flame rises beneath the villa floor.\n\nClosest connection: '+closestName+'\n\n'+message+'\n\nA whisper warns:\n\n“Your strongest bond is not your only choice.”'
+});
+choices('<button onclick="showDayThreeClosestReaction()">❤️ See '+closestName.split(' ')[0]+'’s Reaction</button>');
+try{autoSaveGame();}catch(error){console.error('Day 3 warning autosave error:',error);}
+}
+
+function showDayThreeClosestReaction(){
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+const result=getDayTwoOpeningResult();
+let text='';
+
+if(result==='strong')text=closestName+' finds you near the villa entrance.\n\n“After yesterday, I feel like we could become something real,” they say.\n\n“But I want your choice tonight to be honest.”';
+else if(result==='growing')text=closestName+' waits near the villa entrance.\n\n“I think we are building something,” they say.\n\n“I just need to know whether you feel it too.”';
+else if(result==='tense')text=closestName+' approaches carefully.\n\n“Yesterday hurt,” they say.\n\n“I am not asking for a promise. I am asking you not to surprise me without being honest.”';
+else text=closestName+' gives you a thoughtful look.\n\n“I still do not know what tonight means for us,” they say.\n\n“Maybe today will give us the answer.”';
+
+showScene({speaker:closestPerson,background:'villa',text});
+choices('<button onclick="finishDayThreeOpening()">🗺️ Begin Day 3</button>');
+}
+
+function finishDayThreeOpening(){
+if(!hasStoryFlag('dayThreeOpeningComplete')){
+setStoryFlag('dayThreeOpeningComplete',true,'Completed the Day 3 First Choice opening');
+recordChoice('day_three_opening','Day 3 First Choice Warning','The first coupling ceremony was announced.',{});
+}
+
+q('dialogueCard').classList.add('hidden');
+q('portraitBox').classList.add('hidden');
+q('choices').classList.add('hidden');
+openIslandMap();
+try{autoSaveGame();}catch(error){console.error('Day 3 opening completion autosave error:',error);}
 }
 
 function startDayTwoOpening(){
