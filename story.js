@@ -888,10 +888,17 @@ choices(
 }
 
 function finishDayTwoOpening(){
-autoSaveGame();
 q('dialogueCard').classList.add('hidden');
 q('portraitBox').classList.add('hidden');
+q('choices').classList.add('hidden');
+
 openIslandMap();
+
+try{
+autoSaveGame();
+}catch(error){
+console.error('Day 2 autosave error:',error);
+}
 }
 
 function startCouplingCeremony(){
