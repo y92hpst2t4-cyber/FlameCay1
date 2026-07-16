@@ -1463,6 +1463,9 @@ choices('<button onclick="openIslandMap()">🗺️ Begin Day 4</button>');
 }
 
 function startFirstChallenge(){
+currentTime='Afternoon';
+actionUsed=false;
+updateTimeDisplay();
 if(challengeComplete){showVersionComplete();return}
 challengeScore=0;
 challengeQuestion=0;
