@@ -1362,6 +1362,8 @@ console.error('Day 2 autosave error:',error);
 }
 
 function startCouplingCeremony(){
+currentTime='Evening';
+updateTimeDisplay();
 if(ceremonyComplete){
 showVersionComplete();
 return;
