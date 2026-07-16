@@ -170,7 +170,12 @@ backMap()
 return;
 }
 
-if(currentDay===2){
+if(currentDay===2&&currentTime==='Morning'){
+showDayTwoMorningBondEvent();
+return;
+}
+
+if(currentDay===2&&currentTime==='Afternoon'){
 showScene({
 speaker:'lucas',
 background:'village',
@@ -213,6 +218,117 @@ showEmpty(
 'The village is peaceful. Flame lanterns flicker along the stone paths.',
 'village'
 );
+}
+
+function showDayTwoMorningBondEvent(){
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+
+if(hasStoryFlag('dayTwoMorningBondComplete')){
+showScene({
+speaker:closestPerson,
+background:'village',
+text:closestName+' stands beside the village fountain.\n\nThe Crystal Flame message has already been answered.\n\nYour first bond test is complete.'
+});
+
+choices(
+'<button onclick="openIslandMap()">🗺️ Return to Map</button>'+
+'<button onclick="advanceTime()">'+getAdvanceButtonText()+'</button>'
+);
+return;
+}
+
+if(actionAlreadyUsed())return;
+
+showScene({
+speaker:closestPerson,
+background:'village',
+text:closestName+' waits beside the glowing village fountain.\n\nBoth of your phones light up with the same Crystal Flame message:\n\n“Tell one truth you have not shared with anyone on Flame Cay.”'
+});
+
+choices(
+'<button onclick="chooseDayTwoMorningTruth(\'honest\')">💚 Share an honest truth</button>'+
+'<button onclick="chooseDayTwoMorningTruth(\'small\')">💬 Share something small</button>'+
+'<button onclick="chooseDayTwoMorningTruth(\'avoid\')">🌙 Avoid the question</button>'+
+backMap()
+);
+}
+
+function addDayTwoTrust(person,amount){
+if(person==='lucas'){
+lucasStats.trust+=amount;
+}
+
+if(person==='maya'){
+mayaStats.trust+=amount;
+}
+}
+
+function chooseDayTwoMorningTruth(choice){
+if(actionAlreadyUsed()||hasStoryFlag('dayTwoMorningBondComplete'))return;
+
+const closestPerson=getEpisodeOneClosestConnection();
+const closestName=characters[closestPerson].name;
+let result='';
+
+if(choice==='honest'){
+relationships[closestPerson]+=2;
+addDayTwoTrust(closestPerson,2);
+changeJealousy(closestPerson,-4,'The player shared an honest truth');
+changeReputation(2,'Answered the First Bond Test honestly');
+
+result='You share a real fear about entering Flame Cay and not knowing who you can trust.\n\n'+
+closestName+' listens without interrupting.\n\n'+
+'“Thank you for trusting me,” they say.\n\n'+
+'❤️ Connection +2\n💚 Trust +2';
+}else if(choice==='small'){
+relationships[closestPerson]+=1;
+changeJealousy(closestPerson,-1,'The player shared a small truth');
+
+result='You share a small story from your life outside the island.\n\n'+
+closestName+' smiles, but the Crystal Flame only flickers.\n\n'+
+'❤️ Connection +1';
+}else{
+relationships[closestPerson]=Math.max(0,relationships[closestPerson]-1);
+changeJealousy(closestPerson,4,'The player avoided the First Bond Test');
+changeReputation(-1,'Avoided the First Bond Test');
+
+result='You laugh and change the subject.\n\n'+
+closestName+' notices that you avoided the question.\n\n'+
+'The Crystal Flame dims between you.\n\n'+
+'💔 Connection -1\n⚠️ Jealousy +4';
+}
+
+setStoryFlag(
+'dayTwoMorningBondComplete',
+true,
+'Completed the Day 2 morning First Bond Test with '+closestName
+);
+
+recordChoice(
+'day_two_morning_'+choice,
+'Day 2 First Bond Test',
+'You chose to '+(choice==='honest'?'share an honest truth':choice==='small'?'share something small':'avoid the question')+' with '+closestName+'.',
+{connection:{[closestPerson]:choice==='honest'?2:choice==='small'?1:-1}}
+);
+
+actionUsed=true;
+updateTimeDisplay();
+updateRelationships();
+
+try{
+autoSaveGame();
+}catch(error){
+console.error('Day 2 morning autosave error:',error);
+}
+
+showScene({
+speaker:closestPerson,
+background:'village',
+text:result+'\n\n✅ Day 2 morning activity complete.'
+});
+
+showCompletedButtons();
 }
 function partnerMorningScene(person,locationText,bg,back){
 const isPartner=coupledWith===person;
