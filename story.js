@@ -2389,12 +2389,13 @@ if(dateComplete){
 showVersionComplete();
 return;
 }
+
 currentTime='Evening';
 actionUsed=true;
 updateTimeDisplay();
-autoSaveGame();
 
 chooseDateInvitee();
+autoSaveGame();
 
 showScene({
 speaker:'host',
@@ -2402,7 +2403,9 @@ background:'night',
 text:'The villa phones light up at the same time.\n\n"Islanders... Valentina has made her first date choice."'
 });
 
-choices('<button class="dateButton" onclick="revealDateChoice()">💖 Reveal the Date Choice</button>');
+choices(
+'<button class="dateButton" onclick="revealDateChoice()">💖 Reveal the Date Choice</button>'
+);
 }
 
 function revealDateChoice(){
