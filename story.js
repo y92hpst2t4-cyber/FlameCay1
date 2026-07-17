@@ -2389,6 +2389,10 @@ if(dateComplete){
 showVersionComplete();
 return;
 }
+currentTime='Evening';
+actionUsed=true;
+updateTimeDisplay();
+autoSaveGame();
 
 chooseDateInvitee();
 
