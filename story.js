@@ -1544,7 +1544,8 @@ challengeThree();
 function finishChallengeAnswer(points){
 challengeScore+=points;
 challengeComplete=true;
-autoSaveGame();
+actionUsed=true;
+updateTimeDisplay();
 
 let resultText='';
 let rewardText='';
@@ -1569,8 +1570,10 @@ rewardText='❤️ Partner Connection +1\n💚 Couple Trust +1';
 }
 
 updateRelationships();
+autoSaveGame();
 
 showScene({
+
 speaker:'host',
 background:'crystal',
 text:'🏆 '+resultText+'\n\nFinal Score: '+challengeScore+' / 9\n\n'+rewardText
@@ -1601,7 +1604,13 @@ choices('<button class="bombshellButton" onclick="startBombshellArrival()">💥 
 function startBombshellArrival(){
 if(bombshellComplete){showVersionComplete();return}
 
+currentTime='Evening';
+actionUsed=true;
+updateTimeDisplay();
+autoSaveGame();
+
 showScene({
+    
 speaker:'host',
 background:'night',
 text:'Just as the challenge celebration begins, the villa lights flash red.\n\nA boat horn echoes from Arrival Beach.\n\n"Islanders... please welcome the first new Bombshell."'
@@ -1638,7 +1647,6 @@ function chooseBombshellReaction(choice){
 if(bombshellChoice)return;
 bombshellChoice=choice;
 bombshellComplete=true;
-autoSaveGame();
 
 let sceneText='';
 
@@ -1665,8 +1673,10 @@ sceneText='You make it clear that you want to protect your current couple.\n\nYo
 }
 
 updateRelationships();
+autoSaveGame();
 
 showScene({
+    
 speaker:'valentina',
 background:'night',
 text:sceneText
