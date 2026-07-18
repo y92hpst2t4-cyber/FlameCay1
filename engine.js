@@ -126,7 +126,7 @@ return;
 if(currentDay>=5&&eliminationComplete){
 showScene({
 speaker:'narrator',
-background:'arrival',
+background:currentTime==='Evening'?'night':currentTime==='Afternoon'?'afternoon':'arrival',
 text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+'\n\nYour progress has been restored.'
 });
 choices('<button onclick="openIslandMap()">🗺️ Continue Day '+currentDay+'</button>');
@@ -163,11 +163,29 @@ choices('<button onclick="startBombshellArrival()">💥 Continue to the Bombshel
 return;
 }
 
-if(ceremonyComplete){
+if(currentDay===4){
 showScene({
 speaker:'narrator',
-background:'arrival',
-text:'💾 SAVE LOADED\n\nYou are officially coupled with '+characters[coupledWith].name+'.'
+background:currentTime==='Evening'?'night':currentTime==='Afternoon'?'afternoon':'arrival',
+text:'💾 SAVE LOADED\n\nDay 4 — '+currentTime+'\n\nYou are officially coupled with '+characters[coupledWith].name+'.'
+});
+
+if(currentTime==='Morning'){
+choices('<button onclick="openIslandMap()">🗺️ Continue Day 4 Morning</button>');
+}else if(currentTime==='Afternoon'){
+choices('<button onclick="startFirstChallenge()">🏆 Continue the First Challenge</button>');
+}else{
+choices('<button onclick="startBombshellArrival()">💥 Continue the Evening Event</button>');
+}
+
+return;
+}
+
+if(ceremonyComplete&&currentDay===3){
+showScene({
+speaker:'narrator',
+background:'night',
+text:'💾 SAVE LOADED\n\nThe first coupling ceremony has been completed.\n\nYou chose '+characters[coupledWith].name+'.'
 });
 choices('<button onclick="beginDayFour()">☀️ Continue to Day 4</button>');
 return;
@@ -177,7 +195,7 @@ if(currentDay===3){
 showScene({
 speaker:'narrator',
 background:'arrival',
-text:'💾 SAVE LOADED\n\nDay 3 Morning has been restored.'
+text:'💾 SAVE LOADED\n\nDay 3 — '+currentTime+' has been restored.'
 });
 choices('<button onclick="openIslandMap()">🗺️ Continue Day 3</button>');
 return;
@@ -185,7 +203,7 @@ return;
 
 showScene({
 speaker:'narrator',
-background:'arrival',
+background:currentTime==='Evening'?'night':currentTime==='Afternoon'?'afternoon':'arrival',
 text:'💾 SAVE LOADED\n\nDay '+currentDay+' — '+currentTime+' has been restored.'
 });
 
