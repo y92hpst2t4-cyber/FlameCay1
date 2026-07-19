@@ -592,3 +592,171 @@ font-size:16px;
   border-radius: 50%;
   z-index: 1;
 }
+/* Phase 1 Step 3 — In-game player portrait */
+
+.playerScenePortrait {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
+  margin-bottom: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border-left: 6px solid #ff7200;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.playerScenePortrait.hidden {
+  display: none;
+}
+
+.playerSceneInformation {
+  flex: 1;
+}
+
+.playerSceneInformation h3 {
+  margin: 0 0 6px;
+}
+
+.playerSceneInformation p {
+  margin: 0;
+}
+
+.playerSceneAvatar {
+  --scene-skin: #f6d2b8;
+  --scene-hair: #1f1a17;
+  --scene-outfit: #ff7200;
+
+  position: relative;
+  flex: 0 0 120px;
+  width: 120px;
+  height: 180px;
+}
+
+.playerSceneFace {
+  position: absolute;
+  left: 25px;
+  top: 31px;
+  width: 70px;
+  height: 86px;
+  background: var(--scene-skin);
+  border: 3px solid rgba(0, 0, 0, 0.16);
+  border-radius: 45% 45% 43% 43%;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.playerSceneHair {
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  width: 84px;
+  height: 51px;
+  background: var(--scene-hair);
+  border-radius: 55% 55% 25% 25%;
+  z-index: 4;
+}
+
+.playerSceneBody {
+  position: absolute;
+  left: 12px;
+  bottom: 0;
+  width: 96px;
+  height: 78px;
+  background: var(--scene-outfit);
+  border-radius: 42px 42px 12px 12px;
+  border: 3px solid rgba(0, 0, 0, 0.16);
+  z-index: 1;
+}
+
+.playerSceneEyes {
+  margin-top: 13px;
+  font-size: 13px;
+  letter-spacing: 10px;
+  transform: translateX(5px);
+}
+
+.playerSceneMouth {
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+/* Short */
+
+.playerSceneAvatar.short .playerSceneHair {
+  height: 45px;
+}
+
+/* Curly */
+
+.playerSceneAvatar.curly .playerSceneHair {
+  height: 55px;
+  border-radius: 50%;
+  box-shadow:
+    -11px 7px 0 var(--scene-hair),
+    11px 7px 0 var(--scene-hair),
+    -7px -6px 0 var(--scene-hair),
+    7px -6px 0 var(--scene-hair);
+}
+
+/* Waves */
+
+.playerSceneAvatar.waves .playerSceneHair {
+  height: 51px;
+  border-radius: 65% 42% 35% 20%;
+}
+
+/* Braids */
+
+.playerSceneAvatar.braids .playerSceneHair {
+  height: 48px;
+}
+
+.playerSceneAvatar.braids::before,
+.playerSceneAvatar.braids::after {
+  content: "";
+  position: absolute;
+  top: 54px;
+  width: 11px;
+  height: 66px;
+  background: var(--scene-hair);
+  border-radius: 8px;
+  z-index: 3;
+}
+
+.playerSceneAvatar.braids::before {
+  left: 17px;
+}
+
+.playerSceneAvatar.braids::after {
+  right: 17px;
+}
+
+/* Long */
+
+.playerSceneAvatar.long .playerSceneHair {
+  height: 103px;
+  border-radius: 55% 55% 32% 32%;
+}
+
+/* Ponytail */
+
+.playerSceneAvatar.ponytail .playerSceneHair {
+  height: 48px;
+}
+
+.playerSceneAvatar.ponytail::after {
+  content: "";
+  position: absolute;
+  top: 38px;
+  right: 3px;
+  width: 31px;
+  height: 65px;
+  background: var(--scene-hair);
+  border-radius: 50%;
+  z-index: 2;
+}
