@@ -28,14 +28,15 @@
 
 <p><strong>Version 3.6.4 — Episode 1 Progress Build</strong></p>
 
-<input id="playerName" placeholder="Enter your name">
-
-<button onclick="startGame()">▶ New Game</button>
+<button onclick="
+document.getElementById('menu').classList.add('hidden');
+document.getElementById('characterCreator').classList.remove('hidden');
+">
+🎨 New Game
+</button>
 
 <button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">
-
 ▶ Continue Latest Save
-
 </button>
 
 <button class="loadButton" onclick="openLoadMenu()">📂 Load Game</button>
@@ -49,6 +50,172 @@
 <button onclick="closeLoadMenu()">⬅ Back</button>
 
 </div>
+
+</section>
+
+<section id="characterCreator" class="hidden">
+
+<h1>🔥 Create Your Islander</h1>
+
+<p>Design your character before arriving on Flame Cay.</p>
+
+<div class="card">
+
+<h2>🪞 Character Preview</h2>
+
+<div id="playerCharacterPreview">
+
+<div id="playerPreviewEmoji" style="font-size:90px">🧑</div>
+
+<h3 id="playerPreviewName">Your Islander</h3>
+
+<p id="playerPreviewDetails">
+Choose your appearance and personality.
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📝 Basic Information</h2>
+
+<label for="playerName"><strong>Character Name</strong></label>
+
+<input
+id="playerName"
+type="text"
+placeholder="Enter your character's name"
+maxlength="20"
+>
+
+<br><br>
+
+<label for="playerPronouns"><strong>Pronouns</strong></label>
+
+<select id="playerPronouns">
+
+<option value="she/her">She / Her</option>
+
+<option value="he/him">He / Him</option>
+
+<option value="they/them">They / Them</option>
+
+</select>
+
+</div>
+
+<div class="card">
+
+<h2>🎨 Appearance</h2>
+
+<label for="playerSkinTone"><strong>Skin Tone</strong></label>
+
+<select id="playerSkinTone">
+
+<option value="light">Light</option>
+
+<option value="medium-light">Medium Light</option>
+
+<option value="medium">Medium</option>
+
+<option value="medium-dark">Medium Dark</option>
+
+<option value="dark">Dark</option>
+
+</select>
+
+<br><br>
+
+<label for="playerHairstyle"><strong>Hairstyle</strong></label>
+
+<select id="playerHairstyle">
+
+<option value="short">Short</option>
+
+<option value="curly">Curly</option>
+
+<option value="waves">Waves</option>
+
+<option value="braids">Braids</option>
+
+<option value="long">Long</option>
+
+<option value="ponytail">Ponytail</option>
+
+</select>
+
+<br><br>
+
+<label for="playerHairColor"><strong>Hair Color</strong></label>
+
+<select id="playerHairColor">
+
+<option value="black">Black</option>
+
+<option value="brown">Brown</option>
+
+<option value="blonde">Blonde</option>
+
+<option value="red">Red</option>
+
+<option value="silver">Silver</option>
+
+</select>
+
+<br><br>
+
+<label for="playerOutfit"><strong>Arrival Outfit</strong></label>
+
+<select id="playerOutfit">
+
+<option value="island-casual">Island Casual</option>
+
+<option value="summer-glam">Summer Glam</option>
+
+<option value="sporty">Sporty</option>
+
+<option value="elegant">Elegant</option>
+
+<option value="bold">Bold Entrance</option>
+
+</select>
+
+</div>
+
+<div class="card">
+
+<h2>🔥 Personality</h2>
+
+<p>Your personality will eventually unlock special dialogue choices.</p>
+
+<label for="playerPersonality"><strong>Choose Your Personality</strong></label>
+
+<select id="playerPersonality">
+
+<option value="romantic">💕 Romantic</option>
+
+<option value="loyal">💚 Loyal</option>
+
+<option value="bold">🔥 Bold</option>
+
+<option value="strategic">🧠 Strategic</option>
+
+</select>
+
+</div>
+
+<button disabled>
+✅ Confirm Character — Available in Step 2
+</button>
+
+<button onclick="
+document.getElementById('characterCreator').classList.add('hidden');
+document.getElementById('menu').classList.remove('hidden');
+">
+⬅ Back to Main Menu
+</button>
 
 </section>
 
