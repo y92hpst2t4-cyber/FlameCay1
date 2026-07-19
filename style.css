@@ -479,3 +479,116 @@ button{
 min-height:48px;
 font-size:16px;
 }
+/* Phase 1 — Player Avatar Preview */
+
+#playerAvatarPreview {
+  position: relative;
+  width: 150px;
+  height: 190px;
+  margin: 10px auto 20px;
+}
+
+#playerAvatarFace {
+  position: absolute;
+  left: 25px;
+  top: 35px;
+  width: 100px;
+  height: 120px;
+  background: #f2c7a5;
+  border-radius: 46% 46% 44% 44%;
+  border: 3px solid rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#playerAvatarHair {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  width: 114px;
+  height: 70px;
+  background: #4a2d1f;
+  border-radius: 55% 55% 30% 30%;
+  z-index: 2;
+}
+
+.avatarEyes {
+  margin-top: 20px;
+  font-size: 22px;
+  letter-spacing: 18px;
+  transform: translateX(9px);
+}
+
+.avatarMouth {
+  margin-top: 14px;
+  font-size: 30px;
+}
+
+#playerAvatarPreview.short #playerAvatarHair {
+  height: 52px;
+  border-radius: 55% 55% 22% 22%;
+}
+
+#playerAvatarPreview.curly #playerAvatarHair {
+  height: 72px;
+  border-radius: 50%;
+  box-shadow:
+    -18px 8px 0 #4a2d1f,
+    18px 8px 0 #4a2d1f,
+    -10px -8px 0 #4a2d1f,
+    10px -8px 0 #4a2d1f;
+}
+
+#playerAvatarPreview.waves #playerAvatarHair {
+  height: 66px;
+  border-radius: 60% 45% 35% 25%;
+}
+
+#playerAvatarPreview.braids #playerAvatarHair {
+  height: 62px;
+  border-radius: 50% 50% 25% 25%;
+}
+
+#playerAvatarPreview.braids::before,
+#playerAvatarPreview.braids::after {
+  content: "";
+  position: absolute;
+  top: 65px;
+  width: 16px;
+  height: 85px;
+  background: inherit;
+  border-radius: 10px;
+  z-index: 1;
+}
+
+#playerAvatarPreview.braids::before {
+  left: 20px;
+}
+
+#playerAvatarPreview.braids::after {
+  right: 20px;
+}
+
+#playerAvatarPreview.long #playerAvatarHair {
+  height: 125px;
+  border-radius: 55% 55% 35% 35%;
+}
+
+#playerAvatarPreview.ponytail #playerAvatarHair {
+  height: 60px;
+  border-radius: 55% 55% 28% 28%;
+}
+
+#playerAvatarPreview.ponytail::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 45px;
+  width: 38px;
+  height: 80px;
+  background: inherit;
+  border-radius: 50%;
+  z-index: 1;
+}
