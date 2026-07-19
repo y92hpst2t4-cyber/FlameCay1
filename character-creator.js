@@ -23,7 +23,6 @@ function formatCharacterOption(value) {
     .join(' ');
 }
 
-function getPlayerPreviewEmoji(pronouns, skinTone) {
   const skinToneEmoji = {
     light: '🏻',
     'medium-light': '🏼',
@@ -76,18 +75,38 @@ function updateCharacterPreview() {
     personality: personalityInput.value
   };
 
-  const previewName = getCharacterCreatorElement('playerPreviewName');
-  const previewEmoji = getCharacterCreatorElement('playerPreviewEmoji');
-  const previewDetails = getCharacterCreatorElement('playerPreviewDetails');
-  const confirmButton = getCharacterCreatorElement('confirmCharacterButton');
+const previewName = getCharacterCreatorElement('playerPreviewName');
+const avatarPreview = getCharacterCreatorElement('playerAvatarPreview');
+const avatarFace = getCharacterCreatorElement('playerAvatarFace');
+const avatarHair = getCharacterCreatorElement('playerAvatarHair');
+const previewDetails = getCharacterCreatorElement('playerPreviewDetails');
+const confirmButton = getCharacterCreatorElement('confirmCharacterButton');
 
-  previewName.textContent = name || 'Your Islander';
+const skinColors = {
+  light: '#f6d2b8',
+  'medium-light': '#e8b98f',
+  medium: '#c98a5b',
+  'medium-dark': '#9a5f3d',
+  dark: '#5c3425'
+};
 
-  previewEmoji.textContent = getPlayerPreviewEmoji(
-    window.playerProfile.pronouns,
-    window.playerProfile.skinTone
-  );
+const hairColors = {
+  black: '#1f1a17',
+  brown: '#4a2d1f',
+  blonde: '#d8b45a',
+  red: '#8f3f2b',
+  silver: '#b9bcc2'
+};
 
+avatarPreview.className = '';
+avatarPreview.id = 'playerAvatarPreview';
+avatarPreview.classList.add(window.playerProfile.hairstyle);
+
+avatarFace.style.background =
+  skinColors[window.playerProfile.skinTone] || skinColors.light;
+
+avatarHair.style.background =
+  hairColors[window.playerProfile.hairColor] || hairColors.black;
   previewDetails.textContent =
     formatCharacterOption(window.playerProfile.hairColor) +
     ' ' +
