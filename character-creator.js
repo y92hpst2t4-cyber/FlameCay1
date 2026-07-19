@@ -102,11 +102,16 @@ avatarPreview.className = '';
 avatarPreview.id = 'playerAvatarPreview';
 avatarPreview.classList.add(window.playerProfile.hairstyle);
 
-avatarFace.style.background =
-  skinColors[window.playerProfile.skinTone] || skinColors.light;
+avatarPreview.style.setProperty(
+  '--avatar-skin',
+  skinColors[window.playerProfile.skinTone] || skinColors.light
+);
 
-avatarHair.style.background =
-  hairColors[window.playerProfile.hairColor] || hairColors.black;
+avatarPreview.style.setProperty(
+  '--avatar-hair',
+  hairColors[window.playerProfile.hairColor] || hairColors.black
+);
+
   previewDetails.textContent =
     formatCharacterOption(window.playerProfile.hairColor) +
     ' ' +
