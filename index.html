@@ -262,13 +262,50 @@ document.getElementById('menu').classList.remove('hidden');
 
 </div>
 
-<div id="portraitBox" class="hidden">
+<div id="portraitBox" class="hidden dialoguePortraitRow">
 
-<img id="portraitImage" alt="Character Portrait">
+  <div id="npcDialogueSide" class="dialogueCharacterSide">
 
-<div id="portrait">🌴</div>
+    <img id="portraitImage" alt="Character Portrait">
 
-<div>
+    <div id="portrait">🌴</div>
+
+    <div class="dialogueSpeakerInformation">
+      <h3 id="speakerName">Narrator</h3>
+      <p id="speakerTitle">The Story Begins</p>
+    </div>
+
+  </div>
+
+  <div id="playerDialogueSide" class="dialoguePlayerSide hidden">
+
+    <div id="playerDialogueAvatar" class="playerDialogueAvatar short">
+
+      <div id="playerDialogueHair" class="playerDialogueHair"></div>
+
+      <div id="playerDialogueFace" class="playerDialogueFace">
+
+        <div class="playerDialogueEyes">● ●</div>
+
+        <div class="playerDialogueMouth">⌣</div>
+
+      </div>
+
+      <div id="playerDialogueBody" class="playerDialogueBody"></div>
+
+    </div>
+
+    <div class="playerDialogueInformation">
+
+      <strong id="playerDialogueName">Player</strong>
+
+      <span>You</span>
+
+    </div>
+
+  </div>
+
+</div>
 
 <h3 id="speakerName" style="margin:0">Narrator</h3>
 
