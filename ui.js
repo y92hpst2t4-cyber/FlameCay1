@@ -210,59 +210,201 @@ function choices(html){q('choices').innerHTML=html;q('choices').classList.remove
 
 function backMap(){return '<button onclick="openIslandMap()">⬅ Back to Map</button>'}
 
-function showScene(s){
-const c=characters[s.speaker]||{
-name:'Narrator',
-title:'The Story Begins',
-emoji:'🌴',
-image:''
-};
+function renderDialoguePlayerPortrait() {
+  const profile = window.playerProfile;
 
-changeBackground(s.background);
-q('dialogueCard').classList.remove('hidden');
-q('portraitBox').classList.remove('hidden');
-q('portraitBox').style.animation='none';
-q('portraitBox').offsetHeight;
-q('portraitBox').style.animation='characterEnter .6s ease';
-q('speakerName').textContent=c.name;
-q('speakerTitle').textContent=c.title;
-const portraitImg=q('portraitImage');
-portraitImg.classList.remove('loaded');
+  const playerSide = q('playerDialogueSide');
+  const avatar = q('playerDialogueAvatar');
+  const playerNameElement = q('playerDialogueName');
 
-if(c.image){
-q('portrait').style.display='flex';
-q('portrait').textContent=c.emoji;
-portraitImg.style.display='none';
+  if (
+    !profile ||
+    !profile.name ||
+    !playerSide ||
+    !avatar ||
+    !playerNameElement
+  ) {
+    return false;
+  }
 
-const cached=portraitCache[s.speaker];
+  const skinColors = {
+    light: '#f6d2b8',
+    'medium-light': '#e8b98f',
+    medium: '#c98a5b',
+    'medium-dark': '#9a5f3d',
+    dark: '#5c3425'
+  };
 
-const revealPortrait=()=>{
-portraitImg.src=c.image;
-portraitImg.style.display='block';
-q('portrait').style.display='none';
-requestAnimationFrame(()=>portraitImg.classList.add('loaded'));
-};
+  const hairColors = {
+    black: '#1f1a17',
+    brown: '#4a2d1f',
+    blonde: '#d8b45a',
+    red: '#8f3f2b',
+    silver: '#b9bcc2'
+  };
 
-if(cached&&cached.complete){
-revealPortrait();
-}else{
-const loader=cached||new Image();
-loader.onload=revealPortrait;
-loader.onerror=()=>{
-portraitImg.style.display='none';
-q('portrait').style.display='flex';
-q('portrait').textContent=c.emoji;
-};
-loader.src=c.image;
-portraitCache[s.speaker]=loader;
+  const outfitColors = {
+    'island-casual': '#2f9e83',
+    'summer-glam': '#d95d93',
+    sporty: '#315fa8',
+    elegant: '#282833',
+    bold: '#e0522d'
+  };
+
+  avatar.className = 'playerDialogueAvatar';
+  avatar.classList.add(profile.hairstyle || 'short');
+
+  avatar.style.setProperty(
+    '--dialogue-skin',
+    skinColors[profile.skinTone] || skinColors.light
+  );
+
+  avatar.style.setProperty(
+    '--dialogue-hair',
+    hairColors[profile.hairColor] || hairColors.black
+  );
+
+  avatar.style.setProperty(
+    '--dialogue-outfit',
+    outfitColors[profile.outfit] || outfitColors['island-casual']
+  );
+
+  playerNameElement.textContent = profile.name;
+
+  return true;
 }
-}else{
-portraitImg.style.display='none';
-q('portrait').style.display='flex';
-q('portrait').textContent=c.emoji;
+
+function updateDialoguePortraitLayout(speaker) {
+  const playerSide = q('playerDialogueSide');
+  const npcSide = q('npcDialogueSide');
+
+  if (!playerSide || !npcSide) {
+    return;
+  }
+
+  const isNarrator =
+    !speaker ||
+    speaker === 'narrator';
+
+  const isPlayer =
+    speaker === 'player';
+
+  if (isNarrator) {
+    playerSide.classList.add('hidden');
+    npcSide.classList.remove('hidden');
+    return;
+  }
+
+  const playerRendered = renderDialoguePlayerPortrait();
+
+ if (isPlayer) {
+  if (playerRendered) {
+    npcSide.classList.add('hidden');
+    playerSide.classList.remove('hidden');
+  } else {
+    npcSide.classList.remove('hidden');
+    playerSide.classList.add('hidden');
+  }
+
+  return;
 }
 
-typeText(s.text);
+  npcSide.classList.remove('hidden');
+
+  if (playerRendered) {
+    playerSide.classList.remove('hidden');
+  } else {
+    playerSide.classList.add('hidden');
+  }
+}
+
+function showScene(s) {
+  const isPlayerSpeaker = s.speaker === 'player';
+
+  const c = isPlayerSpeaker
+    ? {
+        name:
+          window.playerProfile?.name ||
+          playerName ||
+          'Player',
+        title: 'You',
+        emoji: '🔥',
+        image: ''
+      }
+    : characters[s.speaker] || {
+        name: 'Narrator',
+        title: 'The Story Begins',
+        emoji: '🌴',
+        image: ''
+      };
+
+  changeBackground(s.background);
+
+  q('dialogueCard').classList.remove('hidden');
+  q('portraitBox').classList.remove('hidden');
+
+  updateDialoguePortraitLayout(s.speaker);
+
+  q('portraitBox').style.animation = 'none';
+  q('portraitBox').offsetHeight;
+  q('portraitBox').style.animation =
+    'characterEnter .6s ease';
+
+  q('speakerName').textContent = c.name;
+  q('speakerTitle').textContent = c.title;
+
+  const portraitImg = q('portraitImage');
+  const fallbackPortrait = q('portrait');
+
+  portraitImg.classList.remove('loaded');
+
+  if (isPlayerSpeaker) {
+    portraitImg.style.display = 'none';
+    fallbackPortrait.style.display = 'none';
+    typeText(s.text);
+    return;
+  }
+
+  if (c.image) {
+    fallbackPortrait.style.display = 'flex';
+    fallbackPortrait.textContent = c.emoji;
+    portraitImg.style.display = 'none';
+
+    const cached = portraitCache[s.speaker];
+
+    const revealPortrait = () => {
+      portraitImg.src = c.image;
+      portraitImg.style.display = 'block';
+      fallbackPortrait.style.display = 'none';
+
+      requestAnimationFrame(() => {
+        portraitImg.classList.add('loaded');
+      });
+    };
+
+    if (cached && cached.complete) {
+      revealPortrait();
+    } else {
+      const loader = cached || new Image();
+
+      loader.onload = revealPortrait;
+
+      loader.onerror = () => {
+        portraitImg.style.display = 'none';
+        fallbackPortrait.style.display = 'flex';
+        fallbackPortrait.textContent = c.emoji;
+      };
+
+      loader.src = c.image;
+      portraitCache[s.speaker] = loader;
+    }
+  } else {
+    portraitImg.style.display = 'none';
+    fallbackPortrait.style.display = 'flex';
+    fallbackPortrait.textContent = c.emoji;
+  }
+
+  typeText(s.text);
 }
 
 // Animated background rendering is loaded from backgrounds.js
