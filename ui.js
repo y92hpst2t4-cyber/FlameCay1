@@ -17,6 +17,8 @@ portraitCache[key]=img;
 });
 }
 
+window.preloadPortraits = preloadPortraits;
+
 function updateConsequenceSummary(){
 if(!q('consequenceSummary'))return;
 
