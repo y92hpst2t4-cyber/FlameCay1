@@ -590,7 +590,7 @@ font-size:16px;
   top: 45px;
   width: 38px;
   height: 80px;
-  background: inherit;
+background: var(--avatar-hair);
   border-radius: 50%;
   z-index: 1;
 }
