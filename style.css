@@ -1033,3 +1033,25 @@ background: var(--avatar-hair);
     height: 190px;
   }
 }
+/* Safari real-background layering repair */
+
+body.has-real-background {
+  position: relative;
+  isolation: isolate;
+}
+
+body.has-real-background::before,
+body.has-real-background::after {
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.has-real-background > main.screen {
+  position: relative;
+  z-index: 10;
+}
+
+#game {
+  position: relative;
+  z-index: 11;
+}
