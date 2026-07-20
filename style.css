@@ -970,3 +970,67 @@ background: var(--avatar-hair);
 #dialogueCard > #speakerTitle {
   display: none;
 }
+/* Player preset selector */
+
+.playerPresetGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.playerPresetCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  padding: 10px;
+  border: 3px solid transparent;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+}
+
+.playerPresetCard input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.playerPresetCard img {
+  display: block;
+  width: 100%;
+  height: 230px;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 12px;
+}
+
+.playerPresetCard span {
+  margin-top: 8px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.playerPresetCard.selected,
+.playerPresetCard:has(input:checked) {
+  border-color: #ff6b00;
+  background: #fff4e8;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.18);
+}
+
+@media (max-width: 480px) {
+  .playerPresetGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .playerPresetCard {
+    padding: 7px;
+  }
+
+  .playerPresetCard img {
+    height: 190px;
+  }
+}
