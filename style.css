@@ -479,6 +479,7 @@ button{
 min-height:48px;
 font-size:16px;
 }
+}
 /* Phase 1 — Player Avatar Preview */
 
 #playerAvatarPreview {
@@ -534,11 +535,12 @@ font-size:16px;
 #playerAvatarPreview.curly #playerAvatarHair {
   height: 72px;
   border-radius: 50%;
+  
   box-shadow:
-    -18px 8px 0 #4a2d1f,
-    18px 8px 0 #4a2d1f,
-    -10px -8px 0 #4a2d1f,
-    10px -8px 0 #4a2d1f;
+  -18px 8px 0 var(--avatar-hair),
+  18px 8px 0 var(--avatar-hair),
+  -10px -8px 0 var(--avatar-hair),
+  10px -8px 0 var(--avatar-hair);
 }
 
 #playerAvatarPreview.waves #playerAvatarHair {
@@ -558,7 +560,7 @@ font-size:16px;
   top: 65px;
   width: 16px;
   height: 85px;
-  background: inherit;
+ background: var(--avatar-hair);
   border-radius: 10px;
   z-index: 1;
 }
