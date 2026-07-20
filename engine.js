@@ -1,4 +1,9 @@
 'use strict';
+if (typeof window.q !== 'function') {
+  window.q = function (id) {
+    return document.getElementById(id);
+  };
+}
 
 // The Island of Flames
 // Version 3.6.4 — Clean Reset Core Engine
