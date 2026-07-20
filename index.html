@@ -35,11 +35,17 @@ document.getElementById('characterCreator').classList.remove('hidden');
 🎨 New Game
 </button>
 
-<button id="continueGameButton" class="saveButton hidden" onclick="continueLatestSave()">
+<button
+id="continueGameButton"
+class="saveButton hidden"
+onclick="continueLatestSave()"
+>
 ▶ Continue Latest Save
 </button>
 
-<button class="loadButton" onclick="openLoadMenu()">📂 Load Game</button>
+<button class="loadButton" onclick="openLoadMenu()">
+📂 Load Game
+</button>
 
 <div id="loadMenu" class="card hidden">
 
@@ -66,12 +72,17 @@ document.getElementById('characterCreator').classList.remove('hidden');
 <div id="playerCharacterPreview">
 
 <div id="playerAvatarPreview">
-  <div id="playerAvatarHair"></div>
 
-  <div id="playerAvatarFace">
-    <div class="avatarEyes">● ●</div>
-    <div class="avatarMouth">⌣</div>
-  </div>
+<div id="playerAvatarHair"></div>
+
+<div id="playerAvatarFace">
+
+<div class="avatarEyes">● ●</div>
+
+<div class="avatarMouth">⌣</div>
+
+</div>
+
 </div>
 
 <h3 id="playerPreviewName">Your Islander</h3>
@@ -88,7 +99,9 @@ Choose your appearance and personality.
 
 <h2>📝 Basic Information</h2>
 
-<label for="playerName"><strong>Character Name</strong></label>
+<label for="playerName">
+<strong>Character Name</strong>
+</label>
 
 <input
 id="playerName"
@@ -99,7 +112,9 @@ maxlength="20"
 
 <br><br>
 
-<label for="playerPronouns"><strong>Pronouns</strong></label>
+<label for="playerPronouns">
+<strong>Pronouns</strong>
+</label>
 
 <select id="playerPronouns">
 
@@ -117,7 +132,9 @@ maxlength="20"
 
 <h2>🎨 Appearance</h2>
 
-<label for="playerSkinTone"><strong>Skin Tone</strong></label>
+<label for="playerSkinTone">
+<strong>Skin Tone</strong>
+</label>
 
 <select id="playerSkinTone">
 
@@ -135,7 +152,9 @@ maxlength="20"
 
 <br><br>
 
-<label for="playerHairstyle"><strong>Hairstyle</strong></label>
+<label for="playerHairstyle">
+<strong>Hairstyle</strong>
+</label>
 
 <select id="playerHairstyle">
 
@@ -155,7 +174,9 @@ maxlength="20"
 
 <br><br>
 
-<label for="playerHairColor"><strong>Hair Color</strong></label>
+<label for="playerHairColor">
+<strong>Hair Color</strong>
+</label>
 
 <select id="playerHairColor">
 
@@ -173,7 +194,9 @@ maxlength="20"
 
 <br><br>
 
-<label for="playerOutfit"><strong>Arrival Outfit</strong></label>
+<label for="playerOutfit">
+<strong>Arrival Outfit</strong>
+</label>
 
 <select id="playerOutfit">
 
@@ -195,9 +218,13 @@ maxlength="20"
 
 <h2>🔥 Personality</h2>
 
-<p>Your personality will eventually unlock special dialogue choices.</p>
+<p>
+Your personality will eventually unlock special dialogue choices.
+</p>
 
-<label for="playerPersonality"><strong>Choose Your Personality</strong></label>
+<label for="playerPersonality">
+<strong>Choose Your Personality</strong>
+</label>
 
 <select id="playerPersonality">
 
@@ -230,86 +257,141 @@ document.getElementById('menu').classList.remove('hidden');
 
 <h2 id="welcome">Welcome to Flame Cay</h2>
 
-<div id="playerScenePortrait" class="playerScenePortrait hidden">
+<div
+id="playerScenePortrait"
+class="playerScenePortrait hidden"
+>
 
-  <div id="playerSceneAvatar" class="playerSceneAvatar short">
+<div
+id="playerSceneAvatar"
+class="playerSceneAvatar short"
+>
 
-    <div id="playerSceneHair" class="playerSceneHair"></div>
+<div
+id="playerSceneHair"
+class="playerSceneHair"
+></div>
 
-    <div id="playerSceneFace" class="playerSceneFace">
-      <div class="playerSceneEyes">● ●</div>
-      <div class="playerSceneMouth">⌣</div>
-    </div>
+<div
+id="playerSceneFace"
+class="playerSceneFace"
+>
 
-    <div id="playerSceneBody" class="playerSceneBody"></div>
+<div class="playerSceneEyes">● ●</div>
 
-  </div>
+<div class="playerSceneMouth">⌣</div>
 
-  <div class="playerSceneInformation">
-    <h3 id="playerSceneName">Player</h3>
-    <p id="playerScenePersonality">New Islander</p>
-  </div>
+</div>
+
+<div
+id="playerSceneBody"
+class="playerSceneBody"
+></div>
+
+</div>
+
+<div class="playerSceneInformation">
+
+<h3 id="playerSceneName">Player</h3>
+
+<p id="playerScenePersonality">
+New Islander
+</p>
+
+</div>
 
 </div>
 
 <div class="card">
 
-<h3>📅 Day <span id="dayNumber">1</span></h3>
+<h3>
+📅 Day <span id="dayNumber">1</span>
+</h3>
 
-<h3><span id="timeIcon">☀️</span> <span id="timePeriod">Morning</span></h3>
+<h3>
+<span id="timeIcon">☀️</span>
+<span id="timePeriod">Morning</span>
+</h3>
 
-<p id="actionStatus">⭐ One activity available</p>
-
-</div>
-
-<div id="portraitBox" class="hidden dialoguePortraitRow">
-
-  <div id="npcDialogueSide" class="dialogueCharacterSide">
-
-    <img id="portraitImage" alt="Character Portrait">
-
-    <div id="portrait">🌴</div>
-
-    <div class="dialogueSpeakerInformation">
-      <h3 id="speakerName">Narrator</h3>
-      <p id="speakerTitle">The Story Begins</p>
-    </div>
-
-  </div>
-
-  <div id="playerDialogueSide" class="dialoguePlayerSide hidden">
-
-    <div id="playerDialogueAvatar" class="playerDialogueAvatar short">
-
-      <div id="playerDialogueHair" class="playerDialogueHair"></div>
-
-      <div id="playerDialogueFace" class="playerDialogueFace">
-
-        <div class="playerDialogueEyes">● ●</div>
-
-        <div class="playerDialogueMouth">⌣</div>
-
-      </div>
-
-      <div id="playerDialogueBody" class="playerDialogueBody"></div>
-
-    </div>
-
-    <div class="playerDialogueInformation">
-
-      <strong id="playerDialogueName">Player</strong>
-
-      <span>You</span>
-
-    </div>
-
-  </div>
+<p id="actionStatus">
+⭐ One activity available
+</p>
 
 </div>
 
-<h3 id="speakerName" style="margin:0">Narrator</h3>
+<div
+id="portraitBox"
+class="hidden dialoguePortraitRow"
+>
 
-<p id="speakerTitle" style="margin:0;color:#666">The Story Begins</p>
+<div
+id="npcDialogueSide"
+class="dialogueCharacterSide"
+>
+
+<img
+id="portraitImage"
+alt="Character Portrait"
+>
+
+<div id="portrait">🌴</div>
+
+<div class="dialogueSpeakerInformation">
+
+<h3 id="speakerName">
+Narrator
+</h3>
+
+<p id="speakerTitle">
+The Story Begins
+</p>
+
+</div>
+
+</div>
+
+<div
+id="playerDialogueSide"
+class="dialoguePlayerSide hidden"
+>
+
+<div
+id="playerDialogueAvatar"
+class="playerDialogueAvatar short"
+>
+
+<div
+id="playerDialogueHair"
+class="playerDialogueHair"
+></div>
+
+<div
+id="playerDialogueFace"
+class="playerDialogueFace"
+>
+
+<div class="playerDialogueEyes">● ●</div>
+
+<div class="playerDialogueMouth">⌣</div>
+
+</div>
+
+<div
+id="playerDialogueBody"
+class="playerDialogueBody"
+></div>
+
+</div>
+
+<div class="playerDialogueInformation">
+
+<strong id="playerDialogueName">
+Player
+</strong>
+
+<span>You</span>
+
+</div>
 
 </div>
 
@@ -317,9 +399,17 @@ document.getElementById('menu').classList.remove('hidden');
 
 <div id="dialogueCard" class="card">
 
-<p id="story" style="font-size:17px;line-height:1.6;min-height:40px"></p>
+<p
+id="story"
+style="font-size:17px;line-height:1.6;min-height:40px"
+></p>
 
-<button id="continueButton" onclick="nextDialogue()">▶ Continue</button>
+<button
+id="continueButton"
+onclick="nextDialogue()"
+>
+▶ Continue
+</button>
 
 </div>
 
@@ -329,11 +419,15 @@ document.getElementById('menu').classList.remove('hidden');
 
 <div class="card">
 
-<h2 id="walkingTitle">🚶 Exploring Flame Cay</h2>
+<h2 id="walkingTitle">
+🚶 Exploring Flame Cay
+</h2>
 
 <p id="walkingText"></p>
 
-<button onclick="finishWalking()">Continue Walking ➜</button>
+<button onclick="finishWalking()">
+Continue Walking ➜
+</button>
 
 </div>
 
@@ -349,29 +443,56 @@ document.getElementById('menu').classList.remove('hidden');
 
 <p id="mapActionText"></p>
 
-<button onclick="startWalking('volcano')">🌋 Volcano Peak</button>
+<button onclick="startWalking('volcano')">
+🌋 Volcano Peak
+</button>
 
-<button onclick="startWalking('jungle')">🌿 Whispering Jungle</button>
+<button onclick="startWalking('jungle')">
+🌿 Whispering Jungle
+</button>
 
-<button onclick="startWalking('shrine')">💎 Crystal Shrine</button>
+<button onclick="startWalking('shrine')">
+💎 Crystal Shrine
+</button>
 
-<button onclick="startWalking('beach')">🏖 Arrival Beach</button>
+<button onclick="startWalking('beach')">
+🏖 Arrival Beach
+</button>
 
-<button onclick="startWalking('villa')">🏡 Main Villa</button>
+<button onclick="startWalking('villa')">
+🏡 Main Villa
+</button>
 
-<button onclick="startWalking('village')">🏝️ Flame Village</button>
+<button onclick="startWalking('village')">
+🏝️ Flame Village
+</button>
 
-<button onclick="startWalking('gym')">💪 Gym</button>
+<button onclick="startWalking('gym')">
+💪 Gym
+</button>
 
-<button onclick="startWalking('kitchen')">🍳 Kitchen</button>
+<button onclick="startWalking('kitchen')">
+🍳 Kitchen
+</button>
 
-<button onclick="startWalking('pool')">🏊 Infinity Pool</button>
+<button onclick="startWalking('pool')">
+🏊 Infinity Pool
+</button>
 
-<button onclick="startWalking('firepit')">🔥 Fire Pit</button>
+<button onclick="startWalking('firepit')">
+🔥 Fire Pit
+</button>
 
-<button onclick="startWalking('cove')">🌙 Moonlight Cove</button>
+<button onclick="startWalking('cove')">
+🌙 Moonlight Cove
+</button>
 
-<button id="advanceTimeButton" onclick="advanceTime()">⏰ Skip This Time Period</button>
+<button
+id="advanceTimeButton"
+onclick="advanceTime()"
+>
+⏰ Skip This Time Period
+</button>
 
 </div>
 
@@ -381,71 +502,146 @@ document.getElementById('menu').classList.remove('hidden');
 
 <h3>💾 Save Game</h3>
 
-<p id="saveStatus">Choose a save slot.</p>
+<p id="saveStatus">
+Choose a save slot.
+</p>
 
-<button class="saveButton" onclick="saveGame(1)">💾 Save Slot 1</button>
+<button
+class="saveButton"
+onclick="saveGame(1)"
+>
+💾 Save Slot 1
+</button>
 
-<button class="saveButton" onclick="saveGame(2)">💾 Save Slot 2</button>
+<button
+class="saveButton"
+onclick="saveGame(2)"
+>
+💾 Save Slot 2
+</button>
 
-<button class="saveButton" onclick="saveGame(3)">💾 Save Slot 3</button>
+<button
+class="saveButton"
+onclick="saveGame(3)"
+>
+💾 Save Slot 3
+</button>
 
-<button class="loadButton" onclick="openInGameLoadMenu()">📂 Load Another Save</button>
+<button
+class="loadButton"
+onclick="openInGameLoadMenu()"
+>
+📂 Load Another Save
+</button>
 
-<div id="inGameLoadMenu" class="hidden">
+<div
+id="inGameLoadMenu"
+class="hidden"
+>
 
 <div id="inGameLoadSlotList"></div>
 
-<button onclick="closeInGameLoadMenu()">⬅ Close Load Menu</button>
+<button onclick="closeInGameLoadMenu()">
+⬅ Close Load Menu
+</button>
 
 </div>
 
 </div>
 
-<div class="card consequenceCard" id="choiceConsequencesPanel">
+<div
+class="card consequenceCard"
+id="choiceConsequencesPanel"
+>
 
 <h3>🧭 Choice Consequences</h3>
 
-<p id="consequenceSummary">Your important decisions are remembered.</p>
+<p id="consequenceSummary">
+Your important decisions are remembered.
+</p>
 
-<button class="consequenceButton" onclick="openChoiceConsequencesDashboard()">📜 View Consequences</button>
+<button
+class="consequenceButton"
+onclick="openChoiceConsequencesDashboard()"
+>
+📜 View Consequences
+</button>
 
 </div>
 
-<div class="card relationshipCard" id="relationshipSystemPanel">
+<div
+class="card relationshipCard"
+id="relationshipSystemPanel"
+>
 
 <h3>❤️ Relationship System 2.0</h3>
 
-<p id="reputationSummary" class="reputationBox">Reputation: New Arrival</p>
+<p
+id="reputationSummary"
+class="reputationBox"
+>
+Reputation: New Arrival
+</p>
 
-<button class="relationshipButton" onclick="openRelationshipDashboard()">📊 Open Relationship Dashboard</button>
+<button
+class="relationshipButton"
+onclick="openRelationshipDashboard()"
+>
+📊 Open Relationship Dashboard
+</button>
 
 </div>
 
-<div class="card" id="villaLifePanel">
+<div
+class="card"
+id="villaLifePanel"
+>
 
 <h3>🏡 Better Villa Life</h3>
 
-<p>See what the Islanders are doing between major story scenes.</p>
+<p>
+See what the Islanders are doing between major story scenes.
+</p>
 
-<button class="villaLifeButton" onclick="openVillaLifeHub()">👀 Explore Living Villa</button>
+<button
+class="villaLifeButton"
+onclick="openVillaLifeHub()"
+>
+👀 Explore Living Villa
+</button>
 
-<p id="villaLifeStatus" class="memoryNote">NPC conversations, gossip, and changing daily schedules are active.</p>
+<p
+id="villaLifeStatus"
+class="memoryNote"
+>
+NPC conversations, gossip, and changing daily schedules are active.
+</p>
 
 </div>
 
-<div class="card" id="relationshipBox"></div>
+<div
+class="card"
+id="relationshipBox"
+></div>
 
 </section>
 
 </main>
 
 <script src="characters.js?v=3648"></script>
+
 <script src="story.js?v=3652"></script>
+
 <script src="save.js?v=3672"></script>
+
 <script src="backgrounds.js?v=3648"></script>
+
 <script src="ui.js?v=3651"></script>
+
 <script src="engine.js?v=3674"></script>
+
 <script src="sound-system.js?v=3648"></script>
+
 <script src="character-creator.js?v=6"></script>
 
 </body>
