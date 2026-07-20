@@ -248,61 +248,14 @@ function renderDialoguePlayerPortrait() {
       src="${spritePath}"
       alt="${profile.name}"
       style="
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        object-position: center bottom;
+        display:block;
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        object-position:center bottom;
       "
     >
   `;
-
-  playerNameElement.textContent = profile.name;
-
-  return true;
-}
-
-  const skinColors = {
-    light: '#f6d2b8',
-    'medium-light': '#e8b98f',
-    medium: '#c98a5b',
-    'medium-dark': '#9a5f3d',
-    dark: '#5c3425'
-  };
-
-  const hairColors = {
-    black: '#1f1a17',
-    brown: '#4a2d1f',
-    blonde: '#d8b45a',
-    red: '#8f3f2b',
-    silver: '#b9bcc2'
-  };
-
-  const outfitColors = {
-    'island-casual': '#2f9e83',
-    'summer-glam': '#d95d93',
-    sporty: '#315fa8',
-    elegant: '#282833',
-    bold: '#e0522d'
-  };
-
-  avatar.className = 'playerDialogueAvatar';
-  avatar.classList.add(profile.hairstyle || 'short');
-
-  avatar.style.setProperty(
-    '--dialogue-skin',
-    skinColors[profile.skinTone] || skinColors.light
-  );
-
-  avatar.style.setProperty(
-    '--dialogue-hair',
-    hairColors[profile.hairColor] || hairColors.black
-  );
-
-  avatar.style.setProperty(
-    '--dialogue-outfit',
-    outfitColors[profile.outfit] || outfitColors['island-casual']
-  );
 
   playerNameElement.textContent = profile.name;
 
@@ -330,19 +283,20 @@ function updateDialoguePortraitLayout(speaker) {
     return;
   }
 
-  const playerRendered = renderDialoguePlayerPortrait();
+  const playerRendered =
+    renderDialoguePlayerPortrait();
 
- if (isPlayer) {
-  if (playerRendered) {
-    npcSide.classList.add('hidden');
-    playerSide.classList.remove('hidden');
-  } else {
-    npcSide.classList.remove('hidden');
-    playerSide.classList.add('hidden');
+  if (isPlayer) {
+    if (playerRendered) {
+      npcSide.classList.add('hidden');
+      playerSide.classList.remove('hidden');
+    } else {
+      npcSide.classList.remove('hidden');
+      playerSide.classList.add('hidden');
+    }
+
+    return;
   }
-
-  return;
-}
 
   npcSide.classList.remove('hidden');
 
