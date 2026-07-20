@@ -1042,7 +1042,18 @@ playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
 
-window.scrollTo(0, 0);
+setTimeout(() => {
+  const gameScreen = q('game');
+
+  if (gameScreen) {
+    gameScreen.scrollIntoView({
+      behavior: 'auto',
+      block: 'start'
+    });
+  }
+
+  window.scrollTo(0, 0);
+}, 150);
 
 q('welcome').textContent='Welcome to Flame Cay, '+playerName+'!';
 dialogueIndex=0;currentDay=1;currentTime='Morning';actionUsed=false;eveningEventDone=false;currentLocation='villa';pendingLocation='';coupledWith='';couplingRomance=0;couplingTrust=0;ceremonyComplete=false;challengeScore=0;challengeQuestion=0;challengeComplete=false;bombshellChoice='';bombshellComplete=false;eliminationComplete=false;eliminatedPerson='';savedPerson='';atRisk=[];currentSaveSlot=0;lastSaveTime='';dateInvitee='';dateChoice='';dateComplete=false;casaStarted=false;casaChoice='';casaPartnerReaction='';casaComplete=false;recouplingChoice='';recouplingPartnerChoice='';recouplingComplete=false;previousPartner='';falloutStarted=false;falloutChoice='';falloutComplete=false;compatibilityStarted=false;compatibilityScore=0;compatibilityQuestion=0;compatibilityPartner='';compatibilityComplete=false;luxuryDateStarted=false;luxuryDateChoice='';luxuryDateResult='';luxuryDateComplete=false;secretVoteStarted=false;secretVoteChoice='';secretVoteResult='';secretVoteComplete=false;secondEliminationStarted=false;secondEliminationSaved='';secondEliminatedPerson='';secondEliminationComplete=false;finalWeekStarted=false;familyMessageChoice='';finalWeekChoice='';finalWeekComplete=false;finalDateStarted=false;finalDatePartner='';finalDateChoice='';finalDatePromise='';finalDateComplete=false;finaleStarted=false;finalSpeechChoice='';finaleScore=0;finaleEnding='';finaleWinner=false;keeperChosen=false;finaleComplete=false;villaLifeVisits=0;villaLifeEventIndex=0;villaLifeLastLocation='';villaLifeGossip=[];villaLifeMemories={};attractionStats={};jealousyStats={};characterMoods={};playerReputation=0;reputationHistory=[];relationshipHistory=[];storyFlags={};choiceHistory=[];pendingConsequences=[];resolvedConsequences=[];
