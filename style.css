@@ -1013,7 +1013,6 @@ background: var(--avatar-hair);
   text-align: center;
 }
 
-.playerPresetCard.selected,
 .playerPresetCard:has(input:checked) {
   border-color: #ff6b00;
   background: #fff4e8;
