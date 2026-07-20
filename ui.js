@@ -227,6 +227,39 @@ function renderDialoguePlayerPortrait() {
     return false;
   }
 
+  const presetNumber = Number(profile.spritePreset) || 1;
+
+  const spritePath =
+    window.playerSpritePresets?.[presetNumber] ||
+    window.playerSpritePresets?.[1];
+
+  if (!spritePath) {
+    return false;
+  }
+
+  avatar.className = 'playerDialogueAvatar';
+  avatar.style.overflow = 'hidden';
+  avatar.style.background = 'transparent';
+
+  avatar.innerHTML = `
+    <img
+      src="${spritePath}"
+      alt="${profile.name}"
+      style="
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center bottom;
+      "
+    >
+  `;
+
+  playerNameElement.textContent = profile.name;
+
+  return true;
+}
+
   const skinColors = {
     light: '#f6d2b8',
     'medium-light': '#e8b98f',
