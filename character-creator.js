@@ -13,8 +13,6 @@ const playerSpritePresets = {
 
 // Phase 1 — Player Character Creator
 
-// Phase 1 — Player Character Creator
-
 window.playerProfile = {
   name: '',
   pronouns: 'she/her',
