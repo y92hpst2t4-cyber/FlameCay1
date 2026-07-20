@@ -12,6 +12,8 @@ window.playerProfile = {
   personality: 'romantic'
 };
 
+const PLAYER_PROFILE_STORAGE_KEY = 'flameCayPlayerProfile';
+
 function getCharacterCreatorElement(id) {
   return document.getElementById(id);
 }
@@ -21,25 +23,6 @@ function formatCharacterOption(value) {
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-}
-
-  const skinToneEmoji = {
-    light: '🏻',
-    'medium-light': '🏼',
-    medium: '🏽',
-    'medium-dark': '🏾',
-    dark: '🏿'
-  };
-
-  let personEmoji = '🧑';
-
-  if (pronouns === 'she/her') {
-    personEmoji = '👩';
-  } else if (pronouns === 'he/him') {
-    personEmoji = '👨';
-  }
-
-  return personEmoji + (skinToneEmoji[skinTone] || '');
 }
 
 function updateCharacterPreview() {
@@ -75,42 +58,51 @@ function updateCharacterPreview() {
     personality: personalityInput.value
   };
 
-const previewName = getCharacterCreatorElement('playerPreviewName');
-const avatarPreview = getCharacterCreatorElement('playerAvatarPreview');
-const avatarFace = getCharacterCreatorElement('playerAvatarFace');
-const avatarHair = getCharacterCreatorElement('playerAvatarHair');
-const previewDetails = getCharacterCreatorElement('playerPreviewDetails');
-const confirmButton = getCharacterCreatorElement('confirmCharacterButton');
+  const previewName = getCharacterCreatorElement('playerPreviewName');
+  const avatarPreview = getCharacterCreatorElement('playerAvatarPreview');
+  const previewDetails = getCharacterCreatorElement('playerPreviewDetails');
+  const confirmButton = getCharacterCreatorElement('confirmCharacterButton');
 
-const skinColors = {
-  light: '#f6d2b8',
-  'medium-light': '#e8b98f',
-  medium: '#c98a5b',
-  'medium-dark': '#9a5f3d',
-  dark: '#5c3425'
-};
+  if (
+    !previewName ||
+    !avatarPreview ||
+    !previewDetails ||
+    !confirmButton
+  ) {
+    return;
+  }
 
-const hairColors = {
-  black: '#1f1a17',
-  brown: '#4a2d1f',
-  blonde: '#d8b45a',
-  red: '#8f3f2b',
-  silver: '#b9bcc2'
-};
+  const skinColors = {
+    light: '#f6d2b8',
+    'medium-light': '#e8b98f',
+    medium: '#c98a5b',
+    'medium-dark': '#9a5f3d',
+    dark: '#5c3425'
+  };
 
-avatarPreview.className = '';
-avatarPreview.id = 'playerAvatarPreview';
-avatarPreview.classList.add(window.playerProfile.hairstyle);
+  const hairColors = {
+    black: '#1f1a17',
+    brown: '#4a2d1f',
+    blonde: '#d8b45a',
+    red: '#8f3f2b',
+    silver: '#b9bcc2'
+  };
 
-avatarPreview.style.setProperty(
-  '--avatar-skin',
-  skinColors[window.playerProfile.skinTone] || skinColors.light
-);
+  previewName.textContent = name || 'Your Islander';
 
-avatarPreview.style.setProperty(
-  '--avatar-hair',
-  hairColors[window.playerProfile.hairColor] || hairColors.black
-);
+  avatarPreview.className = '';
+  avatarPreview.id = 'playerAvatarPreview';
+  avatarPreview.classList.add(window.playerProfile.hairstyle);
+
+  avatarPreview.style.setProperty(
+    '--avatar-skin',
+    skinColors[window.playerProfile.skinTone] || skinColors.light
+  );
+
+  avatarPreview.style.setProperty(
+    '--avatar-hair',
+    hairColors[window.playerProfile.hairColor] || hairColors.black
+  );
 
   previewDetails.textContent =
     formatCharacterOption(window.playerProfile.hairColor) +
@@ -124,6 +116,153 @@ avatarPreview.style.setProperty(
   confirmButton.disabled = name.length === 0;
 }
 
+function savePlayerProfile() {
+  try {
+    localStorage.setItem(
+      PLAYER_PROFILE_STORAGE_KEY,
+      JSON.stringify(window.playerProfile)
+    );
+  } catch (error) {
+    console.warn('Player profile could not be saved.', error);
+  }
+}
+
+function loadPlayerProfile() {
+  try {
+    const savedProfile = localStorage.getItem(
+      PLAYER_PROFILE_STORAGE_KEY
+    );
+
+    if (!savedProfile) {
+      return null;
+    }
+
+    return JSON.parse(savedProfile);
+  } catch (error) {
+    console.warn('Player profile could not be loaded.', error);
+    return null;
+  }
+}
+
+function renderPlayerScenePortrait() {
+  const profile = window.playerProfile;
+
+  if (!profile || !profile.name) {
+    return;
+  }
+
+  const portraitContainer =
+    getCharacterCreatorElement('playerScenePortrait');
+
+  const sceneAvatar =
+    getCharacterCreatorElement('playerSceneAvatar');
+
+  const sceneName =
+    getCharacterCreatorElement('playerSceneName');
+
+  const scenePersonality =
+    getCharacterCreatorElement('playerScenePersonality');
+
+  if (
+    !portraitContainer ||
+    !sceneAvatar ||
+    !sceneName ||
+    !scenePersonality
+  ) {
+    return;
+  }
+
+  const skinColors = {
+    light: '#f6d2b8',
+    'medium-light': '#e8b98f',
+    medium: '#c98a5b',
+    'medium-dark': '#9a5f3d',
+    dark: '#5c3425'
+  };
+
+  const hairColors = {
+    black: '#1f1a17',
+    brown: '#4a2d1f',
+    blonde: '#d8b45a',
+    red: '#8f3f2b',
+    silver: '#b9bcc2'
+  };
+
+  const outfitColors = {
+    'island-casual': '#2f9e83',
+    'summer-glam': '#d95d93',
+    sporty: '#315fa8',
+    elegant: '#282833',
+    bold: '#e0522d'
+  };
+
+  const personalityTitles = {
+    romantic: '💕 Romantic Islander',
+    loyal: '💚 Loyal Islander',
+    bold: '🔥 Bold Islander',
+    strategic: '🧠 Strategic Islander'
+  };
+
+  sceneAvatar.className = 'playerSceneAvatar';
+  sceneAvatar.classList.add(profile.hairstyle);
+
+  sceneAvatar.style.setProperty(
+    '--scene-skin',
+    skinColors[profile.skinTone] || skinColors.light
+  );
+
+  sceneAvatar.style.setProperty(
+    '--scene-hair',
+    hairColors[profile.hairColor] || hairColors.black
+  );
+
+  sceneAvatar.style.setProperty(
+    '--scene-outfit',
+    outfitColors[profile.outfit] || outfitColors['island-casual']
+  );
+
+  sceneName.textContent = profile.name;
+
+  scenePersonality.textContent =
+    personalityTitles[profile.personality] || 'New Islander';
+
+  portraitContainer.classList.remove('hidden');
+}
+
+function restorePlayerCreatorForm() {
+  const savedProfile = loadPlayerProfile();
+
+  if (!savedProfile) {
+    return;
+  }
+
+  window.playerProfile = {
+    ...window.playerProfile,
+    ...savedProfile
+  };
+
+  const fieldMap = {
+    playerName: 'name',
+    playerPronouns: 'pronouns',
+    playerSkinTone: 'skinTone',
+    playerHairstyle: 'hairstyle',
+    playerHairColor: 'hairColor',
+    playerOutfit: 'outfit',
+    playerPersonality: 'personality'
+  };
+
+  Object.entries(fieldMap).forEach(([elementId, profileKey]) => {
+    const element = getCharacterCreatorElement(elementId);
+
+    if (
+      element &&
+      window.playerProfile[profileKey] !== undefined
+    ) {
+      element.value = window.playerProfile[profileKey];
+    }
+  });
+}
+
 function confirmPlayerCharacter() {
   updateCharacterPreview();
 
@@ -132,7 +271,6 @@ function confirmPlayerCharacter() {
     return;
   }
 
-  // These values are available to the rest of the game.
   window.playerPronouns = window.playerProfile.pronouns;
   window.playerSkinTone = window.playerProfile.skinTone;
   window.playerHairstyle = window.playerProfile.hairstyle;
@@ -140,9 +278,13 @@ function confirmPlayerCharacter() {
   window.playerOutfit = window.playerProfile.outfit;
   window.playerPersonality = window.playerProfile.personality;
 
-  getCharacterCreatorElement('characterCreator').classList.add('hidden');
+  savePlayerProfile();
+
+  getCharacterCreatorElement('characterCreator')
+    .classList.add('hidden');
 
   startGame();
+  renderPlayerScenePortrait();
 }
 
 function initializeCharacterCreator() {
@@ -178,7 +320,11 @@ function initializeCharacterCreator() {
     );
   }
 
+  restorePlayerCreatorForm();
   updateCharacterPreview();
 }
 
-window.addEventListener('DOMContentLoaded', initializeCharacterCreator);
+window.addEventListener(
+  'DOMContentLoaded',
+  initializeCharacterCreator
+);
