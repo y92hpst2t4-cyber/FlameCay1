@@ -1055,3 +1055,91 @@ body.has-real-background > main.screen {
   position: relative;
   z-index: 11;
 }
+/* Phase 1 Step 5.5 — Balanced mobile dialogue portraits */
+
+.dialoguePortraitRow {
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.dialogueCharacterSide {
+  flex: 1 1 auto;
+  gap: 12px;
+}
+
+.dialoguePlayerSide {
+  flex: 0 0 105px;
+  justify-content: center;
+  gap: 6px;
+}
+
+.playerDialogueAvatar {
+  width: 72px;
+  height: 104px;
+  flex: 0 0 72px;
+}
+
+.playerDialogueAvatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.playerDialogueInformation {
+  min-width: 0;
+  text-align: center;
+}
+
+.playerDialogueInformation strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.playerDialogueInformation span {
+  font-size: 12px;
+}
+
+@media (max-width: 430px) {
+  .dialoguePortraitRow {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .dialogueCharacterSide {
+    gap: 9px;
+  }
+
+  #portrait,
+  #portraitImage {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+  }
+
+  .dialogueSpeakerInformation h3 {
+    font-size: 17px;
+    line-height: 1.1;
+  }
+
+  .dialogueSpeakerInformation p {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .dialoguePlayerSide {
+    flex-basis: 94px;
+  }
+
+  .playerDialogueAvatar {
+    width: 66px;
+    height: 96px;
+    flex-basis: 66px;
+  }
+
+  .playerDialogueInformation {
+    display: flex;
+  }
+}
