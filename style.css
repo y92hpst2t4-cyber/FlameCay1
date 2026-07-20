@@ -762,3 +762,205 @@ background: var(--avatar-hair);
   border-radius: 50%;
   z-index: 2;
 }
+/* Phase 1 Step 4 — Player and NPC dialogue portraits */
+
+.dialoguePortraitRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.dialogueCharacterSide {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.dialogueSpeakerInformation {
+  min-width: 0;
+}
+
+.dialogueSpeakerInformation h3 {
+  margin: 0 0 4px;
+}
+
+.dialogueSpeakerInformation p {
+  margin: 0;
+  color: #666;
+}
+
+.dialoguePlayerSide {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.dialoguePlayerSide.hidden {
+  display: none;
+}
+
+.playerDialogueInformation {
+  display: flex;
+  flex-direction: column;
+}
+
+.playerDialogueInformation strong {
+  font-size: 15px;
+}
+
+.playerDialogueInformation span {
+  color: #666;
+  font-size: 13px;
+}
+
+.playerDialogueAvatar {
+  --dialogue-skin: #f6d2b8;
+  --dialogue-hair: #1f1a17;
+  --dialogue-outfit: #ff7200;
+
+  position: relative;
+  width: 64px;
+  height: 88px;
+  flex: 0 0 64px;
+}
+
+.playerDialogueFace {
+  position: absolute;
+  left: 14px;
+  top: 17px;
+  width: 38px;
+  height: 47px;
+  background: var(--dialogue-skin);
+  border: 2px solid rgba(0, 0, 0, 0.16);
+  border-radius: 45% 45% 43% 43%;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.playerDialogueHair {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  width: 46px;
+  height: 29px;
+  background: var(--dialogue-hair);
+  border-radius: 55% 55% 25% 25%;
+  z-index: 4;
+}
+
+.playerDialogueBody {
+  position: absolute;
+  left: 7px;
+  bottom: 0;
+  width: 52px;
+  height: 37px;
+  background: var(--dialogue-outfit);
+  border: 2px solid rgba(0, 0, 0, 0.16);
+  border-radius: 25px 25px 7px 7px;
+  z-index: 1;
+}
+
+.playerDialogueEyes {
+  margin-top: 6px;
+  font-size: 7px;
+  letter-spacing: 5px;
+  transform: translateX(2px);
+}
+
+.playerDialogueMouth {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+/* Short */
+
+.playerDialogueAvatar.short .playerDialogueHair {
+  height: 25px;
+}
+
+/* Curly */
+
+.playerDialogueAvatar.curly .playerDialogueHair {
+  height: 31px;
+  border-radius: 50%;
+  box-shadow:
+    -6px 4px 0 var(--dialogue-hair),
+    6px 4px 0 var(--dialogue-hair),
+    -4px -3px 0 var(--dialogue-hair),
+    4px -3px 0 var(--dialogue-hair);
+}
+
+/* Waves */
+
+.playerDialogueAvatar.waves .playerDialogueHair {
+  height: 29px;
+  border-radius: 65% 42% 35% 20%;
+}
+
+/* Braids */
+
+.playerDialogueAvatar.braids::before,
+.playerDialogueAvatar.braids::after {
+  content: "";
+  position: absolute;
+  top: 29px;
+  width: 6px;
+  height: 34px;
+  background: var(--dialogue-hair);
+  border-radius: 6px;
+  z-index: 3;
+}
+
+.playerDialogueAvatar.braids::before {
+  left: 8px;
+}
+
+.playerDialogueAvatar.braids::after {
+  right: 8px;
+}
+
+/* Long */
+
+.playerDialogueAvatar.long .playerDialogueHair {
+  height: 56px;
+  border-radius: 55% 55% 32% 32%;
+}
+
+/* Ponytail */
+
+.playerDialogueAvatar.ponytail::after {
+  content: "";
+  position: absolute;
+  top: 21px;
+  right: 1px;
+  width: 17px;
+  height: 35px;
+  background: var(--dialogue-hair);
+  border-radius: 50%;
+  z-index: 2;
+}
+
+@media (max-width: 430px) {
+  .dialoguePortraitRow {
+    gap: 7px;
+  }
+
+  .dialoguePlayerInformation {
+    display: none;
+  }
+
+  .playerDialogueAvatar {
+    flex-basis: 58px;
+    width: 58px;
+  }
+}
