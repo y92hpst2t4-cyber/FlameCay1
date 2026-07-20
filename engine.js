@@ -1037,7 +1037,9 @@ resumeSavedProgress();
 }
 
 function startGame(){
-preloadPortraits();
+if (typeof window.preloadPortraits === 'function') {
+  window.preloadPortraits();
+}
 playerName=q('playerName').value.trim()||'Player';
 q('menu').classList.add('hidden');
 q('game').classList.remove('hidden');
