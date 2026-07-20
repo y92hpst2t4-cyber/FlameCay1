@@ -1,5 +1,18 @@
 'use strict';
 
+const playerSpritePresets = {
+  1: 'player-sprites/2FFB9EAD-79CB-47C9-93DB-B75F1A3C0DF5.png',
+  2: 'player-sprites/AD4DA575-4307-4915-A00B-5840D120177B.png',
+  3: 'player-sprites/E1FB32B8-80B6-436D-9FF4-22DFC345AE83.png',
+  4: 'player-sprites/618E0EFF-7956-45BE-BC38-F6E6DF5847A9.png',
+  5: 'player-sprites/50DC97F4-3772-4E16-BC7A-9427F3A06FC0.png',
+  6: 'player-sprites/DE96B228-6D9B-4C45-BA1F-F8F7869A480A.png',
+  7: 'player-sprites/AB762639-536E-41A4-8908-0E8BB4D013E8.png',
+  8: 'player-sprites/CB7DD06E-B5B7-4946-BBC2-B8F4489B5D8A.png'
+};
+
+// Phase 1 — Player Character Creator
+
 // Phase 1 — Player Character Creator
 
 window.playerProfile = {
