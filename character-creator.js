@@ -326,15 +326,25 @@ function confirmPlayerCharacter() {
 
   savePlayerProfile();
 
-  const creator =
-    getCharacterCreatorElement('characterCreator');
+  try {
+    startGame();
 
-  if (creator) {
-    creator.classList.add('hidden');
+    const creator =
+      getCharacterCreatorElement('characterCreator');
+
+    if (creator) {
+      creator.classList.add('hidden');
+    }
+
+    renderPlayerScenePortrait();
+  } catch (error) {
+    console.error('New game startup error:', error);
+
+    alert(
+      'Game startup error: ' +
+      (error?.message || String(error))
+    );
   }
-
-  startGame();
-  renderPlayerScenePortrait();
 }
 
 function initializeCharacterCreator() {
