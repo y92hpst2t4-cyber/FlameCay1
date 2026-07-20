@@ -964,3 +964,9 @@ background: var(--avatar-hair);
     width: 58px;
   }
 }
+/* Phase 1 Step 4.1 — Remove duplicate dialogue speaker label */
+
+#dialogueCard > #speakerName,
+#dialogueCard > #speakerTitle {
+  display: none;
+}
