@@ -1197,33 +1197,53 @@ pendingLocation='';
 }
 
 function visitLocation(loc){
-q('islandMap').classList.add('hidden');
-q('dialogueCard').classList.remove('hidden');
-q('choices').classList.remove('hidden');
+  q('islandMap').classList.add('hidden');
+  q('dialogueCard').classList.remove('hidden');
+  q('choices').classList.remove('hidden');
 
-if(currentDay===5&&currentTime==='Morning'){
-visitDayFiveLocation(loc);
-return;
-}
+  const atmosphereMap = {
+    beach: 'beach',
+    villa: 'villa',
+    village: 'island',
+    shrine: 'island',
+    jungle: 'jungle',
+    gym: 'villa',
+    kitchen: 'villa',
+    pool: 'island',
+    firepit: 'firepit',
+    cove: 'beach',
+    volcano: 'island'
+  };
 
-if(currentDay===5&&currentTime==='Afternoon'){
-visitDayFiveAfternoonLocation(loc);
-return;
-}
+  if (typeof window.playAtmosphere === 'function') {
+    window.playAtmosphere(
+      atmosphereMap[loc] || 'island'
+    );
+  }
 
-({
-beach:visitBeach,
-villa:visitVilla,
-village:visitVillage,
-shrine:visitShrine,
-jungle:visitJungle,
-gym:visitGym,
-kitchen:visitKitchen,
-pool:visitPool,
-firepit:visitFirePit,
-cove:visitCove,
-volcano:visitVolcano
-}[loc]||visitVilla)();
+  if(currentDay===5&&currentTime==='Morning'){
+    visitDayFiveLocation(loc);
+    return;
+  }
+
+  if(currentDay===5&&currentTime==='Afternoon'){
+    visitDayFiveAfternoonLocation(loc);
+    return;
+  }
+
+  ({
+    beach:visitBeach,
+    villa:visitVilla,
+    village:visitVillage,
+    shrine:visitShrine,
+    jungle:visitJungle,
+    gym:visitGym,
+    kitchen:visitKitchen,
+    pool:visitPool,
+    firepit:visitFirePit,
+    cove:visitCove,
+    volcano:visitVolcano
+  }[loc]||visitVilla)();
 }
 
 /* DAY 1 + DAY 2 + DAY 3 MORNING + DAY 4 MORNING SCHEDULES */
