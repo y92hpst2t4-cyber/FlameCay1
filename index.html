@@ -10,7 +10,7 @@
 
 <title>The Island of Flames</title>
 
-<link rel="stylesheet" href="style.css?v=3658">
+<link rel="stylesheet" href="style.css?v=3659">
 
 </head>
 
@@ -18,78 +18,149 @@
 
 <main class="screen">
 
-<section id="menu">
+<section id="menu" class="openingMenu">
 
-<button id="soundToggle" onclick="toggleSound()">
-🔊 Sound On
-</button>
+  <div class="openingMenuOverlay">
 
-<h1>🔥 The Island of Flames</h1>
+    <div class="openingMenuContent">
 
-<h2>Season 1 — The Crystal Awakens</h2>
+      <div class="openingLogo">
 
-<p><strong>Version 3.6.4 — Episode 1 Progress Build</strong></p>
+        <p class="openingSeason">
+          SEASON 1
+        </p>
 
-<button onclick="
-document.getElementById('menu').classList.add('hidden');
-document.getElementById('characterCreator').classList.remove('hidden');
-">
-🎨 New Game
-</button>
+        <h1>
+          THE ISLAND<br>
+          <span>OF FLAMES</span>
+        </h1>
 
-<button
-id="continueGameButton"
-class="saveButton hidden"
-onclick="continueLatestSave()"
->
-▶ Continue Latest Save
-</button>
+        <p class="openingSubtitle">
+          The Crystal Awakens
+        </p>
 
-<button class="loadButton" onclick="openLoadMenu()">
-📂 Load Game
-</button>
+      </div>
 
-<div id="audioSettings" class="card audioSettingsCard">
+      <div
+        id="mainMenuButtons"
+        class="openingMenuButtons"
+      >
 
-<h3>🎵 Audio Settings</h3>
+        <button
+          class="openingPrimaryButton"
+          onclick="
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('characterCreator').classList.remove('hidden');
+          "
+        >
+          New Game
+        </button>
 
-<label for="musicVolume">
-<strong>Music Volume</strong>
-</label>
+        <button
+          id="continueGameButton"
+          class="openingSecondaryButton hidden"
+          onclick="continueLatestSave()"
+        >
+          Continue
+        </button>
 
-<input
-id="musicVolume"
-type="range"
-min="0"
-max="1"
-step="0.05"
-value="0.6"
->
+        <button
+          class="openingSecondaryButton"
+          onclick="openLoadMenu()"
+        >
+          Load Game
+        </button>
 
-<label for="soundEffectsVolume">
-<strong>Sound Effects Volume</strong>
-</label>
+        <button
+          class="openingSettingsButton"
+          onclick="
+            document.getElementById('mainMenuButtons').classList.add('hidden');
+            document.getElementById('audioSettings').classList.remove('hidden');
+          "
+        >
+          ⚙ Settings
+        </button>
 
-<input
-id="soundEffectsVolume"
-type="range"
-min="0"
-max="1"
-step="0.05"
-value="0.8"
->
+      </div>
 
-</div>
+      <div
+        id="audioSettings"
+        class="openingSettingsPanel hidden"
+      >
 
-<div id="loadMenu" class="card hidden">
+        <h2>Settings</h2>
 
-<h3>📂 Load Game</h3>
+        <button
+          id="soundToggle"
+          class="openingSecondaryButton"
+          onclick="toggleSound()"
+        >
+          🔊 Sound On
+        </button>
 
-<div id="loadSlotList"></div>
+        <label for="musicVolume">
+          Music Volume
+        </label>
 
-<button onclick="closeLoadMenu()">⬅ Back</button>
+        <input
+          id="musicVolume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          value="0.6"
+        >
 
-</div>
+        <label for="soundEffectsVolume">
+          Sound Effects Volume
+        </label>
+
+        <input
+          id="soundEffectsVolume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          value="0.8"
+        >
+
+        <button
+          class="openingSecondaryButton"
+          onclick="
+            document.getElementById('audioSettings').classList.add('hidden');
+            document.getElementById('mainMenuButtons').classList.remove('hidden');
+          "
+        >
+          Back
+        </button>
+
+      </div>
+
+      <div
+        id="loadMenu"
+        class="openingSettingsPanel hidden"
+      >
+
+        <h2>Load Game</h2>
+
+        <div id="loadSlotList"></div>
+
+        <button
+          class="openingSecondaryButton"
+          onclick="closeLoadMenu()"
+        >
+          Back
+        </button>
+
+      </div>
+
+      <p class="openingVersion">
+        Version 3.6.4
+      </p>
+
+    </div>
+
+  </div>
 
 </section>
 
