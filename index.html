@@ -259,36 +259,91 @@
 
   </div>
 
-  <div
-    id="creatorStepTwoPlaceholder"
-    class="creatorStep hidden"
-  >
+<div
+  id="creatorStepTwo"
+  class="creatorStep hidden"
+>
 
-    <div class="creatorProgress">
-      <span>YOUR ISLANDER</span>
-      <strong>2 of 8</strong>
-    </div>
+  <div class="creatorProgress">
+    <span>YOUR ISLANDER</span>
+    <strong>2 of 8</strong>
+  </div>
 
-    <div class="creatorQuestion">
+  <div class="creatorQuestion">
 
-      <p class="creatorEyebrow">
-        PROFILE SAVED
-      </p>
+    <p class="creatorEyebrow">
+      TELL US ABOUT YOURSELF
+    </p>
 
-      <h1 id="creatorSavedName">
-        Welcome
-      </h1>
+    <h1>Your life outside the villa</h1>
 
-      <p>
-        Your name and pronouns are ready.
-        The next screen will ask about your age,
-        hometown, and career.
-      </p>
+    <p>
+      These details will be used during introductions
+      and future conversations.
+    </p>
 
-    </div>
+  </div>
+
+  <div class="creatorForm">
+
+    <label for="playerAge">
+      Your age
+    </label>
+
+    <input
+      id="playerAge"
+      type="number"
+      min="18"
+      max="99"
+      inputmode="numeric"
+      placeholder="Enter your age"
+    >
+
+    <label for="playerHometown">
+      Your hometown
+    </label>
+
+    <input
+      id="playerHometown"
+      type="text"
+      maxlength="40"
+      placeholder="Example: New York, NY"
+      autocomplete="off"
+    >
+
+    <label for="playerOccupation">
+      Your occupation
+    </label>
+
+    <input
+      id="playerOccupation"
+      type="text"
+      maxlength="40"
+      placeholder="Example: Soccer coach"
+      autocomplete="off"
+    >
+
+    <p
+      id="creatorProfilePreview"
+      class="creatorIdentityPreview"
+    >
+      Complete your profile to continue.
+    </p>
+
+  </div>
+
+  <div class="creatorNavigation">
 
     <button
-      id="creatorReturnToStepOne"
+      id="creatorStepTwoContinue"
+      type="button"
+      disabled
+    >
+      Continue
+    </button>
+
+    <button
+      id="creatorStepTwoBack"
       type="button"
       class="creatorBackButton"
     >
@@ -296,6 +351,44 @@
     </button>
 
   </div>
+
+</div>
+
+<div
+  id="creatorStepThreePlaceholder"
+  class="creatorStep hidden"
+>
+
+  <div class="creatorProgress">
+    <span>YOUR ISLANDER</span>
+    <strong>3 of 8</strong>
+  </div>
+
+  <div class="creatorQuestion">
+
+    <p class="creatorEyebrow">
+      PROFILE UPDATED
+    </p>
+
+    <h1 id="creatorProfileSavedTitle">
+      Your profile is ready
+    </h1>
+
+    <p id="creatorProfileSavedText">
+      Your personal details have been saved.
+    </p>
+
+  </div>
+
+  <button
+    id="creatorReturnToStepTwo"
+    type="button"
+    class="creatorBackButton"
+  >
+    Back
+  </button>
+
+</div>
 
 </section>
 
