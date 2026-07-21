@@ -1083,6 +1083,10 @@ q('continueButton').textContent = '⏩ Finish Text';
 
 q('dialogueCard').classList.remove('hidden');
 
+if (typeof window.playAtmosphere === 'function') {
+  window.playAtmosphere('arrival');
+}
+
 showScene(introDialogue[0]);
 initializeRelationshipSystem();
 initializeChoiceConsequences();
