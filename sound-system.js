@@ -227,36 +227,26 @@ function stopAtmosphere() {
 }
 
 function playMenuMusic() {
-  createOscillator({
-    frequency: 220,
-    type: 'sine',
-    volume: 0.08
+  const noise = createNoise({
+    volume: 0.018,
+    lowpass: 500
   });
 
-  createOscillator({
-    frequency: 277.18,
-    type: 'sine',
-    volume: 0.05
-  });
+  const breezeLfo = audioContext.createOscillator();
+  const breezeDepth = audioContext.createGain();
 
-  createOscillator({
-    frequency: 329.63,
-    type: 'triangle',
-    volume: 0.03
-  });
-}
+  breezeLfo.frequency.value = 0.08;
+  breezeDepth.gain.value = 0.01;
 
-function playIslandAmbience() {
-  createNoise({
-    volume: 0.035,
-    lowpass: 900
-  });
+  breezeLfo.connect(breezeDepth);
+  breezeDepth.connect(noise.gain.gain);
 
-  createOscillator({
-    frequency: 174.61,
-    type: 'sine',
-    volume: 0.025
-  });
+  breezeLfo.start();
+
+  atmosphereNodes.push(
+    breezeLfo,
+    breezeDepth
+  );
 }
 
 function playBeachWaves() {
@@ -404,30 +394,32 @@ function playClickSound() {
   oscillator.type = 'sine';
 
   oscillator.frequency.setValueAtTime(
-    900,
+    420,
     context.currentTime
   );
 
   oscillator.frequency.exponentialRampToValueAtTime(
-    320,
-    context.currentTime + 0.08
+    260,
+    context.currentTime + 0.04
   );
 
   gain.gain.setValueAtTime(
-    effectVolume * 0.22,
+    effectVolume * 0.06,
     context.currentTime
   );
 
   gain.gain.exponentialRampToValueAtTime(
     0.001,
-    context.currentTime + 0.1
+    context.currentTime + 0.05
   );
 
   oscillator.connect(gain);
   gain.connect(effectsGain);
 
   oscillator.start();
-  oscillator.stop(context.currentTime + 0.11);
+  oscillator.stop(
+    context.currentTime + 0.06
+  );
 }
 
 function toggleSound() {
