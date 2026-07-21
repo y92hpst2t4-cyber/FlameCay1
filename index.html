@@ -355,7 +355,7 @@
 </div>
 
 <div
-  id="creatorStepThreePlaceholder"
+  id="creatorStepThree"
   class="creatorStep hidden"
 >
 
@@ -367,21 +367,179 @@
   <div class="creatorQuestion">
 
     <p class="creatorEyebrow">
-      PROFILE UPDATED
+      WHAT ARE YOU BRINGING TO THE VILLA?
     </p>
 
-    <h1 id="creatorProfileSavedTitle">
-      Your profile is ready
+    <h1>Your personality</h1>
+
+    <p>
+      Your choices can unlock different dialogue
+      and influence how the Islanders see you.
+    </p>
+
+  </div>
+
+  <div class="creatorForm">
+
+    <label for="playerPersonality">
+      Choose your personality
+    </label>
+
+    <select id="playerPersonality">
+
+      <option value="">
+        Select a personality
+      </option>
+
+      <option value="romantic">
+        💕 Romantic — You follow your heart
+      </option>
+
+      <option value="loyal">
+        💚 Loyal — Trust matters most
+      </option>
+
+      <option value="bold">
+        🔥 Bold — You are not afraid to make a move
+      </option>
+
+      <option value="strategic">
+        🧠 Strategic — You think before you act
+      </option>
+
+      <option value="funny">
+        😄 Funny — You use humor to connect
+      </option>
+
+      <option value="mysterious">
+        🌙 Mysterious — You keep people guessing
+      </option>
+
+    </select>
+
+    <label for="playerDatingGoal">
+      What are you looking for?
+    </label>
+
+    <select id="playerDatingGoal">
+
+      <option value="">
+        Select your dating intention
+      </option>
+
+      <option value="love">
+        ❤️ A serious relationship
+      </option>
+
+      <option value="connection">
+        ✨ A real connection
+      </option>
+
+      <option value="adventure">
+        🌴 Romance and adventure
+      </option>
+
+      <option value="open">
+        👀 I am keeping my options open
+      </option>
+
+      <option value="competition">
+        🏆 I am here to win
+      </option>
+
+    </select>
+
+    <label for="playerFirstImpression">
+      How do you want to enter the villa?
+    </label>
+
+    <select id="playerFirstImpression">
+
+      <option value="">
+        Select your entrance energy
+      </option>
+
+      <option value="confident">
+        🔥 Confident
+      </option>
+
+      <option value="friendly">
+        ☀️ Friendly
+      </option>
+
+      <option value="flirty">
+        💋 Flirty
+      </option>
+
+      <option value="calm">
+        🌊 Calm
+      </option>
+
+      <option value="mysterious">
+        🌙 Mysterious
+      </option>
+
+    </select>
+
+    <p
+      id="creatorPersonalityPreview"
+      class="creatorIdentityPreview"
+    >
+      Choose all three options to continue.
+    </p>
+
+  </div>
+
+  <div class="creatorNavigation">
+
+    <button
+      id="creatorStepThreeContinue"
+      type="button"
+      disabled
+    >
+      Continue
+    </button>
+
+    <button
+      id="creatorStepThreeBack"
+      type="button"
+      class="creatorBackButton"
+    >
+      Back
+    </button>
+
+  </div>
+
+</div>
+
+<div
+  id="creatorStepFourPlaceholder"
+  class="creatorStep hidden"
+>
+
+  <div class="creatorProgress">
+    <span>YOUR ISLANDER</span>
+    <strong>4 of 8</strong>
+  </div>
+
+  <div class="creatorQuestion">
+
+    <p class="creatorEyebrow">
+      PERSONALITY SAVED
+    </p>
+
+    <h1 id="creatorPersonalitySavedTitle">
+      We know what you want
     </h1>
 
-    <p id="creatorProfileSavedText">
-      Your personal details have been saved.
+    <p id="creatorPersonalitySavedText">
+      Your personality and dating intentions have been saved.
     </p>
 
   </div>
 
   <button
-    id="creatorReturnToStepTwo"
+    id="creatorReturnToStepThree"
     type="button"
     class="creatorBackButton"
   >
