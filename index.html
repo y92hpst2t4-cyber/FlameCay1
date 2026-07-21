@@ -164,228 +164,138 @@
 
 </section>
 
-<section id="characterCreator" class="hidden">
-
-<h1>🔥 Create Your Islander</h1>
-
-<p>Design your character before arriving on Flame Cay.</p>
-
-<div class="card">
-
-<h2>🪞 Character Preview</h2>
-
-<div id="playerCharacterPreview">
-
-<div id="playerAvatarPreview">
-
-<div id="playerAvatarHair"></div>
-
-<div id="playerAvatarFace">
-
-<div class="avatarEyes">● ●</div>
-
-<div class="avatarMouth">⌣</div>
-
-</div>
-
-</div>
-
-<h3 id="playerPreviewName">Your Islander</h3>
-
-<p id="playerPreviewDetails">
-Choose your appearance and personality.
-</p>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>📝 Basic Information</h2>
-
-<label for="playerName">
-<strong>Character Name</strong>
-</label>
-
-<input
-id="playerName"
-type="text"
-placeholder="Enter your character's name"
-maxlength="20"
+<section
+  id="characterCreator"
+  class="hidden characterCreatorFlow"
 >
 
-<br><br>
+  <div
+    id="creatorStepOne"
+    class="creatorStep"
+  >
 
-<label for="playerPronouns">
-<strong>Pronouns</strong>
-</label>
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>1 of 8</strong>
+    </div>
 
-<select id="playerPronouns">
+    <div class="creatorQuestion">
 
-<option value="she/her">She / Her</option>
+      <p class="creatorEyebrow">
+        BEFORE YOU ENTER FLAME CAY
+      </p>
 
-<option value="he/him">He / Him</option>
+      <h1>Who are you?</h1>
 
-<option value="they/them">They / Them</option>
+      <p>
+        Choose the name and pronouns the Islanders
+        will use during your story.
+      </p>
 
-</select>
+    </div>
 
-</div>
+    <div class="creatorForm">
 
-<div class="card">
+      <label for="playerName">
+        Your name
+      </label>
 
-<h2>🎨 Choose Your Islander</h2>
+      <input
+        id="playerName"
+        type="text"
+        placeholder="Enter your name"
+        maxlength="20"
+        autocomplete="off"
+      >
 
-<p>Select one preset character. This sprite will appear in the story.</p>
+      <label for="playerPronouns">
+        Your pronouns
+      </label>
 
-<div id="playerPresetGrid" class="playerPresetGrid">
+      <select id="playerPronouns">
 
-<label class="playerPresetCard" data-preset="1">
-<input
-type="radio"
-name="playerSpritePreset"
-value="1"
-checked
->
-<img
-src="player-sprites/2FFB9EAD-79CB-47C9-93DB-B75F1A3C0DF5.png"
-alt="Orange outfit preset"
->
-<span>Preset 1</span>
-</label>
+        <option value="she/her">
+          She / Her
+        </option>
 
-<label class="playerPresetCard" data-preset="2">
-<input
-type="radio"
-name="playerSpritePreset"
-value="2"
->
-<img
-src="player-sprites/AD4DA575-4307-4915-A00B-5840D120177B.png"
-alt="Green dress preset"
->
-<span>Preset 2</span>
-</label>
+        <option value="he/him">
+          He / Him
+        </option>
 
-<label class="playerPresetCard" data-preset="3">
-<input
-type="radio"
-name="playerSpritePreset"
-value="3"
->
-<img
-src="player-sprites/E1FB32B8-80B6-436D-9FF4-22DFC345AE83.png"
-alt="Pink outfit preset"
->
-<span>Preset 3</span>
-</label>
+        <option value="they/them">
+          They / Them
+        </option>
 
-<label class="playerPresetCard" data-preset="4">
-<input
-type="radio"
-name="playerSpritePreset"
-value="4"
->
-<img
-src="player-sprites/618E0EFF-7956-45BE-BC38-F6E6DF5847A9.png"
-alt="Black sporty outfit preset"
->
-<span>Preset 4</span>
-</label>
+      </select>
 
-<label class="playerPresetCard" data-preset="5">
-<input
-type="radio"
-name="playerSpritePreset"
-value="5"
->
-<img
-src="player-sprites/50DC97F4-3772-4E16-BC7A-9427F3A06FC0.png"
-alt="Green tropical shirt preset"
->
-<span>Preset 5</span>
-</label>
+      <p
+        id="creatorIdentityPreview"
+        class="creatorIdentityPreview"
+      >
+        Your introduction will appear here.
+      </p>
 
-<label class="playerPresetCard" data-preset="6">
-<input
-type="radio"
-name="playerSpritePreset"
-value="6"
->
-<img
-src="player-sprites/DE96B228-6D9B-4C45-BA1F-F8F7869A480A.png"
-alt="Cream outfit preset"
->
-<span>Preset 6</span>
-</label>
+    </div>
 
-<label class="playerPresetCard" data-preset="7">
-<input
-type="radio"
-name="playerSpritePreset"
-value="7"
->
-<img
-src="player-sprites/AB762639-536E-41A4-8908-0E8BB4D013E8.png"
-alt="Black tank top preset"
->
-<span>Preset 7</span>
-</label>
+    <div class="creatorNavigation">
 
-<label class="playerPresetCard" data-preset="8">
-<input
-type="radio"
-name="playerSpritePreset"
-value="8"
->
-<img
-src="player-sprites/CB7DD06E-B5B7-4946-BBC2-B8F4489B5D8A.png"
-alt="Blue shorts preset"
->
-<span>Preset 8</span>
-</label>
+      <button
+        id="creatorStepOneContinue"
+        type="button"
+        disabled
+      >
+        Continue
+      </button>
 
-</div>
+      <button
+        id="creatorBackToMenu"
+        type="button"
+        class="creatorBackButton"
+      >
+        Back to Main Menu
+      </button>
 
-</div>
+    </div>
 
-<div class="card">
+  </div>
 
-<h2>🔥 Personality</h2>
+  <div
+    id="creatorStepTwoPlaceholder"
+    class="creatorStep hidden"
+  >
 
-<p>
-Your personality will eventually unlock special dialogue choices.
-</p>
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>2 of 8</strong>
+    </div>
 
-<label for="playerPersonality">
-<strong>Choose Your Personality</strong>
-</label>
+    <div class="creatorQuestion">
 
-<select id="playerPersonality">
+      <p class="creatorEyebrow">
+        PROFILE SAVED
+      </p>
 
-<option value="romantic">💕 Romantic</option>
+      <h1 id="creatorSavedName">
+        Welcome
+      </h1>
 
-<option value="loyal">💚 Loyal</option>
+      <p>
+        Your name and pronouns are ready.
+        The next screen will ask about your age,
+        hometown, and career.
+      </p>
 
-<option value="bold">🔥 Bold</option>
+    </div>
 
-<option value="strategic">🧠 Strategic</option>
+    <button
+      id="creatorReturnToStepOne"
+      type="button"
+      class="creatorBackButton"
+    >
+      Back
+    </button>
 
-</select>
-
-</div>
-
-<button id="confirmCharacterButton" disabled>
-✅ Confirm Character
-</button>
-
-<button onclick="
-document.getElementById('characterCreator').classList.add('hidden');
-document.getElementById('menu').classList.remove('hidden');
-">
-⬅ Back to Main Menu
-</button>
+  </div>
 
 </section>
 
@@ -778,7 +688,7 @@ id="relationshipBox"
 
 <script src="sound-system.js?v=3655"></script>
 
-<script src="character-creator.js?v=10"></script>
+<script src="character-creator.js?v=11"></script>
 
 </body>
 
