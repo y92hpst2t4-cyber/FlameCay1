@@ -1,5 +1,8 @@
 'use strict';
 
+const PLAYER_PROFILE_STORAGE_KEY =
+  'flameCayPlayerProfile';
+
 const playerSpritePresets = {
   1: 'player-sprites/2FFB9EAD-79CB-47C9-93DB-B75F1A3C0DF5.png',
   2: 'player-sprites/AD4DA575-4307-4915-A00B-5840D120177B.png',
@@ -11,152 +14,28 @@ const playerSpritePresets = {
   8: 'player-sprites/CB7DD06E-B5B7-4946-BBC2-B8F4489B5D8A.png'
 };
 
-window.playerSpritePresets = playerSpritePresets;
+window.playerSpritePresets =
+  playerSpritePresets;
 
 window.playerProfile = {
   name: '',
   pronouns: 'she/her',
+  age: '',
+  hometown: '',
+  occupation: '',
   spritePreset: 1,
   personality: 'romantic'
 };
 
-const PLAYER_PROFILE_STORAGE_KEY = 'flameCayPlayerProfile';
-
-function getCharacterCreatorElement(id) {
+function getCreatorElement(id) {
   return document.getElementById(id);
 }
 
-function getSelectedSpritePreset() {
-  const selectedPreset = document.querySelector(
-    'input[name="playerSpritePreset"]:checked'
-  );
-
-  if (!selectedPreset) {
-    return 1;
-  }
-
-  const presetNumber = Number(selectedPreset.value);
-
-  return playerSpritePresets[presetNumber]
-    ? presetNumber
-    : 1;
-}
-
 function getPlayerSpritePath(presetNumber) {
-  return playerSpritePresets[presetNumber] ||
-    playerSpritePresets[1];
-}
-
-function updatePresetCardSelection() {
-  const presetCards = document.querySelectorAll(
-    '.playerPresetCard'
+  return (
+    playerSpritePresets[presetNumber] ||
+    playerSpritePresets[1]
   );
-
-  presetCards.forEach(card => {
-    const radio = card.querySelector(
-      'input[name="playerSpritePreset"]'
-    );
-
-    card.classList.toggle(
-      'selected',
-      Boolean(radio && radio.checked)
-    );
-  });
-}
-
-function renderCreatorPreview() {
-  const avatarPreview = getCharacterCreatorElement(
-    'playerAvatarPreview'
-  );
-
-  if (!avatarPreview) {
-    return;
-  }
-
-  const spritePath = getPlayerSpritePath(
-    window.playerProfile.spritePreset
-  );
-
-  avatarPreview.className = 'playerPresetMainPreview';
-
-  avatarPreview.style.width = '100%';
-  avatarPreview.style.maxWidth = '280px';
-  avatarPreview.style.height = '380px';
-  avatarPreview.style.margin = '0 auto';
-  avatarPreview.style.background = 'transparent';
-  avatarPreview.style.border = 'none';
-  avatarPreview.style.borderRadius = '0';
-  avatarPreview.style.overflow = 'hidden';
-
-  avatarPreview.innerHTML = `
-    <img
-      src="${spritePath}"
-      alt="Selected player character"
-      style="
-        display:block;
-        width:100%;
-        height:100%;
-        object-fit:contain;
-        object-position:center bottom;
-      "
-    >
-  `;
-}
-
-function updateCharacterPreview() {
-  const nameInput = getCharacterCreatorElement('playerName');
-  const pronounsInput =
-    getCharacterCreatorElement('playerPronouns');
-  const personalityInput =
-    getCharacterCreatorElement('playerPersonality');
-
-  if (
-    !nameInput ||
-    !pronounsInput ||
-    !personalityInput
-  ) {
-    return;
-  }
-
-  const name = nameInput.value.trim();
-  const spritePreset = getSelectedSpritePreset();
-
-  window.playerProfile = {
-    name,
-    pronouns: pronounsInput.value,
-    spritePreset,
-    personality: personalityInput.value
-  };
-
-  const previewName =
-    getCharacterCreatorElement('playerPreviewName');
-
-  const previewDetails =
-    getCharacterCreatorElement('playerPreviewDetails');
-
-  const confirmButton =
-    getCharacterCreatorElement('confirmCharacterButton');
-
-  if (
-    !previewName ||
-    !previewDetails ||
-    !confirmButton
-  ) {
-    return;
-  }
-
-  previewName.textContent = name || 'Your Islander';
-
-  previewDetails.textContent =
-    `Preset ${spritePreset} • ` +
-    `${personalityInput.options[
-      personalityInput.selectedIndex
-    ].text}`;
-
-  confirmButton.disabled = name.length === 0;
-
-  updatePresetCardSelection();
-  renderCreatorPreview();
 }
 
 function savePlayerProfile() {
@@ -175,9 +54,10 @@ function savePlayerProfile() {
 
 function loadPlayerProfile() {
   try {
-    const savedProfile = localStorage.getItem(
-      PLAYER_PROFILE_STORAGE_KEY
-    );
+    const savedProfile =
+      localStorage.getItem(
+        PLAYER_PROFILE_STORAGE_KEY
+      );
 
     if (!savedProfile) {
       return null;
@@ -194,6 +74,150 @@ function loadPlayerProfile() {
   }
 }
 
+function showCreatorStep(stepNumber) {
+  const stepOne =
+    getCreatorElement('creatorStepOne');
+
+  const stepTwo =
+    getCreatorElement(
+      'creatorStepTwoPlaceholder'
+    );
+
+  if (!stepOne || !stepTwo) {
+    return;
+  }
+
+  stepOne.classList.toggle(
+    'hidden',
+    stepNumber !== 1
+  );
+
+  stepTwo.classList.toggle(
+    'hidden',
+    stepNumber !== 2
+  );
+
+  window.scrollTo(0, 0);
+}
+
+function updateIdentityStep() {
+  const nameInput =
+    getCreatorElement('playerName');
+
+  const pronounsInput =
+    getCreatorElement('playerPronouns');
+
+  const preview =
+    getCreatorElement(
+      'creatorIdentityPreview'
+    );
+
+  const continueButton =
+    getCreatorElement(
+      'creatorStepOneContinue'
+    );
+
+  if (
+    !nameInput ||
+    !pronounsInput ||
+    !preview ||
+    !continueButton
+  ) {
+    return;
+  }
+
+  const name = nameInput.value.trim();
+  const pronouns = pronounsInput.value;
+
+  window.playerProfile.name = name;
+  window.playerProfile.pronouns = pronouns;
+
+  if (!name) {
+    preview.textContent =
+      'Your introduction will appear here.';
+
+    continueButton.disabled = true;
+    return;
+  }
+
+  preview.textContent =
+    `Welcome, ${name}. Your pronouns are ${pronouns}.`;
+
+  continueButton.disabled = false;
+}
+
+function continueFromIdentityStep() {
+  updateIdentityStep();
+
+  if (!window.playerProfile.name) {
+    return;
+  }
+
+  savePlayerProfile();
+
+  const savedName =
+    getCreatorElement('creatorSavedName');
+
+  if (savedName) {
+    savedName.textContent =
+      `Welcome, ${window.playerProfile.name}`;
+  }
+
+  showCreatorStep(2);
+}
+
+function returnToMainMenu() {
+  const creator =
+    getCreatorElement('characterCreator');
+
+  const menu =
+    getCreatorElement('menu');
+
+  if (creator) {
+    creator.classList.add('hidden');
+  }
+
+  if (menu) {
+    menu.classList.remove('hidden');
+  }
+
+  showCreatorStep(1);
+  window.scrollTo(0, 0);
+}
+
+function restoreIdentityStep() {
+  const savedProfile =
+    loadPlayerProfile();
+
+  if (savedProfile) {
+    window.playerProfile = {
+      ...window.playerProfile,
+      ...savedProfile,
+      spritePreset:
+        Number(savedProfile.spritePreset) || 1
+    };
+  }
+
+  const nameInput =
+    getCreatorElement('playerName');
+
+  const pronounsInput =
+    getCreatorElement('playerPronouns');
+
+  if (nameInput) {
+    nameInput.value =
+      window.playerProfile.name || '';
+  }
+
+  if (pronounsInput) {
+    pronounsInput.value =
+      window.playerProfile.pronouns ||
+      'she/her';
+  }
+
+  updateIdentityStep();
+}
+
 function renderPlayerScenePortrait() {
   const profile = window.playerProfile;
 
@@ -202,16 +226,20 @@ function renderPlayerScenePortrait() {
   }
 
   const portraitContainer =
-    getCharacterCreatorElement('playerScenePortrait');
+    getCreatorElement(
+      'playerScenePortrait'
+    );
 
   const sceneAvatar =
-    getCharacterCreatorElement('playerSceneAvatar');
+    getCreatorElement('playerSceneAvatar');
 
   const sceneName =
-    getCharacterCreatorElement('playerSceneName');
+    getCreatorElement('playerSceneName');
 
   const scenePersonality =
-    getCharacterCreatorElement('playerScenePersonality');
+    getCreatorElement(
+      'playerScenePersonality'
+    );
 
   if (
     !portraitContainer ||
@@ -229,14 +257,17 @@ function renderPlayerScenePortrait() {
     strategic: '🧠 Strategic Islander'
   };
 
-  const spritePath = getPlayerSpritePath(
-    profile.spritePreset
-  );
+  const spritePath =
+    getPlayerSpritePath(
+      profile.spritePreset
+    );
 
-  sceneAvatar.className = 'playerSceneAvatar';
+  sceneAvatar.className =
+    'playerSceneAvatar';
 
   sceneAvatar.style.overflow = 'hidden';
-  sceneAvatar.style.background = 'transparent';
+  sceneAvatar.style.background =
+    'transparent';
 
   sceneAvatar.innerHTML = `
     <img
@@ -255,149 +286,80 @@ function renderPlayerScenePortrait() {
   sceneName.textContent = profile.name;
 
   scenePersonality.textContent =
-    personalityTitles[profile.personality] ||
-    'New Islander';
+    personalityTitles[
+      profile.personality
+    ] || 'New Islander';
 
-  portraitContainer.classList.remove('hidden');
-}
-
-function restorePlayerCreatorForm() {
-  const savedProfile = loadPlayerProfile();
-
-  if (!savedProfile) {
-    return;
-  }
-
-  window.playerProfile = {
-    ...window.playerProfile,
-    ...savedProfile,
-    spritePreset:
-      Number(savedProfile.spritePreset) || 1
-  };
-
-  const nameInput =
-    getCharacterCreatorElement('playerName');
-
-  const pronounsInput =
-    getCharacterCreatorElement('playerPronouns');
-
-  const personalityInput =
-    getCharacterCreatorElement('playerPersonality');
-
-  if (nameInput) {
-    nameInput.value = window.playerProfile.name || '';
-  }
-
-  if (pronounsInput) {
-    pronounsInput.value =
-      window.playerProfile.pronouns || 'she/her';
-  }
-
-  if (personalityInput) {
-    personalityInput.value =
-      window.playerProfile.personality || 'romantic';
-  }
-
-  const savedPreset = document.querySelector(
-    `input[name="playerSpritePreset"][value="${window.playerProfile.spritePreset}"]`
+  portraitContainer.classList.remove(
+    'hidden'
   );
-
-  if (savedPreset) {
-    savedPreset.checked = true;
-  }
-}
-
-function confirmPlayerCharacter() {
-  updateCharacterPreview();
-
-  if (!window.playerProfile.name) {
-    alert('Please enter your character name.');
-    return;
-  }
-
-  window.playerPronouns =
-    window.playerProfile.pronouns;
-
-  window.playerSpritePreset =
-    window.playerProfile.spritePreset;
-
-  window.playerPersonality =
-    window.playerProfile.personality;
-
-  savePlayerProfile();
-
-  try {
-    startGame();
-
-    const creator =
-      getCharacterCreatorElement('characterCreator');
-
-    if (creator) {
-      creator.classList.add('hidden');
-    }
-
-    renderPlayerScenePortrait();
-  } catch (error) {
-    console.error('New game startup error:', error);
-
-    alert(
-      'Game startup error: ' +
-      (error?.message || String(error))
-    );
-  }
 }
 
 function initializeCharacterCreator() {
-  const controlIds = [
-    'playerName',
-    'playerPronouns',
-    'playerPersonality'
-  ];
+  const nameInput =
+    getCreatorElement('playerName');
 
-  controlIds.forEach(id => {
-    const control = getCharacterCreatorElement(id);
+  const pronounsInput =
+    getCreatorElement('playerPronouns');
 
-    if (!control) {
-      return;
-    }
+  const continueButton =
+    getCreatorElement(
+      'creatorStepOneContinue'
+    );
 
-    control.addEventListener(
+  const backToMenuButton =
+    getCreatorElement(
+      'creatorBackToMenu'
+    );
+
+  const returnToStepOneButton =
+    getCreatorElement(
+      'creatorReturnToStepOne'
+    );
+
+  if (nameInput) {
+    nameInput.addEventListener(
       'input',
-      updateCharacterPreview
-    );
-
-    control.addEventListener(
-      'change',
-      updateCharacterPreview
-    );
-  });
-
-  const presetInputs = document.querySelectorAll(
-    'input[name="playerSpritePreset"]'
-  );
-
-  presetInputs.forEach(input => {
-    input.addEventListener(
-      'change',
-      updateCharacterPreview
-    );
-  });
-
-  const confirmButton =
-    getCharacterCreatorElement(
-      'confirmCharacterButton'
-    );
-
-  if (confirmButton) {
-    confirmButton.addEventListener(
-      'click',
-      confirmPlayerCharacter
+      updateIdentityStep
     );
   }
 
-  restorePlayerCreatorForm();
-  updateCharacterPreview();
+  if (pronounsInput) {
+    pronounsInput.addEventListener(
+      'change',
+      updateIdentityStep
+    );
+  }
+
+  if (continueButton) {
+    continueButton.addEventListener(
+      'click',
+      continueFromIdentityStep
+    );
+  }
+
+  if (backToMenuButton) {
+    backToMenuButton.addEventListener(
+      'click',
+      returnToMainMenu
+    );
+  }
+
+  if (returnToStepOneButton) {
+    returnToStepOneButton.addEventListener(
+      'click',
+      function () {
+        showCreatorStep(1);
+      }
+    );
+  }
+
+  restoreIdentityStep();
+  showCreatorStep(1);
 }
+
+window.renderPlayerScenePortrait =
+  renderPlayerScenePortrait;
 
 window.addEventListener(
   'DOMContentLoaded',
