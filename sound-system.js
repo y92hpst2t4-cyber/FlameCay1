@@ -125,17 +125,11 @@ async function unlockAudio() {
       await context.resume();
     } catch (error) {
       console.warn('Audio could not be resumed.', error);
+      return;
     }
   }
 
   applyAudioVolumes();
-
-  if (
-    soundEnabled &&
-    atmosphereNodes.length === 0
-  ) {
-    playAtmosphere(currentAtmosphere);
-  }
 }
 
 function createOscillator({
@@ -227,28 +221,17 @@ function stopAtmosphere() {
 }
 
 function playMenuMusic() {
-  const noise = createNoise({
-    volume: 0.018,
-    lowpass: 500
-  });
-
-  const breezeLfo = audioContext.createOscillator();
-  const breezeDepth = audioContext.createGain();
-
-  breezeLfo.frequency.value = 0.08;
-  breezeDepth.gain.value = 0.01;
-
-  breezeLfo.connect(breezeDepth);
-  breezeDepth.connect(noise.gain.gain);
-
-  breezeLfo.start();
-
-  atmosphereNodes.push(
-    breezeLfo,
-    breezeDepth
-  );
+  // Keep the main menu silent for now.
+  // Continuous generated tones can glitch on iPhone Safari.
 }
 
+function playIslandAmbience() {
+  createNoise({
+    volume: 0.018,
+    lowpass: 700
+  });
+}
+  
 function playBeachWaves() {
   const noise = createNoise({
     volume: 0.08,
@@ -422,17 +405,24 @@ function playClickSound() {
   );
 }
 
-function toggleSound() {
+async function toggleSound() {
   soundEnabled = !soundEnabled;
 
-  applyAudioVolumes();
-
-  if (soundEnabled) {
-    unlockAudio().then(() => {
-      playAtmosphere(currentAtmosphere);
-    });
-  } else {
+  if (!soundEnabled) {
     stopAtmosphere();
+    applyAudioVolumes();
+    updateSoundButton();
+    saveAudioSettings();
+    return;
+  }
+
+  await unlockAudio();
+
+  applyAudioVolumes();
+  stopAtmosphere();
+
+  if (currentAtmosphere !== 'menu') {
+    playAtmosphere(currentAtmosphere);
   }
 
   updateSoundButton();
@@ -515,10 +505,20 @@ function initializeAudioControls() {
   }
 
   document.addEventListener(
-    'pointerdown',
-    unlockAudio,
-    { once: true }
-  );
+  'pointerdown',
+  async function () {
+    await unlockAudio();
+
+    if (
+      soundEnabled &&
+      currentAtmosphere !== 'menu' &&
+      atmosphereNodes.length === 0
+    ) {
+      playAtmosphere(currentAtmosphere);
+    }
+  },
+  { once: true }
+);
 
   document.addEventListener(
     'click',
