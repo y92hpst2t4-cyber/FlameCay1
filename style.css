@@ -1573,3 +1573,90 @@ body.has-real-background > main.screen {
     height: 125px;
   }
 }
+/* ========================================
+   CHARACTER CREATOR — PROFILE REVIEW
+======================================== */
+
+.creatorProfileCard {
+  text-align: center;
+}
+
+.creatorReviewImage {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: 260px;
+  margin: 0 auto 20px;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.creatorProfileCard h2 {
+  margin: 0 0 8px;
+  color: white;
+  font-size: 30px;
+}
+
+#creatorReviewBasicInfo {
+  margin: 0 0 22px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.creatorReviewDetails {
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+
+.creatorReviewDetails > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.creatorReviewDetails span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.creatorReviewDetails strong {
+  color: white;
+  font-size: 15px;
+  text-align: right;
+}
+
+#creatorStepFiveContinue {
+  border: none;
+  color: white;
+  background:
+    linear-gradient(
+      135deg,
+      #ff9700,
+      #ff5c00
+    );
+}
+
+@media (max-width: 390px) {
+  .creatorReviewImage {
+    max-width: 190px;
+    height: 220px;
+  }
+
+  .creatorReviewDetails > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .creatorReviewDetails strong {
+    text-align: left;
+  }
+}
