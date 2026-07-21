@@ -1659,3 +1659,54 @@ body.has-real-background > main.screen {
     text-align: left;
   }
 }
+/* ========================================
+   CHARACTER CREATOR — FINAL ARRIVAL SCREEN
+======================================== */
+
+.creatorArrivalCard {
+  text-align: center;
+  overflow: hidden;
+}
+
+.creatorArrivalImage {
+  display: block;
+  width: 150px;
+  max-width: 100%;
+  height: 180px;
+  margin: 0 auto 18px;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.creatorArrivalCard h2 {
+  margin: 0 0 8px;
+  color: white;
+  font-size: 30px;
+}
+
+.creatorArrivalCard p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+#creatorEnterIsland {
+  border: none;
+  color: white;
+  background:
+    linear-gradient(
+      135deg,
+      #ff9700,
+      #ff5c00
+    );
+}
+
+@media (max-width: 390px) {
+  .creatorArrivalImage {
+    width: 135px;
+    height: 160px;
+  }
+}
