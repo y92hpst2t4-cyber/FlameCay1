@@ -1143,3 +1143,25 @@ body.has-real-background > main.screen {
     display: flex;
   }
 }
+/* Phase 2 — Compact menu audio settings */
+
+.audioSettingsCard {
+  margin-top: 18px;
+  padding: 16px;
+  text-align: left;
+}
+
+.audioSettingsCard h3 {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.audioSettingsCard label {
+  display: block;
+  margin: 12px 0 6px;
+}
+
+.audioSettingsCard input[type="range"] {
+  width: 100%;
+  margin: 0;
+}
