@@ -39,7 +39,21 @@ typeof playerName!=='undefined'
 ?playerName
 :'Player',
 
+playerProfile:cloneSaveValue(
+window.playerProfile || {
+name:
+typeof playerName!=='undefined'
+?playerName
+:'Player',
+pronouns:'she/her',
+spritePreset:1,
+personality:'romantic'
+},
+{}
+),
+
 dialogueIndex:
+
 typeof dialogueIndex!=='undefined'
 ?dialogueIndex
 :0,
@@ -557,6 +571,32 @@ throw new Error('Invalid save data.');
 }
 
 playerName=data.playerName||'Player';
+
+window.playerProfile=Object.assign(
+{
+name:playerName,
+pronouns:'she/her',
+spritePreset:1,
+personality:'romantic'
+},
+safeObject(data.playerProfile)
+);
+
+window.playerProfile.name=
+window.playerProfile.name||playerName;
+
+window.playerProfile.spritePreset=
+Number(window.playerProfile.spritePreset)||1;
+
+window.playerPronouns=
+window.playerProfile.pronouns;
+
+window.playerSpritePreset=
+window.playerProfile.spritePreset;
+
+window.playerPersonality=
+window.playerProfile.personality;
+
 dialogueIndex=Number(data.dialogueIndex||0);
 currentLocation=data.currentLocation||'villa';
 pendingLocation=data.pendingLocation||'';
@@ -790,6 +830,10 @@ updateReputationSummary();
 
 if(typeof updateConsequenceSummary==='function'){
 updateConsequenceSummary();
+}
+
+if(typeof renderPlayerScenePortrait==='function'){
+renderPlayerScenePortrait();
 }
 
 if(typeof resumeSavedProgress==='function'){
