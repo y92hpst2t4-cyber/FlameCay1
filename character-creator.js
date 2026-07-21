@@ -75,26 +75,25 @@ function loadPlayerProfile() {
 }
 
 function showCreatorStep(stepNumber) {
-  const stepOne =
-    getCreatorElement('creatorStepOne');
+  const steps = {
+    1: getCreatorElement('creatorStepOne'),
+    2: getCreatorElement('creatorStepTwo'),
+    3: getCreatorElement(
+      'creatorStepThreePlaceholder'
+    )
+  };
 
-  const stepTwo =
-    getCreatorElement(
-      'creatorStepTwoPlaceholder'
-    );
+  Object.entries(steps).forEach(
+    ([number, element]) => {
+      if (!element) {
+        return;
+      }
 
-  if (!stepOne || !stepTwo) {
-    return;
-  }
-
-  stepOne.classList.toggle(
-    'hidden',
-    stepNumber !== 1
-  );
-
-  stepTwo.classList.toggle(
-    'hidden',
-    stepNumber !== 2
+      element.classList.toggle(
+        'hidden',
+        Number(number) !== stepNumber
+      );
+    }
   );
 
   window.scrollTo(0, 0);
@@ -154,16 +153,118 @@ function continueFromIdentityStep() {
   }
 
   savePlayerProfile();
+  updateProfileStep();
+  showCreatorStep(2);
+}
 
-  const savedName =
-    getCreatorElement('creatorSavedName');
+function updateProfileStep() {
+  const ageInput =
+    getCreatorElement('playerAge');
 
-  if (savedName) {
-    savedName.textContent =
-      `Welcome, ${window.playerProfile.name}`;
+  const hometownInput =
+    getCreatorElement('playerHometown');
+
+  const occupationInput =
+    getCreatorElement('playerOccupation');
+
+  const preview =
+    getCreatorElement(
+      'creatorProfilePreview'
+    );
+
+  const continueButton =
+    getCreatorElement(
+      'creatorStepTwoContinue'
+    );
+
+  if (
+    !ageInput ||
+    !hometownInput ||
+    !occupationInput ||
+    !preview ||
+    !continueButton
+  ) {
+    return;
   }
 
-  showCreatorStep(2);
+  const age = Number(ageInput.value);
+  const hometown =
+    hometownInput.value.trim();
+
+  const occupation =
+    occupationInput.value.trim();
+
+  const validAge =
+    Number.isInteger(age) &&
+    age >= 18 &&
+    age <= 99;
+
+  window.playerProfile.age =
+    validAge ? age : '';
+
+  window.playerProfile.hometown =
+    hometown;
+
+  window.playerProfile.occupation =
+    occupation;
+
+  const profileComplete =
+    validAge &&
+    hometown.length > 0 &&
+    occupation.length > 0;
+
+  if (!profileComplete) {
+    preview.textContent =
+      'Complete your profile to continue.';
+
+    continueButton.disabled = true;
+    return;
+  }
+
+  preview.textContent =
+    `${window.playerProfile.name}, ${age}, ` +
+    `is a ${occupation} from ${hometown}.`;
+
+  continueButton.disabled = false;
+}
+
+function continueFromProfileStep() {
+  updateProfileStep();
+
+  if (
+    !window.playerProfile.age ||
+    !window.playerProfile.hometown ||
+    !window.playerProfile.occupation
+  ) {
+    return;
+  }
+
+  savePlayerProfile();
+
+  const title =
+    getCreatorElement(
+      'creatorProfileSavedTitle'
+    );
+
+  const text =
+    getCreatorElement(
+      'creatorProfileSavedText'
+    );
+
+  if (title) {
+    title.textContent =
+      `${window.playerProfile.name}, your profile is ready`;
+  }
+
+  if (text) {
+    text.textContent =
+      `${window.playerProfile.name} is ` +
+      `${window.playerProfile.age} years old, ` +
+      `works as a ${window.playerProfile.occupation}, ` +
+      `and comes from ${window.playerProfile.hometown}.`;
+  }
+
+  showCreatorStep(3);
 }
 
 function returnToMainMenu() {
@@ -185,7 +286,7 @@ function returnToMainMenu() {
   window.scrollTo(0, 0);
 }
 
-function restoreIdentityStep() {
+function restoreCreatorForm() {
   const savedProfile =
     loadPlayerProfile();
 
@@ -204,6 +305,15 @@ function restoreIdentityStep() {
   const pronounsInput =
     getCreatorElement('playerPronouns');
 
+  const ageInput =
+    getCreatorElement('playerAge');
+
+  const hometownInput =
+    getCreatorElement('playerHometown');
+
+  const occupationInput =
+    getCreatorElement('playerOccupation');
+
   if (nameInput) {
     nameInput.value =
       window.playerProfile.name || '';
@@ -215,7 +325,23 @@ function restoreIdentityStep() {
       'she/her';
   }
 
+  if (ageInput) {
+    ageInput.value =
+      window.playerProfile.age || '';
+  }
+
+  if (hometownInput) {
+    hometownInput.value =
+      window.playerProfile.hometown || '';
+  }
+
+  if (occupationInput) {
+    occupationInput.value =
+      window.playerProfile.occupation || '';
+  }
+
   updateIdentityStep();
+  updateProfileStep();
 }
 
 function renderPlayerScenePortrait() {
@@ -302,9 +428,23 @@ function initializeCharacterCreator() {
   const pronounsInput =
     getCreatorElement('playerPronouns');
 
-  const continueButton =
+  const ageInput =
+    getCreatorElement('playerAge');
+
+  const hometownInput =
+    getCreatorElement('playerHometown');
+
+  const occupationInput =
+    getCreatorElement('playerOccupation');
+
+  const stepOneContinue =
     getCreatorElement(
       'creatorStepOneContinue'
+    );
+
+  const stepTwoContinue =
+    getCreatorElement(
+      'creatorStepTwoContinue'
     );
 
   const backToMenuButton =
@@ -312,9 +452,14 @@ function initializeCharacterCreator() {
       'creatorBackToMenu'
     );
 
-  const returnToStepOneButton =
+  const stepTwoBack =
     getCreatorElement(
-      'creatorReturnToStepOne'
+      'creatorStepTwoBack'
+    );
+
+  const returnToStepTwo =
+    getCreatorElement(
+      'creatorReturnToStepTwo'
     );
 
   if (nameInput) {
@@ -331,10 +476,37 @@ function initializeCharacterCreator() {
     );
   }
 
-  if (continueButton) {
-    continueButton.addEventListener(
+  [
+    ageInput,
+    hometownInput,
+    occupationInput
+  ].forEach(input => {
+    if (!input) {
+      return;
+    }
+
+    input.addEventListener(
+      'input',
+      updateProfileStep
+    );
+
+    input.addEventListener(
+      'change',
+      updateProfileStep
+    );
+  });
+
+  if (stepOneContinue) {
+    stepOneContinue.addEventListener(
       'click',
       continueFromIdentityStep
+    );
+  }
+
+  if (stepTwoContinue) {
+    stepTwoContinue.addEventListener(
+      'click',
+      continueFromProfileStep
     );
   }
 
@@ -345,8 +517,8 @@ function initializeCharacterCreator() {
     );
   }
 
-  if (returnToStepOneButton) {
-    returnToStepOneButton.addEventListener(
+  if (stepTwoBack) {
+    stepTwoBack.addEventListener(
       'click',
       function () {
         showCreatorStep(1);
@@ -354,7 +526,16 @@ function initializeCharacterCreator() {
     );
   }
 
-  restoreIdentityStep();
+  if (returnToStepTwo) {
+    returnToStepTwo.addEventListener(
+      'click',
+      function () {
+        showCreatorStep(2);
+      }
+    );
+  }
+
+  restoreCreatorForm();
   showCreatorStep(1);
 }
 
