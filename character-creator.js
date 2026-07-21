@@ -85,8 +85,8 @@ function showCreatorStep(stepNumber) {
     4: getCreatorElement('creatorStepFour'),
     5: getCreatorElement('creatorStepFive'),
     6: getCreatorElement(
-      'creatorStepSixPlaceholder'
-    )
+  'creatorStepSix'
+)
   };
 
   Object.entries(steps).forEach(
