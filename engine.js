@@ -1182,18 +1182,26 @@ choices('<button onclick="openIslandMap()">🗺️ Return to Map</button>');
 }
 
 function startWalking(loc){
-pendingLocation=loc;
-['islandMap','choices','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
-q('walkingScreen').classList.remove('hidden');
-q('walkingTitle').textContent='🚶 Walking to '+locationNames[loc];
-q('walkingText').innerHTML='You leave '+(locationNames[currentLocation]||'your current location')+' and follow the island path toward '+locationNames[loc]+'.<br><br>The scenery slowly changes around you.';
+  pendingLocation=loc;
+
+  if (typeof window.stopAtmosphere === 'function') {
+    window.stopAtmosphere();
+  }
+
+  ['islandMap','choices','dialogueCard','portraitBox'].forEach(x=>q(x).classList.add('hidden'));
+  q('walkingScreen').classList.remove('hidden');
+  q('walkingTitle').textContent='🚶 Walking to '+locationNames[loc];
+  q('walkingText').innerHTML='You leave '+(locationNames[currentLocation]||'your current location')+' and follow the island path toward '+locationNames[loc]+'.<br><br>The scenery slowly changes around you.';
 }
 
 function finishWalking(){
-q('walkingScreen').classList.add('hidden');
-currentLocation=pendingLocation;
-visitLocation(pendingLocation);
-pendingLocation='';
+  q('walkingScreen').classList.add('hidden');
+  currentLocation=pendingLocation;
+
+  const destination=pendingLocation;
+  pendingLocation='';
+
+  visitLocation(destination);
 }
 
 function visitLocation(loc){
