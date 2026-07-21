@@ -26,7 +26,8 @@ window.playerProfile = {
   personality: '',
   datingGoal: '',
   firstImpression: '',
-  spritePreset: 0
+  spritePreset: 0,
+  profileConfirmed: false
 };
 
 function getCreatorElement(id) {
@@ -82,8 +83,9 @@ function showCreatorStep(stepNumber) {
     2: getCreatorElement('creatorStepTwo'),
     3: getCreatorElement('creatorStepThree'),
     4: getCreatorElement('creatorStepFour'),
-    5: getCreatorElement(
-      'creatorStepFivePlaceholder'
+    5: getCreatorElement('creatorStepFive'),
+    6: getCreatorElement(
+      'creatorStepSixPlaceholder'
     )
   };
 
@@ -416,7 +418,119 @@ function selectAppearance(presetNumber) {
   window.playerProfile.spritePreset =
     validPreset;
 
+  window.playerProfile.profileConfirmed =
+    false;
+
   updateAppearanceStep();
+}
+
+function populateReviewStep() {
+  const profile =
+    window.playerProfile;
+
+  const reviewImage =
+    getCreatorElement('creatorReviewImage');
+
+  const reviewName =
+    getCreatorElement('creatorReviewName');
+
+  const reviewBasicInfo =
+    getCreatorElement(
+      'creatorReviewBasicInfo'
+    );
+
+  const reviewPronouns =
+    getCreatorElement(
+      'creatorReviewPronouns'
+    );
+
+  const reviewPersonality =
+    getCreatorElement(
+      'creatorReviewPersonality'
+    );
+
+  const reviewDatingGoal =
+    getCreatorElement(
+      'creatorReviewDatingGoal'
+    );
+
+  const reviewFirstImpression =
+    getCreatorElement(
+      'creatorReviewFirstImpression'
+    );
+
+  const personalityNames = {
+    romantic: 'Romantic',
+    loyal: 'Loyal',
+    bold: 'Bold',
+    strategic: 'Strategic',
+    funny: 'Funny',
+    mysterious: 'Mysterious'
+  };
+
+  const datingGoalNames = {
+    love: 'A serious relationship',
+    connection: 'A real connection',
+    adventure: 'Romance and adventure',
+    open: 'Keeping options open',
+    competition: 'Winning the competition'
+  };
+
+  const impressionNames = {
+    confident: 'Confident',
+    friendly: 'Friendly',
+    flirty: 'Flirty',
+    calm: 'Calm',
+    mysterious: 'Mysterious'
+  };
+
+  if (reviewImage) {
+    reviewImage.src =
+      getPlayerSpritePath(
+        profile.spritePreset
+      );
+
+    reviewImage.alt =
+      `${profile.name}'s selected character`;
+  }
+
+  if (reviewName) {
+    reviewName.textContent =
+      profile.name;
+  }
+
+  if (reviewBasicInfo) {
+    reviewBasicInfo.textContent =
+      `${profile.age} · ` +
+      `${profile.occupation} · ` +
+      `${profile.hometown}`;
+  }
+
+  if (reviewPronouns) {
+    reviewPronouns.textContent =
+      profile.pronouns;
+  }
+
+  if (reviewPersonality) {
+    reviewPersonality.textContent =
+      personalityNames[
+        profile.personality
+      ] || '—';
+  }
+
+  if (reviewDatingGoal) {
+    reviewDatingGoal.textContent =
+      datingGoalNames[
+        profile.datingGoal
+      ] || '—';
+  }
+
+  if (reviewFirstImpression) {
+    reviewFirstImpression.textContent =
+      impressionNames[
+        profile.firstImpression
+      ] || '—';
+  }
 }
 
 function continueFromAppearanceStep() {
@@ -432,29 +546,27 @@ function continueFromAppearanceStep() {
   }
 
   savePlayerProfile();
+  populateReviewStep();
+  showCreatorStep(5);
+}
+
+function confirmContestantProfile() {
+  window.playerProfile.profileConfirmed =
+    true;
+
+  savePlayerProfile();
 
   const title =
     getCreatorElement(
-      'creatorAppearanceSavedTitle'
-    );
-
-  const text =
-    getCreatorElement(
-      'creatorAppearanceSavedText'
+      'creatorProfileConfirmedTitle'
     );
 
   if (title) {
     title.textContent =
-      `${window.playerProfile.name}, your look is ready`;
+      `${window.playerProfile.name}, you are almost ready`;
   }
 
-  if (text) {
-    text.textContent =
-      `Look ${selectedPreset} will represent you ` +
-      `during your story on Flame Cay.`;
-  }
-
-  showCreatorStep(5);
+  showCreatorStep(6);
 }
 
 function returnToMainMenu() {
@@ -531,6 +643,7 @@ function restoreCreatorForm() {
   updateProfileStep();
   updatePersonalityStep();
   updateAppearanceStep();
+  populateReviewStep();
 }
 
 function renderPlayerScenePortrait() {
@@ -668,6 +781,11 @@ function initializeCharacterCreator() {
       'creatorStepFourContinue'
     );
 
+  const stepFiveContinue =
+    getCreatorElement(
+      'creatorStepFiveContinue'
+    );
+
   const backToMenuButton =
     getCreatorElement(
       'creatorBackToMenu'
@@ -688,9 +806,14 @@ function initializeCharacterCreator() {
       'creatorStepFourBack'
     );
 
-  const returnToStepFour =
+  const stepFiveBack =
     getCreatorElement(
-      'creatorReturnToStepFour'
+      'creatorStepFiveBack'
+    );
+
+  const returnToStepFive =
+    getCreatorElement(
+      'creatorReturnToStepFive'
     );
 
   if (nameInput) {
@@ -781,6 +904,13 @@ function initializeCharacterCreator() {
     );
   }
 
+  if (stepFiveContinue) {
+    stepFiveContinue.addEventListener(
+      'click',
+      confirmContestantProfile
+    );
+  }
+
   if (backToMenuButton) {
     backToMenuButton.addEventListener(
       'click',
@@ -815,11 +945,21 @@ function initializeCharacterCreator() {
     );
   }
 
-  if (returnToStepFour) {
-    returnToStepFour.addEventListener(
+  if (stepFiveBack) {
+    stepFiveBack.addEventListener(
       'click',
       function () {
         showCreatorStep(4);
+      }
+    );
+  }
+
+  if (returnToStepFive) {
+    returnToStepFive.addEventListener(
+      'click',
+      function () {
+        populateReviewStep();
+        showCreatorStep(5);
       }
     );
   }
