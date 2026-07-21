@@ -1496,3 +1496,93 @@ body.has-real-background > main.screen {
   color: white;
   background: rgba(7, 22, 38, 0.82);
 }
+/* ========================================
+   CHARACTER CREATOR — APPEARANCE GRID
+======================================== */
+
+.creatorAppearanceGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.creatorAppearanceOption {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 10px;
+  overflow: hidden;
+  border: 2px solid
+    rgba(255, 255, 255, 0.28);
+  border-radius: 18px;
+  color: white;
+  background:
+    rgba(255, 255, 255, 0.1);
+}
+
+.creatorAppearanceOption img {
+  display: block;
+  width: 100%;
+  height: 210px;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 12px;
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.creatorAppearanceOption span {
+  display: block;
+  margin-top: 9px;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.creatorAppearanceOption.selected {
+  border-color: #ff8a00;
+  background:
+    rgba(255, 138, 0, 0.2);
+  box-shadow:
+    0 0 0 3px
+    rgba(255, 138, 0, 0.2);
+}
+
+.creatorAppearanceOption.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: #ff7500;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow:
+    0 4px 12px
+    rgba(0, 0, 0, 0.28);
+}
+
+.creatorAppearanceOption:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 390px) {
+  .creatorAppearanceGrid {
+    gap: 10px;
+  }
+
+  .creatorAppearanceOption {
+    padding: 7px;
+  }
+
+  .creatorAppearanceOption img {
+    height: 180px;
+  }
+}
