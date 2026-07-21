@@ -24,6 +24,31 @@
 🔊 Sound On
 </button>
 
+<h1>🔥 The Island of Flames</h1>
+
+<h2>Season 1 — The Crystal Awakens</h2>
+
+<p><strong>Version 3.6.4 — Episode 1 Progress Build</strong></p>
+
+<button onclick="
+document.getElementById('menu').classList.add('hidden');
+document.getElementById('characterCreator').classList.remove('hidden');
+">
+🎨 New Game
+</button>
+
+<button
+id="continueGameButton"
+class="saveButton hidden"
+onclick="continueLatestSave()"
+>
+▶ Continue Latest Save
+</button>
+
+<button class="loadButton" onclick="openLoadMenu()">
+📂 Load Game
+</button>
+
 <div id="audioSettings" class="card audioSettingsCard">
 
 <h3>🎵 Audio Settings</h3>
@@ -55,31 +80,6 @@ value="0.8"
 >
 
 </div>
-
-<h1>🔥 The Island of Flames</h1>
-
-<h2>Season 1 — The Crystal Awakens</h2>
-
-<p><strong>Version 3.6.4 — Episode 1 Progress Build</strong></p>
-
-<button onclick="
-document.getElementById('menu').classList.add('hidden');
-document.getElementById('characterCreator').classList.remove('hidden');
-">
-🎨 New Game
-</button>
-
-<button
-id="continueGameButton"
-class="saveButton hidden"
-onclick="continueLatestSave()"
->
-▶ Continue Latest Save
-</button>
-
-<button class="loadButton" onclick="openLoadMenu()">
-📂 Load Game
-</button>
 
 <div id="loadMenu" class="card hidden">
 
