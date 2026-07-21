@@ -456,6 +456,12 @@ width:auto;
 padding:9px 12px;
 font-size:14px;
 }
+.openingSettingsPanel #soundToggle {
+  position: static;
+  width: 100%;
+  padding: 13px;
+  font-size: 16px;
+}
 
 #portraitImage{
 border-radius:18px;
@@ -1349,4 +1355,144 @@ body.has-real-background > main.screen {
   color: white;
   border: none;
   background: rgba(8, 24, 40, 0.45);
+}
+/* ========================================
+   CHARACTER CREATOR FLOW
+======================================== */
+
+.characterCreatorFlow {
+  min-height: 100svh;
+  padding:
+    calc(28px + env(safe-area-inset-top))
+    22px
+    calc(40px + env(safe-area-inset-bottom));
+  color: white;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(5, 18, 32, 0.62),
+      rgba(5, 16, 29, 0.88)
+    ),
+    url('backgrounds/villa.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.creatorStep {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.creatorProgress {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 48px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.creatorQuestion {
+  margin-bottom: 34px;
+}
+
+.creatorEyebrow {
+  margin: 0 0 14px;
+  color: #ff9a28;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.creatorQuestion h1 {
+  margin: 0 0 18px;
+  color: white;
+  font-size: clamp(42px, 12vw, 60px);
+  line-height: 1;
+}
+
+.creatorQuestion > p:not(.creatorEyebrow) {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.creatorForm {
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 22px;
+  background: rgba(7, 22, 38, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.creatorForm label {
+  display: block;
+  margin: 0 0 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.creatorForm input,
+.creatorForm select {
+  width: 100%;
+  min-height: 58px;
+  margin: 0 0 22px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 14px;
+  color: #111827;
+  background: white;
+  font-size: 18px;
+}
+
+.creatorIdentityPreview {
+  margin: 2px 0 0;
+  padding: 14px;
+  border-radius: 12px;
+  color: white;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.creatorNavigation {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.creatorNavigation button,
+#creatorReturnToStepOne {
+  width: 100%;
+  min-height: 58px;
+  margin: 0;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+#creatorStepOneContinue {
+  border: none;
+  color: white;
+  background:
+    linear-gradient(
+      135deg,
+      #ff9700,
+      #ff5c00
+    );
+}
+
+#creatorStepOneContinue:disabled {
+  opacity: 0.45;
+}
+
+.characterCreatorFlow .creatorBackButton {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  background: rgba(7, 22, 38, 0.82);
 }
