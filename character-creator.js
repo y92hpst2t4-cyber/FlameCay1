@@ -323,7 +323,7 @@ function updatePersonalityStep() {
     love: 'a serious relationship',
     connection: 'a real connection',
     adventure: 'romance and adventure',
-    open: 'keeping their options open',
+    open: 'an open experience',
     competition: 'winning the competition'
   };
 
