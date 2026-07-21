@@ -20,7 +20,41 @@
 
 <section id="menu">
 
-<button id="soundToggle" onclick="toggleSound()">🔊 Sound On</button>
+<button id="soundToggle" onclick="toggleSound()">
+🔊 Sound On
+</button>
+
+<div id="audioSettings" class="card audioSettingsCard">
+
+<h3>🎵 Audio Settings</h3>
+
+<label for="musicVolume">
+<strong>Music Volume</strong>
+</label>
+
+<input
+id="musicVolume"
+type="range"
+min="0"
+max="1"
+step="0.05"
+value="0.6"
+>
+
+<label for="soundEffectsVolume">
+<strong>Sound Effects Volume</strong>
+</label>
+
+<input
+id="soundEffectsVolume"
+type="range"
+min="0"
+max="1"
+step="0.05"
+value="0.8"
+>
+
+</div>
 
 <h1>🔥 The Island of Flames</h1>
 
