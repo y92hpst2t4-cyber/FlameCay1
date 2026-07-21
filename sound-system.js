@@ -1,49 +1,237 @@
 'use strict';
 
-let soundEnabled=true;
-let musicVolume=0.35;
-let effectVolume=0.6;
+const AUDIO_SETTINGS_KEY = 'flameCayAudioSettings';
 
-const backgroundMusic=new Audio('sounds/island-theme.mp3');
-backgroundMusic.loop=true;
-backgroundMusic.volume=musicVolume;
+let soundEnabled = true;
+let musicVolume = 0.6;
+let effectVolume = 0.8;
+let audioUnlocked = false;
 
-const clickSound=new Audio('sounds/button-click.mp3');
-clickSound.volume=effectVolume;
+const backgroundMusic = new Audio(
+  'sounds/island-theme.mp3'
+);
 
-function startBackgroundMusic(){
-if(!soundEnabled)return;
+backgroundMusic.loop = true;
 
-backgroundMusic.play().catch(()=>{
-console.log('Music will begin after the player taps the screen.');
-});
+const clickSound = new Audio(
+  'sounds/button-click.mp3'
+);
+
+function clampVolume(value, fallback) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return fallback;
+  }
+
+  return Math.max(0, Math.min(1, number));
 }
 
-function playClickSound(){
-if(!soundEnabled)return;
+function applyAudioVolumes() {
+  backgroundMusic.volume = soundEnabled
+    ? musicVolume
+    : 0;
 
-clickSound.currentTime=0;
-clickSound.play().catch(()=>{});
+  clickSound.volume = soundEnabled
+    ? effectVolume
+    : 0;
 }
 
-function toggleSound(){
-soundEnabled=!soundEnabled;
+function saveAudioSettings() {
+  try {
+    const settings = {
+      soundEnabled,
+      musicVolume,
+      effectVolume
+    };
 
-if(soundEnabled){
-startBackgroundMusic();
-}else{
-backgroundMusic.pause();
+    localStorage.setItem(
+      AUDIO_SETTINGS_KEY,
+      JSON.stringify(settings)
+    );
+  } catch (error) {
+    console.warn(
+      'Audio settings could not be saved.',
+      error
+    );
+  }
 }
 
-updateSoundButton();
+function loadAudioSettings() {
+  try {
+    const savedSettings = localStorage.getItem(
+      AUDIO_SETTINGS_KEY
+    );
+
+    if (!savedSettings) {
+      return;
+    }
+
+    const settings = JSON.parse(savedSettings);
+
+    soundEnabled =
+      settings.soundEnabled !== false;
+
+    musicVolume = clampVolume(
+      settings.musicVolume,
+      0.6
+    );
+
+    effectVolume = clampVolume(
+      settings.effectVolume,
+      0.8
+    );
+  } catch (error) {
+    console.warn(
+      'Audio settings could not be loaded.',
+      error
+    );
+  }
 }
 
-function updateSoundButton(){
-const button=document.getElementById('soundToggle');
+function startBackgroundMusic() {
+  if (!soundEnabled || !audioUnlocked) {
+    return;
+  }
 
-if(!button)return;
+  applyAudioVolumes();
 
-button.textContent=soundEnabled
-?'🔊 Sound On'
-:'🔇 Sound Off';
+  backgroundMusic.play().catch(() => {
+    console.log(
+      'Music will begin after the player taps the screen.'
+    );
+  });
 }
+
+function unlockAudio() {
+  if (audioUnlocked) {
+    return;
+  }
+
+  audioUnlocked = true;
+  startBackgroundMusic();
+}
+
+function playClickSound() {
+  if (!soundEnabled || !audioUnlocked) {
+    return;
+  }
+
+  clickSound.currentTime = 0;
+  clickSound.volume = effectVolume;
+
+  clickSound.play().catch(() => {});
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+
+  applyAudioVolumes();
+
+  if (soundEnabled) {
+    unlockAudio();
+    startBackgroundMusic();
+  } else {
+    backgroundMusic.pause();
+  }
+
+  updateSoundButton();
+  saveAudioSettings();
+}
+
+function updateSoundButton() {
+  const button = document.getElementById(
+    'soundToggle'
+  );
+
+  if (!button) {
+    return;
+  }
+
+  button.textContent = soundEnabled
+    ? '🔊 Sound On'
+    : '🔇 Sound Off';
+}
+
+function updateAudioSliders() {
+  const musicSlider = document.getElementById(
+    'musicVolume'
+  );
+
+  const effectsSlider = document.getElementById(
+    'soundEffectsVolume'
+  );
+
+  if (musicSlider) {
+    musicSlider.value = String(musicVolume);
+  }
+
+  if (effectsSlider) {
+    effectsSlider.value = String(effectVolume);
+  }
+}
+
+function initializeAudioControls() {
+  loadAudioSettings();
+  applyAudioVolumes();
+  updateSoundButton();
+  updateAudioSliders();
+
+  const musicSlider = document.getElementById(
+    'musicVolume'
+  );
+
+  const effectsSlider = document.getElementById(
+    'soundEffectsVolume'
+  );
+
+  if (musicSlider) {
+    musicSlider.addEventListener(
+      'input',
+      function () {
+        musicVolume = clampVolume(
+          musicSlider.value,
+          0.6
+        );
+
+        applyAudioVolumes();
+        saveAudioSettings();
+      }
+    );
+  }
+
+  if (effectsSlider) {
+    effectsSlider.addEventListener(
+      'input',
+      function () {
+        effectVolume = clampVolume(
+          effectsSlider.value,
+          0.8
+        );
+
+        applyAudioVolumes();
+        saveAudioSettings();
+      }
+    );
+  }
+
+  document.addEventListener(
+    'pointerdown',
+    unlockAudio,
+    { once: true }
+  );
+
+  document.addEventListener(
+    'click',
+    function (event) {
+      if (event.target.closest('button')) {
+        playClickSound();
+      }
+    }
+  );
+}
+
+window.addEventListener(
+  'DOMContentLoaded',
+  initializeAudioControls
+);
