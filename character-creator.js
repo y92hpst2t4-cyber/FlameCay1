@@ -23,8 +23,10 @@ window.playerProfile = {
   age: '',
   hometown: '',
   occupation: '',
-  spritePreset: 1,
-  personality: 'romantic'
+  personality: '',
+  datingGoal: '',
+  firstImpression: '',
+  spritePreset: 1
 };
 
 function getCreatorElement(id) {
@@ -78,8 +80,9 @@ function showCreatorStep(stepNumber) {
   const steps = {
     1: getCreatorElement('creatorStepOne'),
     2: getCreatorElement('creatorStepTwo'),
-    3: getCreatorElement(
-      'creatorStepThreePlaceholder'
+    3: getCreatorElement('creatorStepThree'),
+    4: getCreatorElement(
+      'creatorStepFourPlaceholder'
     )
   };
 
@@ -240,31 +243,176 @@ function continueFromProfileStep() {
   }
 
   savePlayerProfile();
+  updatePersonalityStep();
+  showCreatorStep(3);
+}
+
+function updatePersonalityStep() {
+  const personalityInput =
+    getCreatorElement('playerPersonality');
+
+  const datingGoalInput =
+    getCreatorElement('playerDatingGoal');
+
+  const firstImpressionInput =
+    getCreatorElement(
+      'playerFirstImpression'
+    );
+
+  const preview =
+    getCreatorElement(
+      'creatorPersonalityPreview'
+    );
+
+  const continueButton =
+    getCreatorElement(
+      'creatorStepThreeContinue'
+    );
+
+  if (
+    !personalityInput ||
+    !datingGoalInput ||
+    !firstImpressionInput ||
+    !preview ||
+    !continueButton
+  ) {
+    return;
+  }
+
+  const personality =
+    personalityInput.value;
+
+  const datingGoal =
+    datingGoalInput.value;
+
+  const firstImpression =
+    firstImpressionInput.value;
+
+  window.playerProfile.personality =
+    personality;
+
+  window.playerProfile.datingGoal =
+    datingGoal;
+
+  window.playerProfile.firstImpression =
+    firstImpression;
+
+  const personalityComplete =
+    personality &&
+    datingGoal &&
+    firstImpression;
+
+  if (!personalityComplete) {
+    preview.textContent =
+      'Choose all three options to continue.';
+
+    continueButton.disabled = true;
+    return;
+  }
+
+  const personalityNames = {
+    romantic: 'romantic',
+    loyal: 'loyal',
+    bold: 'bold',
+    strategic: 'strategic',
+    funny: 'funny',
+    mysterious: 'mysterious'
+  };
+
+  const datingGoalNames = {
+    love: 'a serious relationship',
+    connection: 'a real connection',
+    adventure: 'romance and adventure',
+    open: 'keeping their options open',
+    competition: 'winning the competition'
+  };
+
+  const impressionNames = {
+    confident: 'confident',
+    friendly: 'friendly',
+    flirty: 'flirty',
+    calm: 'calm',
+    mysterious: 'mysterious'
+  };
+
+  preview.textContent =
+    `${window.playerProfile.name} is ` +
+    `${personalityNames[personality]}, ` +
+    `is looking for ${datingGoalNames[datingGoal]}, ` +
+    `and plans to enter the villa feeling ` +
+    `${impressionNames[firstImpression]}.`;
+
+  continueButton.disabled = false;
+}
+
+function continueFromPersonalityStep() {
+  updatePersonalityStep();
+
+  if (
+    !window.playerProfile.personality ||
+    !window.playerProfile.datingGoal ||
+    !window.playerProfile.firstImpression
+  ) {
+    return;
+  }
+
+  savePlayerProfile();
 
   const title =
     getCreatorElement(
-      'creatorProfileSavedTitle'
+      'creatorPersonalitySavedTitle'
     );
 
   const text =
     getCreatorElement(
-      'creatorProfileSavedText'
+      'creatorPersonalitySavedText'
     );
+
+  const personalityTitles = {
+    romantic: 'Romantic',
+    loyal: 'Loyal',
+    bold: 'Bold',
+    strategic: 'Strategic',
+    funny: 'Funny',
+    mysterious: 'Mysterious'
+  };
+
+  const datingGoalTitles = {
+    love: 'a serious relationship',
+    connection: 'a real connection',
+    adventure: 'romance and adventure',
+    open: 'keeping your options open',
+    competition: 'winning the competition'
+  };
+
+  const impressionTitles = {
+    confident: 'confident',
+    friendly: 'friendly',
+    flirty: 'flirty',
+    calm: 'calm',
+    mysterious: 'mysterious'
+  };
 
   if (title) {
     title.textContent =
-      `${window.playerProfile.name}, your profile is ready`;
+      `${window.playerProfile.name}, we know what you want`;
   }
 
   if (text) {
     text.textContent =
-      `${window.playerProfile.name} is ` +
-      `${window.playerProfile.age} years old, ` +
-      `works as a ${window.playerProfile.occupation}, ` +
-      `and comes from ${window.playerProfile.hometown}.`;
+      `You are a ` +
+      `${personalityTitles[
+        window.playerProfile.personality
+      ]} Islander looking for ` +
+      `${datingGoalTitles[
+        window.playerProfile.datingGoal
+      ]}. Your first impression will be ` +
+      `${impressionTitles[
+        window.playerProfile.firstImpression
+      ]}.`;
   }
 
-  showCreatorStep(3);
+  showCreatorStep(4);
 }
 
 function returnToMainMenu() {
@@ -299,49 +447,47 @@ function restoreCreatorForm() {
     };
   }
 
-  const nameInput =
-    getCreatorElement('playerName');
+  const fieldValues = {
+    playerName:
+      window.playerProfile.name || '',
 
-  const pronounsInput =
-    getCreatorElement('playerPronouns');
-
-  const ageInput =
-    getCreatorElement('playerAge');
-
-  const hometownInput =
-    getCreatorElement('playerHometown');
-
-  const occupationInput =
-    getCreatorElement('playerOccupation');
-
-  if (nameInput) {
-    nameInput.value =
-      window.playerProfile.name || '';
-  }
-
-  if (pronounsInput) {
-    pronounsInput.value =
+    playerPronouns:
       window.playerProfile.pronouns ||
-      'she/her';
-  }
+      'she/her',
 
-  if (ageInput) {
-    ageInput.value =
-      window.playerProfile.age || '';
-  }
+    playerAge:
+      window.playerProfile.age || '',
 
-  if (hometownInput) {
-    hometownInput.value =
-      window.playerProfile.hometown || '';
-  }
+    playerHometown:
+      window.playerProfile.hometown || '',
 
-  if (occupationInput) {
-    occupationInput.value =
-      window.playerProfile.occupation || '';
-  }
+    playerOccupation:
+      window.playerProfile.occupation || '',
+
+    playerPersonality:
+      window.playerProfile.personality || '',
+
+    playerDatingGoal:
+      window.playerProfile.datingGoal || '',
+
+    playerFirstImpression:
+      window.playerProfile.firstImpression || ''
+  };
+
+  Object.entries(fieldValues).forEach(
+    ([id, value]) => {
+      const element =
+        getCreatorElement(id);
+
+      if (element) {
+        element.value = value;
+      }
+    }
+  );
 
   updateIdentityStep();
   updateProfileStep();
+  updatePersonalityStep();
 }
 
 function renderPlayerScenePortrait() {
@@ -380,7 +526,9 @@ function renderPlayerScenePortrait() {
     romantic: '💕 Romantic Islander',
     loyal: '💚 Loyal Islander',
     bold: '🔥 Bold Islander',
-    strategic: '🧠 Strategic Islander'
+    strategic: '🧠 Strategic Islander',
+    funny: '😄 Funny Islander',
+    mysterious: '🌙 Mysterious Islander'
   };
 
   const spritePath =
@@ -437,6 +585,17 @@ function initializeCharacterCreator() {
   const occupationInput =
     getCreatorElement('playerOccupation');
 
+  const personalityInput =
+    getCreatorElement('playerPersonality');
+
+  const datingGoalInput =
+    getCreatorElement('playerDatingGoal');
+
+  const firstImpressionInput =
+    getCreatorElement(
+      'playerFirstImpression'
+    );
+
   const stepOneContinue =
     getCreatorElement(
       'creatorStepOneContinue'
@@ -445,6 +604,11 @@ function initializeCharacterCreator() {
   const stepTwoContinue =
     getCreatorElement(
       'creatorStepTwoContinue'
+    );
+
+  const stepThreeContinue =
+    getCreatorElement(
+      'creatorStepThreeContinue'
     );
 
   const backToMenuButton =
@@ -457,9 +621,14 @@ function initializeCharacterCreator() {
       'creatorStepTwoBack'
     );
 
-  const returnToStepTwo =
+  const stepThreeBack =
     getCreatorElement(
-      'creatorReturnToStepTwo'
+      'creatorStepThreeBack'
+    );
+
+  const returnToStepThree =
+    getCreatorElement(
+      'creatorReturnToStepThree'
     );
 
   if (nameInput) {
@@ -496,6 +665,21 @@ function initializeCharacterCreator() {
     );
   });
 
+  [
+    personalityInput,
+    datingGoalInput,
+    firstImpressionInput
+  ].forEach(select => {
+    if (!select) {
+      return;
+    }
+
+    select.addEventListener(
+      'change',
+      updatePersonalityStep
+    );
+  });
+
   if (stepOneContinue) {
     stepOneContinue.addEventListener(
       'click',
@@ -507,6 +691,13 @@ function initializeCharacterCreator() {
     stepTwoContinue.addEventListener(
       'click',
       continueFromProfileStep
+    );
+  }
+
+  if (stepThreeContinue) {
+    stepThreeContinue.addEventListener(
+      'click',
+      continueFromPersonalityStep
     );
   }
 
@@ -526,11 +717,20 @@ function initializeCharacterCreator() {
     );
   }
 
-  if (returnToStepTwo) {
-    returnToStepTwo.addEventListener(
+  if (stepThreeBack) {
+    stepThreeBack.addEventListener(
       'click',
       function () {
         showCreatorStep(2);
+      }
+    );
+  }
+
+  if (returnToStepThree) {
+    returnToStepThree.addEventListener(
+      'click',
+      function () {
+        showCreatorStep(3);
       }
     );
   }
