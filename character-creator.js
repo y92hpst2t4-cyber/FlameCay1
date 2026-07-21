@@ -84,9 +84,7 @@ function showCreatorStep(stepNumber) {
     3: getCreatorElement('creatorStepThree'),
     4: getCreatorElement('creatorStepFour'),
     5: getCreatorElement('creatorStepFive'),
-    6: getCreatorElement(
-  'creatorStepSix'
-)
+    6: getCreatorElement('creatorStepSix')
   };
 
   Object.entries(steps).forEach(
@@ -131,24 +129,33 @@ function updateIdentityStep() {
     return;
   }
 
-  const name = nameInput.value.trim();
-  const pronouns = pronounsInput.value;
+  const name =
+    nameInput.value.trim();
 
-  window.playerProfile.name = name;
-  window.playerProfile.pronouns = pronouns;
+  const pronouns =
+    pronounsInput.value;
+
+  window.playerProfile.name =
+    name;
+
+  window.playerProfile.pronouns =
+    pronouns;
 
   if (!name) {
     preview.textContent =
       'Your introduction will appear here.';
 
-    continueButton.disabled = true;
+    continueButton.disabled =
+      true;
+
     return;
   }
 
   preview.textContent =
     `Welcome, ${name}. Your pronouns are ${pronouns}.`;
 
-  continueButton.disabled = false;
+  continueButton.disabled =
+    false;
 }
 
 function continueFromIdentityStep() {
@@ -193,7 +200,9 @@ function updateProfileStep() {
     return;
   }
 
-  const age = Number(ageInput.value);
+  const age =
+    Number(ageInput.value);
+
   const hometown =
     hometownInput.value.trim();
 
@@ -223,7 +232,9 @@ function updateProfileStep() {
     preview.textContent =
       'Complete your profile to continue.';
 
-    continueButton.disabled = true;
+    continueButton.disabled =
+      true;
+
     return;
   }
 
@@ -231,7 +242,8 @@ function updateProfileStep() {
     `${window.playerProfile.name}, ${age}, ` +
     `is a ${occupation} from ${hometown}.`;
 
-  continueButton.disabled = false;
+  continueButton.disabled =
+    false;
 }
 
 function continueFromProfileStep() {
@@ -252,10 +264,14 @@ function continueFromProfileStep() {
 
 function updatePersonalityStep() {
   const personalityInput =
-    getCreatorElement('playerPersonality');
+    getCreatorElement(
+      'playerPersonality'
+    );
 
   const datingGoalInput =
-    getCreatorElement('playerDatingGoal');
+    getCreatorElement(
+      'playerDatingGoal'
+    );
 
   const firstImpressionInput =
     getCreatorElement(
@@ -309,7 +325,9 @@ function updatePersonalityStep() {
     preview.textContent =
       'Choose all three options to continue.';
 
-    continueButton.disabled = true;
+    continueButton.disabled =
+      true;
+
     return;
   }
 
@@ -328,7 +346,8 @@ function updatePersonalityStep() {
     `and plans to enter the villa feeling ` +
     `${firstImpression}.`;
 
-  continueButton.disabled = false;
+  continueButton.disabled =
+    false;
 }
 
 function continueFromPersonalityStep() {
@@ -397,14 +416,17 @@ function updateAppearanceStep() {
     preview.textContent =
       'Select your appearance to continue.';
 
-    continueButton.disabled = true;
+    continueButton.disabled =
+      true;
+
     return;
   }
 
   preview.textContent =
     `Look ${selectedPreset} is selected.`;
 
-  continueButton.disabled = false;
+  continueButton.disabled =
+    false;
 }
 
 function selectAppearance(presetNumber) {
@@ -429,10 +451,14 @@ function populateReviewStep() {
     window.playerProfile;
 
   const reviewImage =
-    getCreatorElement('creatorReviewImage');
+    getCreatorElement(
+      'creatorReviewImage'
+    );
 
   const reviewName =
-    getCreatorElement('creatorReviewName');
+    getCreatorElement(
+      'creatorReviewName'
+    );
 
   const reviewBasicInfo =
     getCreatorElement(
@@ -496,7 +522,7 @@ function populateReviewStep() {
 
   if (reviewName) {
     reviewName.textContent =
-      profile.name;
+      profile.name || 'New Islander';
   }
 
   if (reviewBasicInfo) {
@@ -508,7 +534,7 @@ function populateReviewStep() {
 
   if (reviewPronouns) {
     reviewPronouns.textContent =
-      profile.pronouns;
+      profile.pronouns || '—';
   }
 
   if (reviewPersonality) {
@@ -550,28 +576,91 @@ function continueFromAppearanceStep() {
   showCreatorStep(5);
 }
 
+function populateArrivalStep() {
+  const profile =
+    window.playerProfile;
+
+  const arrivalImage =
+    getCreatorElement(
+      'creatorArrivalImage'
+    );
+
+  const arrivalName =
+    getCreatorElement(
+      'creatorArrivalName'
+    );
+
+  const arrivalMessage =
+    getCreatorElement(
+      'creatorArrivalMessage'
+    );
+
+  if (arrivalImage) {
+    arrivalImage.src =
+      getPlayerSpritePath(
+        profile.spritePreset
+      );
+
+    arrivalImage.alt =
+      `${profile.name}'s contestant`;
+  }
+
+  if (arrivalName) {
+    arrivalName.textContent =
+      profile.name || 'New Islander';
+  }
+
+  if (arrivalMessage) {
+    arrivalMessage.textContent =
+      `${profile.name || 'New Islander'}, ` +
+      `the boat is waiting. Your first day ` +
+      `on Flame Cay is about to begin.`;
+  }
+}
+
 function confirmContestantProfile() {
   window.playerProfile.profileConfirmed =
     true;
 
   savePlayerProfile();
+  populateArrivalStep();
+  showCreatorStep(6);
+}
 
-  const title =
+function enterFlameCay() {
+  const creator =
     getCreatorElement(
-      'creatorProfileConfirmedTitle'
+      'characterCreator'
     );
 
-  if (title) {
-    title.textContent =
-      `${window.playerProfile.name}, you are almost ready`;
+  const game =
+    getCreatorElement('game');
+
+  if (creator) {
+    creator.classList.add('hidden');
   }
 
-  showCreatorStep(6);
+  if (game) {
+    game.classList.remove('hidden');
+  }
+
+  renderPlayerScenePortrait();
+
+  if (
+    typeof window.startGame ===
+    'function'
+  ) {
+    window.startGame();
+  }
+
+  window.scrollTo(0, 0);
 }
 
 function returnToMainMenu() {
   const creator =
-    getCreatorElement('characterCreator');
+    getCreatorElement(
+      'characterCreator'
+    );
 
   const menu =
     getCreatorElement('menu');
@@ -597,7 +686,9 @@ function restoreCreatorForm() {
       ...window.playerProfile,
       ...savedProfile,
       spritePreset:
-        Number(savedProfile.spritePreset) || 0
+        Number(
+          savedProfile.spritePreset
+        ) || 0
     };
   }
 
@@ -634,7 +725,8 @@ function restoreCreatorForm() {
         getCreatorElement(id);
 
       if (element) {
-        element.value = value;
+        element.value =
+          value;
       }
     }
   );
@@ -644,6 +736,7 @@ function restoreCreatorForm() {
   updatePersonalityStep();
   updateAppearanceStep();
   populateReviewStep();
+  populateArrivalStep();
 }
 
 function renderPlayerScenePortrait() {
@@ -660,10 +753,14 @@ function renderPlayerScenePortrait() {
     );
 
   const sceneAvatar =
-    getCreatorElement('playerSceneAvatar');
+    getCreatorElement(
+      'playerSceneAvatar'
+    );
 
   const sceneName =
-    getCreatorElement('playerSceneName');
+    getCreatorElement(
+      'playerSceneName'
+    );
 
   const scenePersonality =
     getCreatorElement(
@@ -734,22 +831,32 @@ function initializeCharacterCreator() {
     getCreatorElement('playerName');
 
   const pronounsInput =
-    getCreatorElement('playerPronouns');
+    getCreatorElement(
+      'playerPronouns'
+    );
 
   const ageInput =
     getCreatorElement('playerAge');
 
   const hometownInput =
-    getCreatorElement('playerHometown');
+    getCreatorElement(
+      'playerHometown'
+    );
 
   const occupationInput =
-    getCreatorElement('playerOccupation');
+    getCreatorElement(
+      'playerOccupation'
+    );
 
   const personalityInput =
-    getCreatorElement('playerPersonality');
+    getCreatorElement(
+      'playerPersonality'
+    );
 
   const datingGoalInput =
-    getCreatorElement('playerDatingGoal');
+    getCreatorElement(
+      'playerDatingGoal'
+    );
 
   const firstImpressionInput =
     getCreatorElement(
@@ -784,6 +891,11 @@ function initializeCharacterCreator() {
   const stepFiveContinue =
     getCreatorElement(
       'creatorStepFiveContinue'
+    );
+
+  const enterIslandButton =
+    getCreatorElement(
+      'creatorEnterIsland'
     );
 
   const backToMenuButton =
@@ -908,6 +1020,13 @@ function initializeCharacterCreator() {
     stepFiveContinue.addEventListener(
       'click',
       confirmContestantProfile
+    );
+  }
+
+  if (enterIslandButton) {
+    enterIslandButton.addEventListener(
+      'click',
+      enterFlameCay
     );
   }
 
