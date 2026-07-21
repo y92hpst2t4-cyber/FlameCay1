@@ -124,7 +124,10 @@ async function unlockAudio() {
     try {
       await context.resume();
     } catch (error) {
-      console.warn('Audio could not be resumed.', error);
+      console.warn(
+        'Audio could not be resumed.',
+        error
+      );
       return;
     }
   }
@@ -138,8 +141,15 @@ function createOscillator({
   volume = 0.1,
   destination = musicGain
 }) {
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
+  if (!audioContext || !destination) {
+    return null;
+  }
+
+  const oscillator =
+    audioContext.createOscillator();
+
+  const gain =
+    audioContext.createGain();
 
   oscillator.type = type;
   oscillator.frequency.value = frequency;
@@ -150,7 +160,10 @@ function createOscillator({
 
   oscillator.start();
 
-  atmosphereNodes.push(oscillator, gain);
+  atmosphereNodes.push(
+    oscillator,
+    gain
+  );
 
   return {
     oscillator,
@@ -162,24 +175,40 @@ function createNoise({
   volume = 0.05,
   lowpass = 1000
 }) {
+  if (!audioContext || !musicGain) {
+    return null;
+  }
+
   const bufferLength =
     audioContext.sampleRate * 2;
 
-  const buffer = audioContext.createBuffer(
-    1,
-    bufferLength,
-    audioContext.sampleRate
-  );
+  const buffer =
+    audioContext.createBuffer(
+      1,
+      bufferLength,
+      audioContext.sampleRate
+    );
 
-  const data = buffer.getChannelData(0);
+  const data =
+    buffer.getChannelData(0);
 
-  for (let index = 0; index < bufferLength; index++) {
-    data[index] = Math.random() * 2 - 1;
+  for (
+    let index = 0;
+    index < bufferLength;
+    index++
+  ) {
+    data[index] =
+      Math.random() * 2 - 1;
   }
 
-  const source = audioContext.createBufferSource();
-  const filter = audioContext.createBiquadFilter();
-  const gain = audioContext.createGain();
+  const source =
+    audioContext.createBufferSource();
+
+  const filter =
+    audioContext.createBiquadFilter();
+
+  const gain =
+    audioContext.createGain();
 
   source.buffer = buffer;
   source.loop = true;
@@ -195,7 +224,11 @@ function createNoise({
 
   source.start();
 
-  atmosphereNodes.push(source, filter, gain);
+  atmosphereNodes.push(
+    source,
+    filter,
+    gain
+  );
 
   return {
     source,
@@ -207,11 +240,17 @@ function createNoise({
 function stopAtmosphere() {
   atmosphereNodes.forEach(node => {
     try {
-      if (typeof node.stop === 'function') {
+      if (
+        typeof node.stop === 'function'
+      ) {
         node.stop();
       }
 
-      node.disconnect();
+      if (
+        typeof node.disconnect === 'function'
+      ) {
+        node.disconnect();
+      }
     } catch (error) {
       // Node may already be stopped.
     }
@@ -221,88 +260,161 @@ function stopAtmosphere() {
 }
 
 function playMenuMusic() {
-  // Keep the main menu silent for now.
-  // Continuous generated tones can glitch on iPhone Safari.
+  // Main menu stays quiet.
 }
 
 function playIslandAmbience() {
-  createNoise({
-    volume: 0.018,
-    lowpass: 700
+  const breeze = createNoise({
+    volume: 0.006,
+    lowpass: 260
   });
+
+  if (!breeze) {
+    return;
+  }
+
+  const breezeLfo =
+    audioContext.createOscillator();
+
+  const breezeDepth =
+    audioContext.createGain();
+
+  breezeLfo.type = 'sine';
+  breezeLfo.frequency.value = 0.07;
+  breezeDepth.gain.value = 0.003;
+
+  breezeLfo.connect(breezeDepth);
+  breezeDepth.connect(
+    breeze.gain.gain
+  );
+
+  breezeLfo.start();
+
+  atmosphereNodes.push(
+    breezeLfo,
+    breezeDepth
+  );
 }
-  
+
 function playBeachWaves() {
   const noise = createNoise({
-    volume: 0.08,
+    volume: 0.025,
     lowpass: 1500
   });
 
-  noise.gain.gain.value = 0.04;
+  if (!noise) {
+    return;
+  }
 
-  const waveLfo = audioContext.createOscillator();
-  const waveDepth = audioContext.createGain();
+  noise.gain.gain.value = 0.012;
 
+  const waveLfo =
+    audioContext.createOscillator();
+
+  const waveDepth =
+    audioContext.createGain();
+
+  waveLfo.type = 'sine';
   waveLfo.frequency.value = 0.18;
-  waveDepth.gain.value = 0.035;
+  waveDepth.gain.value = 0.01;
 
   waveLfo.connect(waveDepth);
-  waveDepth.connect(noise.gain.gain);
+  waveDepth.connect(
+    noise.gain.gain
+  );
 
   waveLfo.start();
 
-  atmosphereNodes.push(waveLfo, waveDepth);
+  atmosphereNodes.push(
+    waveLfo,
+    waveDepth
+  );
 }
 
 function playJungleAmbience() {
-  createNoise({
-    volume: 0.025,
-    lowpass: 1200
-  });
-
-  createOscillator({
-    frequency: 4200,
+  const insectOne = createOscillator({
+    frequency: 4800,
     type: 'sine',
-    volume: 0.008
+    volume: 0.002
   });
 
   createOscillator({
-    frequency: 5100,
-    type: 'square',
-    volume: 0.003
+    frequency: 5600,
+    type: 'sine',
+    volume: 0.0015
   });
+
+  if (!insectOne) {
+    return;
+  }
+
+  const jungleLfo =
+    audioContext.createOscillator();
+
+  const jungleDepth =
+    audioContext.createGain();
+
+  jungleLfo.type = 'sine';
+  jungleLfo.frequency.value = 3.5;
+  jungleDepth.gain.value = 0.0015;
+
+  jungleLfo.connect(jungleDepth);
+  jungleDepth.connect(
+    insectOne.gain.gain
+  );
+
+  jungleLfo.start();
+
+  atmosphereNodes.push(
+    jungleLfo,
+    jungleDepth
+  );
 }
 
 function playFirePitAmbience() {
-  createNoise({
-    volume: 0.045,
-    lowpass: 2800
+  const fireNoise = createNoise({
+    volume: 0.012,
+    lowpass: 1800
   });
 
-  createOscillator({
-    frequency: 75,
-    type: 'sine',
-    volume: 0.018
-  });
+  if (!fireNoise) {
+    return;
+  }
+
+  const crackleLfo =
+    audioContext.createOscillator();
+
+  const crackleDepth =
+    audioContext.createGain();
+
+  crackleLfo.type = 'square';
+  crackleLfo.frequency.value = 5;
+  crackleDepth.gain.value = 0.009;
+
+  crackleLfo.connect(crackleDepth);
+  crackleDepth.connect(
+    fireNoise.gain.gain
+  );
+
+  crackleLfo.start();
+
+  atmosphereNodes.push(
+    crackleLfo,
+    crackleDepth
+  );
 }
 
 function playChallengeMusic() {
   createOscillator({
     frequency: 110,
-    type: 'square',
-    volume: 0.06
+    type: 'triangle',
+    volume: 0.018
   });
 
   createOscillator({
     frequency: 165,
-    type: 'triangle',
-    volume: 0.05
-  });
-
-  createOscillator({
-    frequency: 440,
-    type: 'sawtooth',
-    volume: 0.025
+    type: 'sine',
+    volume: 0.012
   });
 }
 
@@ -310,19 +422,13 @@ function playCeremonyMusic() {
   createOscillator({
     frequency: 73.42,
     type: 'sine',
-    volume: 0.07
+    volume: 0.018
   });
 
   createOscillator({
     frequency: 146.83,
     type: 'triangle',
-    volume: 0.06
-  });
-
-  createOscillator({
-    frequency: 174.61,
-    type: 'sine',
-    volume: 0.04
+    volume: 0.012
   });
 }
 
@@ -335,7 +441,10 @@ function playAtmosphere(type = 'island') {
 
   const context = createAudioContext();
 
-  if (!context || context.state !== 'running') {
+  if (
+    !context ||
+    context.state !== 'running'
+  ) {
     return;
   }
 
@@ -367,12 +476,19 @@ function playClickSound() {
 
   const context = createAudioContext();
 
-  if (!context || context.state !== 'running') {
+  if (
+    !context ||
+    context.state !== 'running' ||
+    !effectsGain
+  ) {
     return;
   }
 
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
+  const oscillator =
+    context.createOscillator();
+
+  const gain =
+    context.createGain();
 
   oscillator.type = 'sine';
 
@@ -381,25 +497,28 @@ function playClickSound() {
     context.currentTime
   );
 
-  oscillator.frequency.exponentialRampToValueAtTime(
-    260,
-    context.currentTime + 0.04
-  );
+  oscillator.frequency
+    .exponentialRampToValueAtTime(
+      260,
+      context.currentTime + 0.04
+    );
 
   gain.gain.setValueAtTime(
     effectVolume * 0.06,
     context.currentTime
   );
 
-  gain.gain.exponentialRampToValueAtTime(
-    0.001,
-    context.currentTime + 0.05
-  );
+  gain.gain
+    .exponentialRampToValueAtTime(
+      0.001,
+      context.currentTime + 0.05
+    );
 
   oscillator.connect(gain);
   gain.connect(effectsGain);
 
   oscillator.start();
+
   oscillator.stop(
     context.currentTime + 0.06
   );
@@ -421,8 +540,12 @@ async function toggleSound() {
   applyAudioVolumes();
   stopAtmosphere();
 
-  if (currentAtmosphere !== 'menu') {
-    playAtmosphere(currentAtmosphere);
+  if (
+    currentAtmosphere !== 'menu'
+  ) {
+    playAtmosphere(
+      currentAtmosphere
+    );
   }
 
   updateSoundButton();
@@ -430,9 +553,10 @@ async function toggleSound() {
 }
 
 function updateSoundButton() {
-  const button = document.getElementById(
-    'soundToggle'
-  );
+  const button =
+    document.getElementById(
+      'soundToggle'
+    );
 
   if (!button) {
     return;
@@ -444,20 +568,24 @@ function updateSoundButton() {
 }
 
 function updateAudioSliders() {
-  const musicSlider = document.getElementById(
-    'musicVolume'
-  );
+  const musicSlider =
+    document.getElementById(
+      'musicVolume'
+    );
 
-  const effectsSlider = document.getElementById(
-    'soundEffectsVolume'
-  );
+  const effectsSlider =
+    document.getElementById(
+      'soundEffectsVolume'
+    );
 
   if (musicSlider) {
-    musicSlider.value = String(musicVolume);
+    musicSlider.value =
+      String(musicVolume);
   }
 
   if (effectsSlider) {
-    effectsSlider.value = String(effectVolume);
+    effectsSlider.value =
+      String(effectVolume);
   }
 }
 
@@ -466,13 +594,15 @@ function initializeAudioControls() {
   updateSoundButton();
   updateAudioSliders();
 
-  const musicSlider = document.getElementById(
-    'musicVolume'
-  );
+  const musicSlider =
+    document.getElementById(
+      'musicVolume'
+    );
 
-  const effectsSlider = document.getElementById(
-    'soundEffectsVolume'
-  );
+  const effectsSlider =
+    document.getElementById(
+      'soundEffectsVolume'
+    );
 
   if (musicSlider) {
     musicSlider.addEventListener(
@@ -505,34 +635,53 @@ function initializeAudioControls() {
   }
 
   document.addEventListener(
-  'pointerdown',
-  async function () {
-    await unlockAudio();
+    'pointerdown',
+    async function () {
+      await unlockAudio();
 
-    if (
-      soundEnabled &&
-      currentAtmosphere !== 'menu' &&
-      atmosphereNodes.length === 0
-    ) {
-      playAtmosphere(currentAtmosphere);
-    }
-  },
-  { once: true }
-);
+      if (
+        soundEnabled &&
+        currentAtmosphere !== 'menu' &&
+        atmosphereNodes.length === 0
+      ) {
+        playAtmosphere(
+          currentAtmosphere
+        );
+      }
+    },
+    { once: true }
+  );
 
   document.addEventListener(
     'click',
     function (event) {
-      if (event.target.closest('button')) {
+      const button =
+        event.target.closest('button');
+
+      if (!button) {
+        return;
+      }
+
+      if (
+        button.id !== 'soundToggle'
+      ) {
         playClickSound();
       }
     }
   );
 }
 
-window.playAtmosphere = playAtmosphere;
-window.stopAtmosphere = stopAtmosphere;
-window.playClickSound = playClickSound;
+window.playAtmosphere =
+  playAtmosphere;
+
+window.stopAtmosphere =
+  stopAtmosphere;
+
+window.playClickSound =
+  playClickSound;
+
+window.toggleSound =
+  toggleSound;
 
 window.addEventListener(
   'DOMContentLoaded',
