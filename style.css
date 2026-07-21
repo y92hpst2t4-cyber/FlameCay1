@@ -1330,3 +1330,23 @@ body.has-real-background > main.screen {
     font-size: 42px;
   }
 }
+.openingMenu .openingPrimaryButton {
+  color: white;
+  background: linear-gradient(
+    135deg,
+    #ff9700,
+    #ff5c00
+  );
+}
+
+.openingMenu .openingSecondaryButton {
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(8, 24, 40, 0.82);
+}
+
+.openingMenu .openingSettingsButton {
+  color: white;
+  border: none;
+  background: rgba(8, 24, 40, 0.45);
+}
