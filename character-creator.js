@@ -1166,6 +1166,65 @@ function finishOpeningDialogue() {
       'openingDialogueScene'
     );
 
+  const openingChoiceScene =
+    getCreatorElement(
+      'openingChoiceScene'
+    );
+
+  if (openingDialogueScene) {
+    openingDialogueScene.classList.add(
+      'hidden'
+    );
+  }
+
+  if (openingChoiceScene) {
+    openingChoiceScene.classList.remove(
+      'hidden'
+    );
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function advanceOpeningDialogue() {
+  openingDialogueIndex += 1;
+
+  if (
+    openingDialogueIndex >=
+    openingDialogueLines.length
+  ) {
+    finishOpeningDialogue();
+    return;
+  }
+
+  showOpeningDialogueLine();
+}
+
+function selectOpeningChoice(choice) {
+  const validChoices = [
+    'confident',
+    'friendly',
+    'mysterious'
+  ];
+
+  if (
+    !validChoices.includes(
+      choice
+    )
+  ) {
+    return;
+  }
+
+  window.playerProfile.firstImpression =
+    choice;
+
+  savePlayerProfile();
+
+  const openingChoiceScene =
+    getCreatorElement(
+      'openingChoiceScene'
+    );
+
   const mainGameInterface =
     getCreatorElement(
       'mainGameInterface'
@@ -1176,8 +1235,8 @@ function finishOpeningDialogue() {
       'welcome'
     );
 
-  if (openingDialogueScene) {
-    openingDialogueScene.classList.add(
+  if (openingChoiceScene) {
+    openingChoiceScene.classList.add(
       'hidden'
     );
   }
@@ -1204,20 +1263,6 @@ function finishOpeningDialogue() {
   }
 
   window.scrollTo(0, 0);
-}
-
-function advanceOpeningDialogue() {
-  openingDialogueIndex += 1;
-
-  if (
-    openingDialogueIndex >=
-    openingDialogueLines.length
-  ) {
-    finishOpeningDialogue();
-    return;
-  }
-
-  showOpeningDialogueLine();
 }
 
 function returnToMainMenu() {
@@ -1470,6 +1515,11 @@ function initializeCharacterCreator() {
     getCreatorElement(
       'playerName'
     );
+    
+    const openingChoiceButtons =
+  document.querySelectorAll(
+    '.openingChoiceButton'
+  );
 
   const pronounsInput =
     getCreatorElement(
@@ -1796,6 +1846,19 @@ function initializeCharacterCreator() {
       }
     );
   }
+  
+openingChoiceButtons.forEach(
+  button => {
+    button.addEventListener(
+      'click',
+      function () {
+        selectOpeningChoice(
+          this.dataset.openingChoice
+        );
+      }
+    );
+  }
+);
 
   restoreCreatorForm();
   showCreatorStep(1);
