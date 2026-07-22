@@ -1044,6 +1044,31 @@ function enterFlameCay() {
   window.scrollTo(0, 0);
 }
 
+let openingDialogueIndex = 0;
+
+const openingDialogueLines = [
+  {
+    speaker: 'Narrator',
+    text:
+      'Warm ocean air reaches you as the boat approaches the shore.'
+  },
+  {
+    speaker: 'Narrator',
+    text:
+      'Ahead, the Flame Cay villa rises between palm trees and the bright blue ocean.'
+  },
+  {
+    speaker: 'Player',
+    text:
+      'This is it. My new life on Flame Cay starts now.'
+  },
+  {
+    speaker: 'Narrator',
+    text:
+      'You take one final breath as the boat reaches the dock.'
+  }
+];
+
 function continueArrivalScene() {
   const arrivalScene =
     getCreatorElement(
@@ -1060,15 +1085,7 @@ function continueArrivalScene() {
       'openingDialoguePlayerImage'
     );
 
-  const openingDialogueSpeaker =
-    getCreatorElement(
-      'openingDialogueSpeaker'
-    );
-
-  const openingDialogueText =
-    getCreatorElement(
-      'openingDialogueText'
-    );
+  openingDialogueIndex = 0;
 
   if (arrivalScene) {
     arrivalScene.classList.add(
@@ -1092,17 +1109,55 @@ function continueArrivalScene() {
       `${window.playerProfile.name}'s Islander`;
   }
 
-  if (openingDialogueSpeaker) {
-    openingDialogueSpeaker.textContent =
-      'Narrator';
-  }
-
-  if (openingDialogueText) {
-    openingDialogueText.textContent =
-      'Warm ocean air reaches you as the boat approaches the shore.';
-  }
-
+  showOpeningDialogueLine();
   window.scrollTo(0, 0);
+}
+
+function showOpeningDialogueLine() {
+  const speaker =
+    getCreatorElement(
+      'openingDialogueSpeaker'
+    );
+
+  const text =
+    getCreatorElement(
+      'openingDialogueText'
+    );
+
+  const continueButton =
+    getCreatorElement(
+      'openingDialogueContinue'
+    );
+
+  const line =
+    openingDialogueLines[
+      openingDialogueIndex
+    ];
+
+  if (!line) {
+    finishOpeningDialogue();
+    return;
+  }
+
+  if (speaker) {
+    speaker.textContent =
+      line.speaker === 'Player'
+        ? window.playerProfile.name
+        : line.speaker;
+  }
+
+  if (text) {
+    text.textContent =
+      line.text;
+  }
+
+  if (continueButton) {
+    continueButton.textContent =
+      openingDialogueIndex ===
+      openingDialogueLines.length - 1
+        ? 'Enter the Villa'
+        : 'Continue';
+  }
 }
 
 function finishOpeningDialogue() {
@@ -1149,6 +1204,20 @@ function finishOpeningDialogue() {
   }
 
   window.scrollTo(0, 0);
+}
+
+function advanceOpeningDialogue() {
+  openingDialogueIndex += 1;
+
+  if (
+    openingDialogueIndex >=
+    openingDialogueLines.length
+  ) {
+    finishOpeningDialogue();
+    return;
+  }
+
+  showOpeningDialogueLine();
 }
 
 function returnToMainMenu() {
@@ -1659,11 +1728,11 @@ function initializeCharacterCreator() {
   }
 
   if (openingDialogueContinue) {
-    openingDialogueContinue.addEventListener(
-      'click',
-      finishOpeningDialogue
-    );
-  }
+  openingDialogueContinue.addEventListener(
+    'click',
+    advanceOpeningDialogue
+  );
+}
 
   if (backToMenuButton) {
     backToMenuButton.addEventListener(
