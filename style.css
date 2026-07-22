@@ -1710,3 +1710,72 @@ body.has-real-background > main.screen {
     height: 160px;
   }
 }
+/* ========================================
+   CHARACTER CREATOR — OUTFIT SELECTION
+======================================== */
+
+.creatorOutfitGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.creatorOutfitOption {
+  min-height: 145px;
+  padding: 18px 12px;
+  border: 2px solid
+    rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  color: white;
+  background:
+    rgba(255, 255, 255, 0.07);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.creatorOutfitOption:hover {
+  transform: translateY(-2px);
+  border-color:
+    rgba(255, 151, 0, 0.7);
+}
+
+.creatorOutfitOption.selected {
+  border-color: #ff9700;
+  background:
+    rgba(255, 151, 0, 0.18);
+}
+
+.creatorOutfitIcon {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 34px;
+}
+
+.creatorOutfitOption strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 17px;
+}
+
+.creatorOutfitOption small {
+  display: block;
+  color:
+    rgba(255, 255, 255, 0.68);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@media (max-width: 390px) {
+  .creatorOutfitGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .creatorOutfitOption {
+    min-height: 120px;
+  }
+}
