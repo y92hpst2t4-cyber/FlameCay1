@@ -1947,3 +1947,120 @@ body.has-real-background > main.screen {
     font-size: 22px;
   }
 }
+/* ========================================
+   OPENING DIALOGUE SCENE
+======================================== */
+
+.openingDialogueScene {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      rgba(3, 18, 29, 0.12),
+      rgba(3, 18, 29, 0.75)
+    ),
+    url("backgrounds/arrival-beach.jpg")
+    center / cover no-repeat;
+}
+
+.openingDialogueOverlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100vh;
+  padding:
+    24px
+    20px
+    max(30px, env(safe-area-inset-bottom));
+}
+
+.openingDialogueCharacter {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#openingDialoguePlayerImage {
+  display: block;
+  width: min(78vw, 430px);
+  max-height: 58vh;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.openingDialogueBox {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  border-radius: 22px;
+  color: white;
+  background:
+    rgba(5, 20, 32, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.openingDialogueSpeaker {
+  margin: 0 0 8px;
+  color: #ffad3b;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.openingDialogueText {
+  margin: 0 0 18px;
+  color:
+    rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+#openingDialogueContinue {
+  width: 100%;
+  min-height: 56px;
+  border: none;
+  border-radius: 16px;
+  color: white;
+  background:
+    linear-gradient(
+      135deg,
+      #ff9700,
+      #ff5c00
+    );
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#openingDialogueContinue:active {
+  transform: scale(0.99);
+}
+
+@media (max-width: 480px) {
+  .openingDialogueOverlay {
+    padding:
+      16px
+      16px
+      max(
+        24px,
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  #openingDialoguePlayerImage {
+    width: min(86vw, 360px);
+    max-height: 55vh;
+  }
+
+  .openingDialogueBox {
+    padding: 18px;
+    border-radius: 20px;
+  }
+}
