@@ -1779,3 +1779,171 @@ body.has-real-background > main.screen {
     min-height: 120px;
   }
 }
+/* ========================================
+   EPISODE 1 — ARRIVAL SCENE
+======================================== */
+
+.arrivalScene {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      rgba(3, 18, 29, 0.35),
+      rgba(3, 18, 29, 0.78)
+    ),
+    url("backgrounds/arrival-beach.jpg")
+    center / cover no-repeat;
+}
+
+.arrivalSceneOverlay {
+  display: flex;
+  align-items: flex-end;
+  min-height: 100vh;
+  padding:
+    32px
+    24px
+    max(34px, env(safe-area-inset-bottom));
+}
+
+.arrivalSceneContent {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 26px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  color: white;
+  background:
+    rgba(5, 20, 32, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.arrivalSceneEpisode {
+  margin: 0 0 10px;
+  color: #ffb347;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.arrivalSceneContent h1 {
+  margin: 0 0 14px;
+  font-size: clamp(
+    38px,
+    9vw,
+    64px
+  );
+  line-height: 0.95;
+}
+
+.arrivalSceneContent h1 span {
+  display: block;
+  color: #ff8a00;
+}
+
+#arrivalSceneText {
+  margin: 0 0 22px;
+  color:
+    rgba(255, 255, 255, 0.84);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.arrivalScenePlayer {
+  display: grid;
+  grid-template-columns:
+    120px
+    minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+  padding: 14px;
+  border-radius: 18px;
+  background:
+    rgba(255, 255, 255, 0.09);
+}
+
+.arrivalScenePlayer img {
+  display: block;
+  width: 120px;
+  height: 160px;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 14px;
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.arrivalScenePlayer div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.arrivalScenePlayer strong {
+  font-size: 26px;
+}
+
+.arrivalScenePlayer span {
+  color: #ffbd66;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+#arrivalSceneContinue {
+  width: 100%;
+  min-height: 58px;
+  border: none;
+  border-radius: 16px;
+  color: white;
+  background:
+    linear-gradient(
+      135deg,
+      #ff9700,
+      #ff5c00
+    );
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#arrivalSceneContinue:active {
+  transform: scale(0.99);
+}
+
+@media (max-width: 480px) {
+  .arrivalSceneOverlay {
+    padding:
+      22px
+      16px
+      max(
+        24px,
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  .arrivalSceneContent {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .arrivalScenePlayer {
+    grid-template-columns:
+      92px
+      minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .arrivalScenePlayer img {
+    width: 92px;
+    height: 132px;
+  }
+
+  .arrivalScenePlayer strong {
+    font-size: 22px;
+  }
+}
