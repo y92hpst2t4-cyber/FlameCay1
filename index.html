@@ -1073,7 +1073,14 @@
 
 </section>
 
-<h2 id="welcome">Welcome to Flame Cay</h2>
+<div
+  id="mainGameInterface"
+  class="hidden"
+>
+
+<h2 id="welcome">
+  Welcome to Flame Cay
+</h2>
 
 <div
 id="playerScenePortrait"
@@ -1316,54 +1323,59 @@ onclick="advanceTime()"
 
 </section>
 
-<div class="card" id="savePanel">
-
-<h3>💾 Save Game</h3>
-
-<p id="saveStatus">
-Choose a save slot.
-</p>
-
-<button
-class="saveButton"
-onclick="saveGame(1)"
->
-💾 Save Slot 1
-</button>
-
-<button
-class="saveButton"
-onclick="saveGame(2)"
->
-💾 Save Slot 2
-</button>
-
-<button
-class="saveButton"
-onclick="saveGame(3)"
->
-💾 Save Slot 3
-</button>
-
-<button
-class="loadButton"
-onclick="openInGameLoadMenu()"
->
-📂 Load Another Save
-</button>
-
 <div
-id="inGameLoadMenu"
-class="hidden"
+  class="card"
+  id="savePanel"
 >
 
-<div id="inGameLoadSlotList"></div>
+  <h3>💾 Save Game</h3>
 
-<button onclick="closeInGameLoadMenu()">
-⬅ Close Load Menu
-</button>
+  <p id="saveStatus">
+    Choose a save slot.
+  </p>
 
-</div>
+  <button
+    class="saveButton"
+    onclick="saveGame(1)"
+  >
+    💾 Save Slot 1
+  </button>
+
+  <button
+    class="saveButton"
+    onclick="saveGame(2)"
+  >
+    💾 Save Slot 2
+  </button>
+
+  <button
+    class="saveButton"
+    onclick="saveGame(3)"
+  >
+    💾 Save Slot 3
+  </button>
+
+  <button
+    class="loadButton"
+    onclick="openInGameLoadMenu()"
+  >
+    📂 Load Another Save
+  </button>
+
+  <div
+    id="inGameLoadMenu"
+    class="hidden"
+  >
+
+    <div id="inGameLoadSlotList"></div>
+
+    <button
+      onclick="closeInGameLoadMenu()"
+    >
+      ⬅ Close Load Menu
+    </button>
+
+  </div>
 
 </div>
 
@@ -1438,9 +1450,11 @@ NPC conversations, gossip, and changing daily schedules are active.
 </div>
 
 <div
-class="card"
-id="relationshipBox"
+  class="card"
+  id="relationshipBox"
 ></div>
+
+</div>
 
 </section>
 
