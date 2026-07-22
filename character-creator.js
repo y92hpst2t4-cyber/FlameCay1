@@ -27,6 +27,7 @@ window.playerProfile = {
   datingGoal: '',
   firstImpression: '',
   spritePreset: 0,
+  outfit: '',
   profileConfirmed: false
 };
 
@@ -34,9 +35,13 @@ function getCreatorElement(id) {
   return document.getElementById(id);
 }
 
-function getPlayerSpritePath(presetNumber) {
+function getPlayerSpritePath(
+  presetNumber
+) {
   return (
-    playerSpritePresets[presetNumber] ||
+    playerSpritePresets[
+      presetNumber
+    ] ||
     playerSpritePresets[1]
   );
 }
@@ -45,7 +50,9 @@ function savePlayerProfile() {
   try {
     localStorage.setItem(
       PLAYER_PROFILE_STORAGE_KEY,
-      JSON.stringify(window.playerProfile)
+      JSON.stringify(
+        window.playerProfile
+      )
     );
   } catch (error) {
     console.warn(
@@ -66,7 +73,9 @@ function loadPlayerProfile() {
       return null;
     }
 
-    return JSON.parse(savedProfile);
+    return JSON.parse(
+      savedProfile
+    );
   } catch (error) {
     console.warn(
       'Player profile could not be loaded.',
@@ -77,17 +86,36 @@ function loadPlayerProfile() {
   }
 }
 
-function showCreatorStep(stepNumber) {
+function showCreatorStep(
+  stepNumber
+) {
   const steps = {
-    1: getCreatorElement('creatorStepOne'),
-    2: getCreatorElement('creatorStepTwo'),
-    3: getCreatorElement('creatorStepThree'),
-    4: getCreatorElement('creatorStepFour'),
-    5: getCreatorElement('creatorStepFive'),
-    6: getCreatorElement('creatorStepSix')
+    1: getCreatorElement(
+      'creatorStepOne'
+    ),
+    2: getCreatorElement(
+      'creatorStepTwo'
+    ),
+    3: getCreatorElement(
+      'creatorStepThree'
+    ),
+    4: getCreatorElement(
+      'creatorStepFour'
+    ),
+    5: getCreatorElement(
+      'creatorStepFive'
+    ),
+    6: getCreatorElement(
+      'creatorStepSix'
+    ),
+    7: getCreatorElement(
+      'creatorStepSeven'
+    )
   };
 
-  Object.entries(steps).forEach(
+  Object.entries(
+    steps
+  ).forEach(
     ([number, element]) => {
       if (!element) {
         return;
@@ -95,7 +123,8 @@ function showCreatorStep(stepNumber) {
 
       element.classList.toggle(
         'hidden',
-        Number(number) !== stepNumber
+        Number(number) !==
+          stepNumber
       );
     }
   );
@@ -105,10 +134,14 @@ function showCreatorStep(stepNumber) {
 
 function updateIdentityStep() {
   const nameInput =
-    getCreatorElement('playerName');
+    getCreatorElement(
+      'playerName'
+    );
 
   const pronounsInput =
-    getCreatorElement('playerPronouns');
+    getCreatorElement(
+      'playerPronouns'
+    );
 
   const preview =
     getCreatorElement(
@@ -152,7 +185,8 @@ function updateIdentityStep() {
   }
 
   preview.textContent =
-    `Welcome, ${name}. Your pronouns are ${pronouns}.`;
+    `Welcome, ${name}. ` +
+    `Your pronouns are ${pronouns}.`;
 
   continueButton.disabled =
     false;
@@ -161,7 +195,9 @@ function updateIdentityStep() {
 function continueFromIdentityStep() {
   updateIdentityStep();
 
-  if (!window.playerProfile.name) {
+  if (
+    !window.playerProfile.name
+  ) {
     return;
   }
 
@@ -172,13 +208,19 @@ function continueFromIdentityStep() {
 
 function updateProfileStep() {
   const ageInput =
-    getCreatorElement('playerAge');
+    getCreatorElement(
+      'playerAge'
+    );
 
   const hometownInput =
-    getCreatorElement('playerHometown');
+    getCreatorElement(
+      'playerHometown'
+    );
 
   const occupationInput =
-    getCreatorElement('playerOccupation');
+    getCreatorElement(
+      'playerOccupation'
+    );
 
   const preview =
     getCreatorElement(
@@ -239,8 +281,9 @@ function updateProfileStep() {
   }
 
   preview.textContent =
-    `${window.playerProfile.name}, ${age}, ` +
-    `is a ${occupation} from ${hometown}.`;
+    `${window.playerProfile.name}, ` +
+    `${age}, is a ${occupation} ` +
+    `from ${hometown}.`;
 
   continueButton.disabled =
     false;
@@ -251,8 +294,10 @@ function continueFromProfileStep() {
 
   if (
     !window.playerProfile.age ||
-    !window.playerProfile.hometown ||
-    !window.playerProfile.occupation
+    !window.playerProfile
+      .hometown ||
+    !window.playerProfile
+      .occupation
   ) {
     return;
   }
@@ -313,15 +358,15 @@ function updatePersonalityStep() {
   window.playerProfile.datingGoal =
     datingGoal;
 
-  window.playerProfile.firstImpression =
+  window.playerProfile
+    .firstImpression =
     firstImpression;
 
-  const personalityComplete =
-    personality &&
-    datingGoal &&
-    firstImpression;
-
-  if (!personalityComplete) {
+  if (
+    !personality ||
+    !datingGoal ||
+    !firstImpression
+  ) {
     preview.textContent =
       'Choose all three options to continue.';
 
@@ -332,18 +377,25 @@ function updatePersonalityStep() {
   }
 
   const datingGoalNames = {
-    love: 'a serious relationship',
-    connection: 'a real connection',
-    adventure: 'romance and adventure',
-    open: 'an open experience',
-    competition: 'winning the competition'
+    love:
+      'a serious relationship',
+    connection:
+      'a real connection',
+    adventure:
+      'romance and adventure',
+    open:
+      'an open experience',
+    competition:
+      'winning the competition'
   };
 
   preview.textContent =
-    `${window.playerProfile.name} is ` +
-    `${personality}, is looking for ` +
-    `${datingGoalNames[datingGoal]}, ` +
-    `and plans to enter the villa feeling ` +
+    `${window.playerProfile.name} ` +
+    `is ${personality}, is looking ` +
+    `for ${datingGoalNames[
+      datingGoal
+    ]}, and plans to enter the ` +
+    `villa feeling ` +
     `${firstImpression}.`;
 
   continueButton.disabled =
@@ -354,9 +406,12 @@ function continueFromPersonalityStep() {
   updatePersonalityStep();
 
   if (
-    !window.playerProfile.personality ||
-    !window.playerProfile.datingGoal ||
-    !window.playerProfile.firstImpression
+    !window.playerProfile
+      .personality ||
+    !window.playerProfile
+      .datingGoal ||
+    !window.playerProfile
+      .firstImpression
   ) {
     return;
   }
@@ -382,36 +437,47 @@ function updateAppearanceStep() {
       'creatorStepFourContinue'
     );
 
-  if (!preview || !continueButton) {
+  if (
+    !preview ||
+    !continueButton
+  ) {
     return;
   }
 
   const selectedPreset =
     Number(
-      window.playerProfile.spritePreset
+      window.playerProfile
+        .spritePreset
     );
 
-  appearanceOptions.forEach(option => {
-    const optionPreset =
-      Number(option.dataset.preset);
+  appearanceOptions.forEach(
+    option => {
+      const optionPreset =
+        Number(
+          option.dataset.preset
+        );
 
-    const isSelected =
-      optionPreset === selectedPreset;
+      const isSelected =
+        optionPreset ===
+        selectedPreset;
 
-    option.classList.toggle(
-      'selected',
-      isSelected
-    );
+      option.classList.toggle(
+        'selected',
+        isSelected
+      );
 
-    option.setAttribute(
-      'aria-pressed',
-      String(isSelected)
-    );
-  });
+      option.setAttribute(
+        'aria-pressed',
+        String(isSelected)
+      );
+    }
+  );
 
   if (
     !selectedPreset ||
-    !playerSpritePresets[selectedPreset]
+    !playerSpritePresets[
+      selectedPreset
+    ]
   ) {
     preview.textContent =
       'Select your appearance to continue.';
@@ -423,24 +489,33 @@ function updateAppearanceStep() {
   }
 
   preview.textContent =
-    `Look ${selectedPreset} is selected.`;
+    `Look ${selectedPreset} ` +
+    `is selected.`;
 
   continueButton.disabled =
     false;
 }
 
-function selectAppearance(presetNumber) {
+function selectAppearance(
+  presetNumber
+) {
   const validPreset =
     Number(presetNumber);
 
-  if (!playerSpritePresets[validPreset]) {
+  if (
+    !playerSpritePresets[
+      validPreset
+    ]
+  ) {
     return;
   }
 
-  window.playerProfile.spritePreset =
+  window.playerProfile
+    .spritePreset =
     validPreset;
 
-  window.playerProfile.profileConfirmed =
+  window.playerProfile
+    .profileConfirmed =
     false;
 
   updateAppearanceStep();
@@ -495,11 +570,16 @@ function populateReviewStep() {
   };
 
   const datingGoalNames = {
-    love: 'A serious relationship',
-    connection: 'A real connection',
-    adventure: 'Romance and adventure',
-    open: 'Keeping options open',
-    competition: 'Winning the competition'
+    love:
+      'A serious relationship',
+    connection:
+      'A real connection',
+    adventure:
+      'Romance and adventure',
+    open:
+      'Keeping options open',
+    competition:
+      'Winning the competition'
   };
 
   const impressionNames = {
@@ -517,12 +597,14 @@ function populateReviewStep() {
       );
 
     reviewImage.alt =
-      `${profile.name}'s selected character`;
+      `${profile.name}'s ` +
+      `selected character`;
   }
 
   if (reviewName) {
     reviewName.textContent =
-      profile.name || 'New Islander';
+      profile.name ||
+      'New Islander';
   }
 
   if (reviewBasicInfo) {
@@ -552,7 +634,8 @@ function populateReviewStep() {
   }
 
   if (reviewFirstImpression) {
-    reviewFirstImpression.textContent =
+    reviewFirstImpression
+      .textContent =
       impressionNames[
         profile.firstImpression
       ] || '—';
@@ -564,16 +647,148 @@ function continueFromAppearanceStep() {
 
   const selectedPreset =
     Number(
-      window.playerProfile.spritePreset
+      window.playerProfile
+        .spritePreset
     );
 
-  if (!playerSpritePresets[selectedPreset]) {
+  if (
+    !playerSpritePresets[
+      selectedPreset
+    ]
+  ) {
     return;
   }
 
   savePlayerProfile();
   populateReviewStep();
   showCreatorStep(5);
+}
+
+function confirmContestantProfile() {
+  window.playerProfile
+    .profileConfirmed =
+    false;
+
+  savePlayerProfile();
+  updateOutfitStep();
+  showCreatorStep(6);
+}
+
+function updateOutfitStep() {
+  const outfitOptions =
+    document.querySelectorAll(
+      '.creatorOutfitOption'
+    );
+
+  const preview =
+    getCreatorElement(
+      'creatorOutfitPreview'
+    );
+
+  const continueButton =
+    getCreatorElement(
+      'creatorStepSixContinue'
+    );
+
+  const selectedOutfit =
+    window.playerProfile.outfit;
+
+  const outfitNames = {
+    sunset: 'Sunset Glow',
+    ocean: 'Ocean Breeze',
+    midnight: 'Midnight Flame',
+    tropical: 'Tropical Heat'
+  };
+
+  outfitOptions.forEach(
+    option => {
+      const isSelected =
+        option.dataset.outfit ===
+        selectedOutfit;
+
+      option.classList.toggle(
+        'selected',
+        isSelected
+      );
+
+      option.setAttribute(
+        'aria-pressed',
+        String(isSelected)
+      );
+    }
+  );
+
+  if (
+    !outfitNames[
+      selectedOutfit
+    ]
+  ) {
+    if (preview) {
+      preview.textContent =
+        'Select your arrival outfit to continue.';
+    }
+
+    if (continueButton) {
+      continueButton.disabled =
+        true;
+    }
+
+    return;
+  }
+
+  if (preview) {
+    preview.textContent =
+      `${outfitNames[
+        selectedOutfit
+      ]} selected.`;
+  }
+
+  if (continueButton) {
+    continueButton.disabled =
+      false;
+  }
+}
+
+function selectOutfit(outfit) {
+  const validOutfits = [
+    'sunset',
+    'ocean',
+    'midnight',
+    'tropical'
+  ];
+
+  if (
+    !validOutfits.includes(
+      outfit
+    )
+  ) {
+    return;
+  }
+
+  window.playerProfile.outfit =
+    outfit;
+
+  window.playerProfile
+    .profileConfirmed =
+    false;
+
+  updateOutfitStep();
+}
+
+function continueFromOutfitStep() {
+  if (
+    !window.playerProfile.outfit
+  ) {
+    return;
+  }
+
+  window.playerProfile
+    .profileConfirmed =
+    true;
+
+  savePlayerProfile();
+  populateArrivalStep();
+  showCreatorStep(7);
 }
 
 function populateArrivalStep() {
@@ -595,6 +810,22 @@ function populateArrivalStep() {
       'creatorArrivalMessage'
     );
 
+  const arrivalOutfit =
+    getCreatorElement(
+      'creatorArrivalOutfit'
+    );
+
+  const outfitNames = {
+    sunset:
+      '🌅 Sunset Glow',
+    ocean:
+      '🌊 Ocean Breeze',
+    midnight:
+      '🌙 Midnight Flame',
+    tropical:
+      '🌴 Tropical Heat'
+  };
+
   if (arrivalImage) {
     arrivalImage.src =
       getPlayerSpritePath(
@@ -607,41 +838,80 @@ function populateArrivalStep() {
 
   if (arrivalName) {
     arrivalName.textContent =
-      profile.name || 'New Islander';
+      profile.name ||
+      'New Islander';
   }
 
   if (arrivalMessage) {
     arrivalMessage.textContent =
-      `${profile.name || 'New Islander'}, ` +
-      `the boat is waiting. Your first day ` +
-      `on Flame Cay is about to begin.`;
+      `${profile.name ||
+        'New Islander'}, ` +
+      `the boat is waiting. ` +
+      `Your first day on Flame Cay ` +
+      `is about to begin.`;
+  }
+
+  if (arrivalOutfit) {
+    arrivalOutfit.textContent =
+      outfitNames[
+        profile.outfit
+      ] ||
+      'Arrival outfit';
   }
 }
 
-function confirmContestantProfile() {
-  window.playerProfile.profileConfirmed =
-    true;
+function enterFlameCay() {
+  if (
+    !window.playerProfile
+      .profileConfirmed
+  ) {
+    return;
+  }
 
   savePlayerProfile();
-  populateArrivalStep();
-  showCreatorStep(6);
-}
 
-function enterFlameCay() {
   const creator =
     getCreatorElement(
       'characterCreator'
     );
 
+  const menu =
+    getCreatorElement(
+      'menu'
+    );
+
   const game =
-    getCreatorElement('game');
+    getCreatorElement(
+      'game'
+    );
+
+  const welcome =
+    getCreatorElement(
+      'welcome'
+    );
 
   if (creator) {
-    creator.classList.add('hidden');
+    creator.classList.add(
+      'hidden'
+    );
+  }
+
+  if (menu) {
+    menu.classList.add(
+      'hidden'
+    );
   }
 
   if (game) {
-    game.classList.remove('hidden');
+    game.classList.remove(
+      'hidden'
+    );
+  }
+
+  if (welcome) {
+    welcome.textContent =
+      `Welcome to Flame Cay, ` +
+      `${window.playerProfile.name}`;
   }
 
   renderPlayerScenePortrait();
@@ -663,14 +933,20 @@ function returnToMainMenu() {
     );
 
   const menu =
-    getCreatorElement('menu');
+    getCreatorElement(
+      'menu'
+    );
 
   if (creator) {
-    creator.classList.add('hidden');
+    creator.classList.add(
+      'hidden'
+    );
   }
 
   if (menu) {
-    menu.classList.remove('hidden');
+    menu.classList.remove(
+      'hidden'
+    );
   }
 
   showCreatorStep(1);
@@ -685,41 +961,62 @@ function restoreCreatorForm() {
     window.playerProfile = {
       ...window.playerProfile,
       ...savedProfile,
+
       spritePreset:
         Number(
-          savedProfile.spritePreset
-        ) || 0
+          savedProfile
+            .spritePreset
+        ) || 0,
+
+      outfit:
+        savedProfile.outfit ||
+        ''
     };
   }
 
   const fieldValues = {
     playerName:
-      window.playerProfile.name || '',
+      window.playerProfile.name ||
+      '',
 
     playerPronouns:
-      window.playerProfile.pronouns ||
+      window.playerProfile
+        .pronouns ||
       'she/her',
 
     playerAge:
-      window.playerProfile.age || '',
+      window.playerProfile.age ||
+      '',
 
     playerHometown:
-      window.playerProfile.hometown || '',
+      window.playerProfile
+        .hometown ||
+      '',
 
     playerOccupation:
-      window.playerProfile.occupation || '',
+      window.playerProfile
+        .occupation ||
+      '',
 
     playerPersonality:
-      window.playerProfile.personality || '',
+      window.playerProfile
+        .personality ||
+      '',
 
     playerDatingGoal:
-      window.playerProfile.datingGoal || '',
+      window.playerProfile
+        .datingGoal ||
+      '',
 
     playerFirstImpression:
-      window.playerProfile.firstImpression || ''
+      window.playerProfile
+        .firstImpression ||
+      ''
   };
 
-  Object.entries(fieldValues).forEach(
+  Object.entries(
+    fieldValues
+  ).forEach(
     ([id, value]) => {
       const element =
         getCreatorElement(id);
@@ -736,6 +1033,7 @@ function restoreCreatorForm() {
   updatePersonalityStep();
   updateAppearanceStep();
   populateReviewStep();
+  updateOutfitStep();
   populateArrivalStep();
 }
 
@@ -743,7 +1041,10 @@ function renderPlayerScenePortrait() {
   const profile =
     window.playerProfile;
 
-  if (!profile || !profile.name) {
+  if (
+    !profile ||
+    !profile.name
+  ) {
     return;
   }
 
@@ -777,12 +1078,18 @@ function renderPlayerScenePortrait() {
   }
 
   const personalityTitles = {
-    romantic: '💕 Romantic Islander',
-    loyal: '💚 Loyal Islander',
-    bold: '🔥 Bold Islander',
-    strategic: '🧠 Strategic Islander',
-    funny: '😄 Funny Islander',
-    mysterious: '🌙 Mysterious Islander'
+    romantic:
+      '💕 Romantic Islander',
+    loyal:
+      '💚 Loyal Islander',
+    bold:
+      '🔥 Bold Islander',
+    strategic:
+      '🧠 Strategic Islander',
+    funny:
+      '😄 Funny Islander',
+    mysterious:
+      '🌙 Mysterious Islander'
   };
 
   const spritePath =
@@ -804,11 +1111,11 @@ function renderPlayerScenePortrait() {
       src="${spritePath}"
       alt="${profile.name}"
       style="
-        display:block;
-        width:100%;
-        height:100%;
-        object-fit:contain;
-        object-position:center bottom;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center bottom;
       "
     >
   `;
@@ -819,7 +1126,8 @@ function renderPlayerScenePortrait() {
   scenePersonality.textContent =
     personalityTitles[
       profile.personality
-    ] || 'New Islander';
+    ] ||
+    'New Islander';
 
   portraitContainer.classList.remove(
     'hidden'
@@ -828,7 +1136,9 @@ function renderPlayerScenePortrait() {
 
 function initializeCharacterCreator() {
   const nameInput =
-    getCreatorElement('playerName');
+    getCreatorElement(
+      'playerName'
+    );
 
   const pronounsInput =
     getCreatorElement(
@@ -836,7 +1146,9 @@ function initializeCharacterCreator() {
     );
 
   const ageInput =
-    getCreatorElement('playerAge');
+    getCreatorElement(
+      'playerAge'
+    );
 
   const hometownInput =
     getCreatorElement(
@@ -868,6 +1180,11 @@ function initializeCharacterCreator() {
       '.creatorAppearanceOption'
     );
 
+  const outfitOptions =
+    document.querySelectorAll(
+      '.creatorOutfitOption'
+    );
+
   const stepOneContinue =
     getCreatorElement(
       'creatorStepOneContinue'
@@ -891,6 +1208,11 @@ function initializeCharacterCreator() {
   const stepFiveContinue =
     getCreatorElement(
       'creatorStepFiveContinue'
+    );
+
+  const stepSixContinue =
+    getCreatorElement(
+      'creatorStepSixContinue'
     );
 
   const enterIslandButton =
@@ -923,9 +1245,14 @@ function initializeCharacterCreator() {
       'creatorStepFiveBack'
     );
 
-  const returnToStepFive =
+  const stepSixBack =
     getCreatorElement(
-      'creatorReturnToStepFive'
+      'creatorStepSixBack'
+    );
+
+  const returnToStepSix =
+    getCreatorElement(
+      'creatorReturnToStepSix'
     );
 
   if (nameInput) {
@@ -977,16 +1304,31 @@ function initializeCharacterCreator() {
     );
   });
 
-  appearanceOptions.forEach(option => {
-    option.addEventListener(
-      'click',
-      function () {
-        selectAppearance(
-          this.dataset.preset
-        );
-      }
-    );
-  });
+  appearanceOptions.forEach(
+    option => {
+      option.addEventListener(
+        'click',
+        function () {
+          selectAppearance(
+            this.dataset.preset
+          );
+        }
+      );
+    }
+  );
+
+  outfitOptions.forEach(
+    option => {
+      option.addEventListener(
+        'click',
+        function () {
+          selectOutfit(
+            this.dataset.outfit
+          );
+        }
+      );
+    }
+  );
 
   if (stepOneContinue) {
     stepOneContinue.addEventListener(
@@ -1020,6 +1362,13 @@ function initializeCharacterCreator() {
     stepFiveContinue.addEventListener(
       'click',
       confirmContestantProfile
+    );
+  }
+
+  if (stepSixContinue) {
+    stepSixContinue.addEventListener(
+      'click',
+      continueFromOutfitStep
     );
   }
 
@@ -1073,12 +1422,22 @@ function initializeCharacterCreator() {
     );
   }
 
-  if (returnToStepFive) {
-    returnToStepFive.addEventListener(
+  if (stepSixBack) {
+    stepSixBack.addEventListener(
       'click',
       function () {
         populateReviewStep();
         showCreatorStep(5);
+      }
+    );
+  }
+
+  if (returnToStepSix) {
+    returnToStepSix.addEventListener(
+      'click',
+      function () {
+        updateOutfitStep();
+        showCreatorStep(6);
       }
     );
   }
