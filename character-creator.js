@@ -294,10 +294,8 @@ function continueFromProfileStep() {
 
   if (
     !window.playerProfile.age ||
-    !window.playerProfile
-      .hometown ||
-    !window.playerProfile
-      .occupation
+    !window.playerProfile.hometown ||
+    !window.playerProfile.occupation
   ) {
     return;
   }
@@ -358,8 +356,7 @@ function updatePersonalityStep() {
   window.playerProfile.datingGoal =
     datingGoal;
 
-  window.playerProfile
-    .firstImpression =
+  window.playerProfile.firstImpression =
     firstImpression;
 
   if (
@@ -392,11 +389,9 @@ function updatePersonalityStep() {
   preview.textContent =
     `${window.playerProfile.name} ` +
     `is ${personality}, is looking ` +
-    `for ${datingGoalNames[
-      datingGoal
-    ]}, and plans to enter the ` +
-    `villa feeling ` +
-    `${firstImpression}.`;
+    `for ${datingGoalNames[datingGoal]}, ` +
+    `and plans to enter the villa ` +
+    `feeling ${firstImpression}.`;
 
   continueButton.disabled =
     false;
@@ -406,12 +401,9 @@ function continueFromPersonalityStep() {
   updatePersonalityStep();
 
   if (
-    !window.playerProfile
-      .personality ||
-    !window.playerProfile
-      .datingGoal ||
-    !window.playerProfile
-      .firstImpression
+    !window.playerProfile.personality ||
+    !window.playerProfile.datingGoal ||
+    !window.playerProfile.firstImpression
   ) {
     return;
   }
@@ -446,8 +438,7 @@ function updateAppearanceStep() {
 
   const selectedPreset =
     Number(
-      window.playerProfile
-        .spritePreset
+      window.playerProfile.spritePreset
     );
 
   appearanceOptions.forEach(
@@ -510,12 +501,10 @@ function selectAppearance(
     return;
   }
 
-  window.playerProfile
-    .spritePreset =
+  window.playerProfile.spritePreset =
     validPreset;
 
-  window.playerProfile
-    .profileConfirmed =
+  window.playerProfile.profileConfirmed =
     false;
 
   updateAppearanceStep();
@@ -597,8 +586,7 @@ function populateReviewStep() {
       );
 
     reviewImage.alt =
-      `${profile.name}'s ` +
-      `selected character`;
+      `${profile.name}'s selected character`;
   }
 
   if (reviewName) {
@@ -634,8 +622,7 @@ function populateReviewStep() {
   }
 
   if (reviewFirstImpression) {
-    reviewFirstImpression
-      .textContent =
+    reviewFirstImpression.textContent =
       impressionNames[
         profile.firstImpression
       ] || '—';
@@ -647,8 +634,7 @@ function continueFromAppearanceStep() {
 
   const selectedPreset =
     Number(
-      window.playerProfile
-        .spritePreset
+      window.playerProfile.spritePreset
     );
 
   if (
@@ -665,8 +651,7 @@ function continueFromAppearanceStep() {
 }
 
 function confirmContestantProfile() {
-  window.playerProfile
-    .profileConfirmed =
+  window.playerProfile.profileConfirmed =
     false;
 
   savePlayerProfile();
@@ -738,9 +723,7 @@ function updateOutfitStep() {
 
   if (preview) {
     preview.textContent =
-      `${outfitNames[
-        selectedOutfit
-      ]} selected.`;
+      `${outfitNames[selectedOutfit]} selected.`;
   }
 
   if (continueButton) {
@@ -768,8 +751,7 @@ function selectOutfit(outfit) {
   window.playerProfile.outfit =
     outfit;
 
-  window.playerProfile
-    .profileConfirmed =
+  window.playerProfile.profileConfirmed =
     false;
 
   updateOutfitStep();
@@ -782,8 +764,7 @@ function continueFromOutfitStep() {
     return;
   }
 
-  window.playerProfile
-    .profileConfirmed =
+  window.playerProfile.profileConfirmed =
     true;
 
   savePlayerProfile();
@@ -938,8 +919,7 @@ function populateArrivalStep() {
 
 function enterFlameCay() {
   if (
-    !window.playerProfile
-      .profileConfirmed
+    !window.playerProfile.profileConfirmed
   ) {
     return;
   }
@@ -955,14 +935,23 @@ function enterFlameCay() {
     );
 
   const menu =
-    getCreatorElement('menu');
+    getCreatorElement(
+      'menu'
+    );
 
   const game =
-    getCreatorElement('game');
+    getCreatorElement(
+      'game'
+    );
 
   const arrivalScene =
     getCreatorElement(
       'arrivalScene'
+    );
+
+  const openingDialogueScene =
+    getCreatorElement(
+      'openingDialogueScene'
     );
 
   const mainGameInterface =
@@ -1016,6 +1005,12 @@ function enterFlameCay() {
     );
   }
 
+  if (openingDialogueScene) {
+    openingDialogueScene.classList.add(
+      'hidden'
+    );
+  }
+
   if (mainGameInterface) {
     mainGameInterface.classList.add(
       'hidden'
@@ -1034,14 +1029,16 @@ function enterFlameCay() {
 
   if (arrivalPlayerName) {
     arrivalPlayerName.textContent =
-      profile.name;
+      profile.name ||
+      'New Islander';
   }
 
   if (arrivalPlayerOutfit) {
     arrivalPlayerOutfit.textContent =
       outfitNames[
         profile.outfit
-      ] || 'Arrival outfit';
+      ] ||
+      'Arrival outfit';
   }
 
   window.scrollTo(0, 0);
@@ -1051,6 +1048,67 @@ function continueArrivalScene() {
   const arrivalScene =
     getCreatorElement(
       'arrivalScene'
+    );
+
+  const openingDialogueScene =
+    getCreatorElement(
+      'openingDialogueScene'
+    );
+
+  const openingDialoguePlayerImage =
+    getCreatorElement(
+      'openingDialoguePlayerImage'
+    );
+
+  const openingDialogueSpeaker =
+    getCreatorElement(
+      'openingDialogueSpeaker'
+    );
+
+  const openingDialogueText =
+    getCreatorElement(
+      'openingDialogueText'
+    );
+
+  if (arrivalScene) {
+    arrivalScene.classList.add(
+      'hidden'
+    );
+  }
+
+  if (openingDialogueScene) {
+    openingDialogueScene.classList.remove(
+      'hidden'
+    );
+  }
+
+  if (openingDialoguePlayerImage) {
+    openingDialoguePlayerImage.src =
+      getPlayerSpritePath(
+        window.playerProfile.spritePreset
+      );
+
+    openingDialoguePlayerImage.alt =
+      `${window.playerProfile.name}'s Islander`;
+  }
+
+  if (openingDialogueSpeaker) {
+    openingDialogueSpeaker.textContent =
+      'Narrator';
+  }
+
+  if (openingDialogueText) {
+    openingDialogueText.textContent =
+      'Warm ocean air reaches you as the boat approaches the shore.';
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function finishOpeningDialogue() {
+  const openingDialogueScene =
+    getCreatorElement(
+      'openingDialogueScene'
     );
 
   const mainGameInterface =
@@ -1063,8 +1121,8 @@ function continueArrivalScene() {
       'welcome'
     );
 
-  if (arrivalScene) {
-    arrivalScene.classList.add(
+  if (openingDialogueScene) {
+    openingDialogueScene.classList.add(
       'hidden'
     );
   }
@@ -1104,8 +1162,52 @@ function returnToMainMenu() {
       'menu'
     );
 
+  const game =
+    getCreatorElement(
+      'game'
+    );
+
+  const arrivalScene =
+    getCreatorElement(
+      'arrivalScene'
+    );
+
+  const openingDialogueScene =
+    getCreatorElement(
+      'openingDialogueScene'
+    );
+
+  const mainGameInterface =
+    getCreatorElement(
+      'mainGameInterface'
+    );
+
   if (creator) {
     creator.classList.add(
+      'hidden'
+    );
+  }
+
+  if (game) {
+    game.classList.add(
+      'hidden'
+    );
+  }
+
+  if (arrivalScene) {
+    arrivalScene.classList.add(
+      'hidden'
+    );
+  }
+
+  if (openingDialogueScene) {
+    openingDialogueScene.classList.add(
+      'hidden'
+    );
+  }
+
+  if (mainGameInterface) {
+    mainGameInterface.classList.add(
       'hidden'
     );
   }
@@ -1131,8 +1233,7 @@ function restoreCreatorForm() {
 
       spritePreset:
         Number(
-          savedProfile
-            .spritePreset
+          savedProfile.spritePreset
         ) || 0,
 
       outfit:
@@ -1147,8 +1248,7 @@ function restoreCreatorForm() {
       '',
 
     playerPronouns:
-      window.playerProfile
-        .pronouns ||
+      window.playerProfile.pronouns ||
       'she/her',
 
     playerAge:
@@ -1156,28 +1256,23 @@ function restoreCreatorForm() {
       '',
 
     playerHometown:
-      window.playerProfile
-        .hometown ||
+      window.playerProfile.hometown ||
       '',
 
     playerOccupation:
-      window.playerProfile
-        .occupation ||
+      window.playerProfile.occupation ||
       '',
 
     playerPersonality:
-      window.playerProfile
-        .personality ||
+      window.playerProfile.personality ||
       '',
 
     playerDatingGoal:
-      window.playerProfile
-        .datingGoal ||
+      window.playerProfile.datingGoal ||
       '',
 
     playerFirstImpression:
-      window.playerProfile
-        .firstImpression ||
+      window.playerProfile.firstImpression ||
       ''
   };
 
@@ -1381,24 +1476,22 @@ function initializeCharacterCreator() {
     getCreatorElement(
       'creatorStepSixContinue'
     );
-    
+
   const arrivalContinueButton =
-  getCreatorElement(
-    'arrivalSceneContinue'
-  );
-  
-  if (arrivalContinueButton) {
-  arrivalContinueButton.addEventListener(
-    'click',
-    continueArrivalScene
-  );
-}
-  
+    getCreatorElement(
+      'arrivalSceneContinue'
+    );
+
+  const openingDialogueContinue =
+    getCreatorElement(
+      'openingDialogueContinue'
+    );
+
   const enterIslandButton =
     getCreatorElement(
       'creatorEnterIsland'
     );
-  
+
   const backToMenuButton =
     getCreatorElement(
       'creatorBackToMenu'
@@ -1433,7 +1526,7 @@ function initializeCharacterCreator() {
     getCreatorElement(
       'creatorReturnToStepSix'
     );
-    
+
   if (nameInput) {
     nameInput.addEventListener(
       'input',
@@ -1555,6 +1648,20 @@ function initializeCharacterCreator() {
     enterIslandButton.addEventListener(
       'click',
       enterFlameCay
+    );
+  }
+
+  if (arrivalContinueButton) {
+    arrivalContinueButton.addEventListener(
+      'click',
+      continueArrivalScene
+    );
+  }
+
+  if (openingDialogueContinue) {
+    openingDialogueContinue.addEventListener(
+      'click',
+      finishOpeningDialogue
     );
   }
 
