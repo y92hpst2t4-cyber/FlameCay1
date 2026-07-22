@@ -2064,3 +2064,121 @@ body.has-real-background > main.screen {
     border-radius: 20px;
   }
 }
+/* ========================================
+   OPENING CHOICE SCENE
+======================================== */
+
+.openingChoiceScene {
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      rgba(3, 18, 29, 0.18),
+      rgba(3, 18, 29, 0.7)
+    ),
+    url("backgrounds/arrival-beach.jpg")
+    center / cover no-repeat;
+}
+
+.openingChoiceOverlay {
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  padding:
+    24px
+    20px
+    max(30px, env(safe-area-inset-bottom));
+}
+
+.openingChoiceCard {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 26px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  color: white;
+  background:
+    rgba(5, 20, 32, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.openingChoiceLabel {
+  margin: 0 0 10px;
+  color: #ffad3b;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.openingChoiceCard h2 {
+  margin: 0 0 14px;
+  font-size: clamp(
+    30px,
+    8vw,
+    48px
+  );
+  line-height: 1.05;
+}
+
+.openingChoiceCard > p:not(
+  .openingChoiceLabel
+) {
+  margin: 0 0 22px;
+  color:
+    rgba(255, 255, 255, 0.84);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.openingChoiceButtons {
+  display: grid;
+  gap: 14px;
+}
+
+.openingChoiceButton {
+  width: 100%;
+  min-height: 64px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 16px;
+  color: white;
+  background:
+    linear-gradient(
+      135deg,
+      #ff9700,
+      #ff5c00
+    );
+  font-size: 17px;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.openingChoiceButton:active {
+  transform: scale(0.99);
+}
+
+@media (max-width: 480px) {
+  .openingChoiceOverlay {
+    align-items: flex-end;
+    padding:
+      16px
+      16px
+      max(
+        24px,
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  .openingChoiceCard {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .openingChoiceButton {
+    min-height: 60px;
+    font-size: 16px;
+  }
+}
