@@ -946,25 +946,51 @@ function enterFlameCay() {
 
   savePlayerProfile();
 
+  const profile =
+    window.playerProfile;
+
   const creator =
     getCreatorElement(
       'characterCreator'
     );
 
   const menu =
-    getCreatorElement(
-      'menu'
-    );
+    getCreatorElement('menu');
 
   const game =
+    getCreatorElement('game');
+
+  const arrivalScene =
     getCreatorElement(
-      'game'
+      'arrivalScene'
     );
 
-  const welcome =
+  const mainGameInterface =
     getCreatorElement(
-      'welcome'
+      'mainGameInterface'
     );
+
+  const arrivalPlayerImage =
+    getCreatorElement(
+      'arrivalScenePlayerImage'
+    );
+
+  const arrivalPlayerName =
+    getCreatorElement(
+      'arrivalScenePlayerName'
+    );
+
+  const arrivalPlayerOutfit =
+    getCreatorElement(
+      'arrivalScenePlayerOutfit'
+    );
+
+  const outfitNames = {
+    sunset: '🌅 Sunset Glow',
+    ocean: '🌊 Ocean Breeze',
+    midnight: '🌙 Midnight Flame',
+    tropical: '🌴 Tropical Heat'
+  };
 
   if (creator) {
     creator.classList.add(
@@ -980,6 +1006,71 @@ function enterFlameCay() {
 
   if (game) {
     game.classList.remove(
+      'hidden'
+    );
+  }
+
+  if (arrivalScene) {
+    arrivalScene.classList.remove(
+      'hidden'
+    );
+  }
+
+  if (mainGameInterface) {
+    mainGameInterface.classList.add(
+      'hidden'
+    );
+  }
+
+  if (arrivalPlayerImage) {
+    arrivalPlayerImage.src =
+      getPlayerSpritePath(
+        profile.spritePreset
+      );
+
+    arrivalPlayerImage.alt =
+      `${profile.name}'s Islander`;
+  }
+
+  if (arrivalPlayerName) {
+    arrivalPlayerName.textContent =
+      profile.name;
+  }
+
+  if (arrivalPlayerOutfit) {
+    arrivalPlayerOutfit.textContent =
+      outfitNames[
+        profile.outfit
+      ] || 'Arrival outfit';
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function continueArrivalScene() {
+  const arrivalScene =
+    getCreatorElement(
+      'arrivalScene'
+    );
+
+  const mainGameInterface =
+    getCreatorElement(
+      'mainGameInterface'
+    );
+
+  const welcome =
+    getCreatorElement(
+      'welcome'
+    );
+
+  if (arrivalScene) {
+    arrivalScene.classList.add(
+      'hidden'
+    );
+  }
+
+  if (mainGameInterface) {
+    mainGameInterface.classList.remove(
       'hidden'
     );
   }
@@ -1290,12 +1381,24 @@ function initializeCharacterCreator() {
     getCreatorElement(
       'creatorStepSixContinue'
     );
-
+    
+  const arrivalContinueButton =
+  getCreatorElement(
+    'arrivalSceneContinue'
+  );
+  
+  if (arrivalContinueButton) {
+  arrivalContinueButton.addEventListener(
+    'click',
+    continueArrivalScene
+  );
+}
+  
   const enterIslandButton =
     getCreatorElement(
       'creatorEnterIsland'
     );
-
+  
   const backToMenuButton =
     getCreatorElement(
       'creatorBackToMenu'
@@ -1330,7 +1433,7 @@ function initializeCharacterCreator() {
     getCreatorElement(
       'creatorReturnToStepSix'
     );
-
+    
   if (nameInput) {
     nameInput.addEventListener(
       'input',
