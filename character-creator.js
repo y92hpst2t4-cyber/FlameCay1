@@ -810,20 +810,66 @@ function populateArrivalStep() {
       'creatorArrivalMessage'
     );
 
+  const arrivalBasicInfo =
+    getCreatorElement(
+      'creatorArrivalBasicInfo'
+    );
+
+  const arrivalPronouns =
+    getCreatorElement(
+      'creatorArrivalPronouns'
+    );
+
+  const arrivalPersonality =
+    getCreatorElement(
+      'creatorArrivalPersonality'
+    );
+
+  const arrivalDatingGoal =
+    getCreatorElement(
+      'creatorArrivalDatingGoal'
+    );
+
+  const arrivalFirstImpression =
+    getCreatorElement(
+      'creatorArrivalFirstImpression'
+    );
+
   const arrivalOutfit =
     getCreatorElement(
       'creatorArrivalOutfit'
     );
 
+  const personalityNames = {
+    romantic: 'Romantic',
+    loyal: 'Loyal',
+    bold: 'Bold',
+    strategic: 'Strategic',
+    funny: 'Funny',
+    mysterious: 'Mysterious'
+  };
+
+  const datingGoalNames = {
+    love: 'A serious relationship',
+    connection: 'A real connection',
+    adventure: 'Romance and adventure',
+    open: 'Keeping options open',
+    competition: 'Winning the competition'
+  };
+
+  const impressionNames = {
+    confident: 'Confident',
+    friendly: 'Friendly',
+    flirty: 'Flirty',
+    calm: 'Calm',
+    mysterious: 'Mysterious'
+  };
+
   const outfitNames = {
-    sunset:
-      '🌅 Sunset Glow',
-    ocean:
-      '🌊 Ocean Breeze',
-    midnight:
-      '🌙 Midnight Flame',
-    tropical:
-      '🌴 Tropical Heat'
+    sunset: '🌅 Sunset Glow',
+    ocean: '🌊 Ocean Breeze',
+    midnight: '🌙 Midnight Flame',
+    tropical: '🌴 Tropical Heat'
   };
 
   if (arrivalImage) {
@@ -844,19 +890,49 @@ function populateArrivalStep() {
 
   if (arrivalMessage) {
     arrivalMessage.textContent =
-      `${profile.name ||
-        'New Islander'}, ` +
-      `the boat is waiting. ` +
-      `Your first day on Flame Cay ` +
-      `is about to begin.`;
+      `${profile.name || 'New Islander'}, ` +
+      `the boat is waiting. Your first day ` +
+      `on Flame Cay is about to begin.`;
+  }
+
+  if (arrivalBasicInfo) {
+    arrivalBasicInfo.textContent =
+      `${profile.age} · ` +
+      `${profile.occupation} · ` +
+      `${profile.hometown}`;
+  }
+
+  if (arrivalPronouns) {
+    arrivalPronouns.textContent =
+      profile.pronouns || '—';
+  }
+
+  if (arrivalPersonality) {
+    arrivalPersonality.textContent =
+      personalityNames[
+        profile.personality
+      ] || '—';
+  }
+
+  if (arrivalDatingGoal) {
+    arrivalDatingGoal.textContent =
+      datingGoalNames[
+        profile.datingGoal
+      ] || '—';
+  }
+
+  if (arrivalFirstImpression) {
+    arrivalFirstImpression.textContent =
+      impressionNames[
+        profile.firstImpression
+      ] || '—';
   }
 
   if (arrivalOutfit) {
     arrivalOutfit.textContent =
       outfitNames[
         profile.outfit
-      ] ||
-      'Arrival outfit';
+      ] || '—';
   }
 }
 
