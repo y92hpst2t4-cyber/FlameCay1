@@ -1288,36 +1288,26 @@ function selectOpeningChoice(choice) {
 }
 
 function continueFromOpeningChoiceResult() {
-  getCreatorElement(
-    'openingChoiceResultScene'
-  )?.classList.add(
-    'hidden'
-  );
-
-  getCreatorElement(
-    'mainGameInterface'
-  )?.classList.remove(
-    'hidden'
-  );
-
-  const welcome =
+  const resultScene =
     getCreatorElement(
-      'welcome'
+      'openingChoiceResultScene'
     );
 
-  if (welcome) {
-    welcome.textContent =
-      `Welcome to Flame Cay, ` +
-      `${window.playerProfile.name}`;
+  const meetIslandersScene =
+    getCreatorElement(
+      'meetIslandersScene'
+    );
+
+  if (resultScene) {
+    resultScene.classList.add(
+      'hidden'
+    );
   }
 
-  renderPlayerScenePortrait();
-
-  if (
-    typeof window.startGame ===
-    'function'
-  ) {
-    window.startGame();
+  if (meetIslandersScene) {
+    meetIslandersScene.classList.remove(
+      'hidden'
+    );
   }
 
   window.scrollTo(0, 0);
