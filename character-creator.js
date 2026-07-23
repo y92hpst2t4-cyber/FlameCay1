@@ -41,6 +41,7 @@ relationships: {
 
 lucasFirstResponse: ''
 };
+
 function continueAfterLucasResponse() {
   const speaker =
     getCreatorElement(
@@ -57,19 +58,62 @@ function continueAfterLucasResponse() {
       'meetIslandersContinue'
     );
 
-  if (speaker) {
+  const characterImage =
+    getCreatorElement(
+      'meetIslandersCharacterImage'
+    );
+
+  if (
+    !speaker ||
+    !dialogueText ||
+    !continueButton
+  ) {
+    return;
+  }
+
+  const currentStage =
+    continueButton.dataset.stage || 'lucas';
+
+  if (currentStage === 'lucas') {
     speaker.textContent =
       'Narrator';
-  }
 
-  if (dialogueText) {
     dialogueText.textContent =
       'Lucas steps back toward the group, but you notice him glance at you one more time.';
-  }
 
-  if (continueButton) {
     continueButton.textContent =
       'Continue Meeting the Islanders';
+
+    continueButton.dataset.stage =
+      'maya';
+
+    continueButton.disabled =
+      false;
+
+    return;
+  }
+
+  if (currentStage === 'maya') {
+    speaker.textContent =
+      'Maya';
+
+    dialogueText.textContent =
+      'Maya steps forward with a bright smile. “Welcome to Flame Cay. I have a feeling you and I are going to have a lot to talk about.”';
+
+    if (characterImage) {
+      characterImage.classList.add(
+        'hidden'
+      );
+
+      characterImage.alt =
+        'Maya character artwork coming soon';
+    }
+
+    continueButton.textContent =
+      'Continue';
+
+    continueButton.dataset.stage =
+      'maya-introduction';
 
     continueButton.disabled =
       true;
