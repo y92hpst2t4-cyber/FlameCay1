@@ -1410,11 +1410,10 @@ function selectLucasFirstResponse(choice) {
   ];
 
   if (
-    !validChoices.includes(choice) ||
-    window.playerProfile.lucasFirstResponse
-  ) {
-    return;
-  }
+  !validChoices.includes(choice)
+) {
+  return;
+}
 
   const lucasRelationship =
     window.playerProfile.relationships.lucas;
