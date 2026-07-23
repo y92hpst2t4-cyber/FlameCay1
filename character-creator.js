@@ -41,6 +41,40 @@ relationships: {
 
 lucasFirstResponse: ''
 };
+function continueAfterLucasResponse() {
+  const speaker =
+    getCreatorElement(
+      'meetIslandersSpeaker'
+    );
+
+  const dialogueText =
+    getCreatorElement(
+      'meetIslandersText'
+    );
+
+  const continueButton =
+    getCreatorElement(
+      'meetIslandersContinue'
+    );
+
+  if (speaker) {
+    speaker.textContent =
+      'Narrator';
+  }
+
+  if (dialogueText) {
+    dialogueText.textContent =
+      'Lucas steps back toward the group, but you notice him glance at you one more time.';
+  }
+
+  if (continueButton) {
+    continueButton.textContent =
+      'Continue Meeting the Islanders';
+
+    continueButton.disabled =
+      true;
+  }
+}
 
 function getCreatorElement(id) {
   return document.getElementById(id);
@@ -1931,6 +1965,13 @@ document.querySelectorAll(
       }
     );
   }
+);
+
+getCreatorElement(
+  'meetIslandersContinue'
+)?.addEventListener(
+  'click',
+  continueAfterLucasResponse
 );
 
   restoreCreatorForm();
