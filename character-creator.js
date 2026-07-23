@@ -28,7 +28,18 @@ window.playerProfile = {
   firstImpression: '',
   spritePreset: 0,
   outfit: '',
-  profileConfirmed: false
+  profileConfirmed: false,
+
+relationships: {
+  lucas: {
+    friendship: 0,
+    romance: 0,
+    trust: 0,
+    rivalry: 0
+  }
+},
+
+lucasFirstResponse: ''
 };
 
 function getCreatorElement(id) {
@@ -1313,6 +1324,91 @@ function continueFromOpeningChoiceResult() {
   window.scrollTo(0, 0);
 }
 
+function selectLucasFirstResponse(choice) {
+  const validChoices = [
+    'confident',
+    'friendly',
+    'mysterious'
+  ];
+
+  if (
+    !validChoices.includes(choice) ||
+    window.playerProfile.lucasFirstResponse
+  ) {
+    return;
+  }
+
+  const lucasRelationship =
+    window.playerProfile.relationships.lucas;
+
+  const reactions = {
+    confident: {
+      text:
+        'Lucas raises an eyebrow and smiles. “Competition? I like your confidence. This villa could get interesting.”',
+      relationship:
+        'rivalry'
+    },
+
+    friendly: {
+      text:
+        'Lucas smiles warmly. “It’s really nice to meet you too. I think you’re going to fit in here.”',
+      relationship:
+        'friendship'
+    },
+
+    mysterious: {
+      text:
+        'Lucas studies you for a moment. “Keeping your secrets already? Now you have my attention.”',
+      relationship:
+        'romance'
+    }
+  };
+
+  const selectedReaction =
+    reactions[choice];
+
+  window.playerProfile.lucasFirstResponse =
+    choice;
+
+  lucasRelationship[
+    selectedReaction.relationship
+  ] += 1;
+
+  savePlayerProfile();
+
+  const choices =
+    getCreatorElement(
+      'meetIslandersChoices'
+    );
+
+  const dialogueText =
+    getCreatorElement(
+      'meetIslandersText'
+    );
+
+  const continueButton =
+    getCreatorElement(
+      'meetIslandersContinue'
+    );
+
+  if (choices) {
+    choices.classList.add(
+      'hidden'
+    );
+  }
+
+  if (dialogueText) {
+    dialogueText.textContent =
+      selectedReaction.text;
+  }
+
+  if (continueButton) {
+    continueButton.classList.remove(
+      'hidden'
+    );
+  }
+}
+
 function returnToMainMenu() {
   const hiddenSections = [
     'characterCreator',
@@ -1321,6 +1417,7 @@ function returnToMainMenu() {
     'openingDialogueScene',
     'openingChoiceScene',
     'openingChoiceResultScene',
+    'meetIslandersScene',
     'mainGameInterface'
   ];
 
@@ -1356,12 +1453,37 @@ function restoreCreatorForm() {
       spritePreset:
         Number(
           savedProfile.spritePreset
-        ) ||
-        0,
+        ) || 0,
 
       outfit:
-        savedProfile.outfit ||
-        ''
+        savedProfile.outfit || '',
+
+      relationships: {
+        lucas: {
+          friendship:
+            savedProfile.relationships
+              ?.lucas
+              ?.friendship || 0,
+
+          romance:
+            savedProfile.relationships
+              ?.lucas
+              ?.romance || 0,
+
+          trust:
+            savedProfile.relationships
+              ?.lucas
+              ?.trust || 0,
+
+          rivalry:
+            savedProfile.relationships
+              ?.lucas
+              ?.rivalry || 0
+        }
+      },
+
+      lucasFirstResponse:
+        savedProfile.lucasFirstResponse || ''
     };
   }
 
@@ -1795,6 +1917,21 @@ function initializeCharacterCreator() {
       showCreatorStep(6);
     }
   );
+
+document.querySelectorAll(
+  '.meetIslandersChoiceButton'
+).forEach(
+  button => {
+    button.addEventListener(
+      'click',
+      function () {
+        selectLucasFirstResponse(
+          this.dataset.lucasChoice
+        );
+      }
+    );
+  }
+);
 
   restoreCreatorForm();
   showCreatorStep(1);
