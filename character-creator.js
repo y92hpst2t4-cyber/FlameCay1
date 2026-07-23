@@ -1225,15 +1225,46 @@ function selectOpeningChoice(choice) {
       'openingChoiceScene'
     );
 
-  const mainGameInterface =
+  const resultScene =
     getCreatorElement(
-      'mainGameInterface'
+      'openingChoiceResultScene'
     );
 
-  const welcome =
+  const resultTitle =
     getCreatorElement(
-      'welcome'
+      'openingChoiceResultTitle'
     );
+
+  const resultText =
+    getCreatorElement(
+      'openingChoiceResultText'
+    );
+
+  const choiceResults = {
+    confident: {
+      title:
+        'You make a bold entrance.',
+      text:
+        'You walk through the doors with confidence. Every Islander turns to look at you.'
+    },
+
+    friendly: {
+      title:
+        'You enter with a warm smile.',
+      text:
+        'Your friendly energy immediately relaxes the group, and several Islanders smile back.'
+    },
+
+    mysterious: {
+      title:
+        'You keep them guessing.',
+      text:
+        'You enter calmly without revealing too much. The Islanders immediately become curious about you.'
+    }
+  };
+
+  const selectedResult =
+    choiceResults[choice];
 
   if (openingChoiceScene) {
     openingChoiceScene.classList.add(
@@ -1241,25 +1272,20 @@ function selectOpeningChoice(choice) {
     );
   }
 
-  if (mainGameInterface) {
-    mainGameInterface.classList.remove(
+  if (resultScene) {
+    resultScene.classList.remove(
       'hidden'
     );
   }
 
-  if (welcome) {
-    welcome.textContent =
-      `Welcome to Flame Cay, ` +
-      `${window.playerProfile.name}`;
+  if (resultTitle) {
+    resultTitle.textContent =
+      selectedResult.title;
   }
 
-  renderPlayerScenePortrait();
-
-  if (
-    typeof window.startGame ===
-    'function'
-  ) {
-    window.startGame();
+  if (resultText) {
+    resultText.textContent =
+      selectedResult.text;
   }
 
   window.scrollTo(0, 0);
