@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0"
+  >
 
-<meta charset="UTF-8">
+  <title>The Island of Flames</title>
 
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>The Island of Flames</title>
-
-<link rel="stylesheet" href="style.css?v=3675">
-
+  <link
+    rel="stylesheet"
+    href="style.css?v=3675"
+  >
 </head>
 
 <body>
 
 <main class="screen">
 
-<section id="menu" class="openingMenu">
+<section
+  id="menu"
+  class="openingMenu"
+>
 
   <div class="openingMenuOverlay">
 
@@ -49,8 +54,13 @@
         <button
           class="openingPrimaryButton"
           onclick="
-            document.getElementById('menu').classList.add('hidden');
-            document.getElementById('characterCreator').classList.remove('hidden');
+            document
+              .getElementById('menu')
+              .classList.add('hidden');
+
+            document
+              .getElementById('characterCreator')
+              .classList.remove('hidden');
           "
         >
           New Game
@@ -74,8 +84,13 @@
         <button
           class="openingSettingsButton"
           onclick="
-            document.getElementById('mainMenuButtons').classList.add('hidden');
-            document.getElementById('audioSettings').classList.remove('hidden');
+            document
+              .getElementById('mainMenuButtons')
+              .classList.add('hidden');
+
+            document
+              .getElementById('audioSettings')
+              .classList.remove('hidden');
           "
         >
           ⚙ Settings
@@ -127,8 +142,13 @@
         <button
           class="openingSecondaryButton"
           onclick="
-            document.getElementById('audioSettings').classList.add('hidden');
-            document.getElementById('mainMenuButtons').classList.remove('hidden');
+            document
+              .getElementById('audioSettings')
+              .classList.add('hidden');
+
+            document
+              .getElementById('mainMenuButtons')
+              .classList.remove('hidden');
           "
         >
           Back
@@ -259,1431 +279,1509 @@
 
   </div>
 
-<div
-  id="creatorStepTwo"
-  class="creatorStep hidden"
->
-
-  <div class="creatorProgress">
-    <span>YOUR ISLANDER</span>
-    <strong>2 of 8</strong>
-  </div>
-
-  <div class="creatorQuestion">
-
-    <p class="creatorEyebrow">
-      TELL US ABOUT YOURSELF
-    </p>
-
-    <h1>Your life outside the villa</h1>
-
-    <p>
-      These details will be used during introductions
-      and future conversations.
-    </p>
-
-  </div>
-
-  <div class="creatorForm">
-
-    <label for="playerAge">
-      Your age
-    </label>
-
-    <input
-      id="playerAge"
-      type="number"
-      min="18"
-      max="99"
-      inputmode="numeric"
-      placeholder="Enter your age"
-    >
-
-    <label for="playerHometown">
-      Your hometown
-    </label>
-
-    <input
-      id="playerHometown"
-      type="text"
-      maxlength="40"
-      placeholder="Example: New York, NY"
-      autocomplete="off"
-    >
-
-    <label for="playerOccupation">
-      Your occupation
-    </label>
-
-    <input
-      id="playerOccupation"
-      type="text"
-      maxlength="40"
-      placeholder="Example: Soccer coach"
-      autocomplete="off"
-    >
-
-    <p
-      id="creatorProfilePreview"
-      class="creatorIdentityPreview"
-    >
-      Complete your profile to continue.
-    </p>
-
-  </div>
-
-  <div class="creatorNavigation">
-
-    <button
-      id="creatorStepTwoContinue"
-      type="button"
-      disabled
-    >
-      Continue
-    </button>
-
-    <button
-      id="creatorStepTwoBack"
-      type="button"
-      class="creatorBackButton"
-    >
-      Back
-    </button>
-
-  </div>
-
-</div>
-
-<div
-  id="creatorStepThree"
-  class="creatorStep hidden"
->
-
-  <div class="creatorProgress">
-    <span>YOUR ISLANDER</span>
-    <strong>3 of 8</strong>
-  </div>
-
-  <div class="creatorQuestion">
-
-    <p class="creatorEyebrow">
-      WHAT ARE YOU BRINGING TO THE VILLA?
-    </p>
-
-    <h1>Your personality</h1>
-
-    <p>
-      Your choices can unlock different dialogue
-      and influence how the Islanders see you.
-    </p>
-
-  </div>
-
-  <div class="creatorForm">
-
-    <label for="playerPersonality">
-      Choose your personality
-    </label>
-
-    <select id="playerPersonality">
-
-      <option value="">
-        Select a personality
-      </option>
-
-      <option value="romantic">
-        💕 Romantic — You follow your heart
-      </option>
-
-      <option value="loyal">
-        💚 Loyal — Trust matters most
-      </option>
-
-      <option value="bold">
-        🔥 Bold — You are not afraid to make a move
-      </option>
-
-      <option value="strategic">
-        🧠 Strategic — You think before you act
-      </option>
-
-      <option value="funny">
-        😄 Funny — You use humor to connect
-      </option>
-
-      <option value="mysterious">
-        🌙 Mysterious — You keep people guessing
-      </option>
-
-    </select>
-
-    <label for="playerDatingGoal">
-      What are you looking for?
-    </label>
-
-    <select id="playerDatingGoal">
-
-      <option value="">
-        Select your dating intention
-      </option>
-
-      <option value="love">
-        ❤️ A serious relationship
-      </option>
-
-      <option value="connection">
-        ✨ A real connection
-      </option>
-
-      <option value="adventure">
-        🌴 Romance and adventure
-      </option>
-
-      <option value="open">
-        👀 I am keeping my options open
-      </option>
-
-      <option value="competition">
-        🏆 I am here to win
-      </option>
-
-    </select>
-
-    <label for="playerFirstImpression">
-      How do you want to enter the villa?
-    </label>
-
-    <select id="playerFirstImpression">
-
-      <option value="">
-        Select your entrance energy
-      </option>
-
-      <option value="confident">
-        🔥 Confident
-      </option>
-
-      <option value="friendly">
-        ☀️ Friendly
-      </option>
-
-      <option value="flirty">
-        💋 Flirty
-      </option>
-
-      <option value="calm">
-        🌊 Calm
-      </option>
-
-      <option value="mysterious">
-        🌙 Mysterious
-      </option>
-
-    </select>
-
-    <p
-      id="creatorPersonalityPreview"
-      class="creatorIdentityPreview"
-    >
-      Choose all three options to continue.
-    </p>
-
-  </div>
-
-  <div class="creatorNavigation">
-
-  <button
-  id="creatorStepThreeContinue"
-  type="button"
-  disabled
->
-  Continue
-</button>
-
-<button
-  id="creatorStepThreeBack"
-  type="button"
-  class="creatorBackButton"
->
-  Back
-</button>
-
-</div>
-
-</div>
-
-<div
-  id="creatorStepFour"
-  class="creatorStep hidden"
->
-
-  <div class="creatorProgress">
-    <span>YOUR ISLANDER</span>
-    <strong>4 of 8</strong>
-  </div>
-
-  <div class="creatorQuestion">
-
-    <p class="creatorEyebrow">
-      CHOOSE YOUR LOOK
-    </p>
-
-    <h1>Your appearance</h1>
-
-    <p>
-      Select the character you want to represent
-      you during your story.
-    </p>
-
-  </div>
-
-  <div class="creatorForm">
-
-    <div
-      id="creatorAppearanceGrid"
-      class="creatorAppearanceGrid"
-    >
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="1"
-      >
-        <img
-          src="player-sprites/2FFB9EAD-79CB-47C9-93DB-B75F1A3C0DF5.png"
-          alt="Appearance option 1"
-        >
-        <span>Look 1</span>
-      </button>
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="2"
-      >
-        <img
-          src="player-sprites/AD4DA575-4307-4915-A00B-5840D120177B.png"
-          alt="Appearance option 2"
-        >
-        <span>Look 2</span>
-      </button>
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="3"
-      >
-        <img
-          src="player-sprites/E1FB32B8-80B6-436D-9FF4-22DFC345AE83.png"
-          alt="Appearance option 3"
-        >
-        <span>Look 3</span>
-      </button>
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="4"
-      >
-        <img
-          src="player-sprites/618E0EFF-7956-45BE-BC38-F6E6DF5847A9.png"
-          alt="Appearance option 4"
-        >
-        <span>Look 4</span>
-      </button>
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="5"
-      >
-        <img
-          src="player-sprites/50DC97F4-3772-4E16-BC7A-9427F3A06FC0.png"
-          alt="Appearance option 5"
-        >
-        <span>Look 5</span>
-      </button>
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="6"
-      >
-        <img
-          src="player-sprites/DE96B228-6D9B-4C45-BA1F-F8F7869A480A.png"
-          alt="Appearance option 6"
-        >
-        <span>Look 6</span>
-      </button>
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="7"
-      >
-        <img
-          src="player-sprites/AB762639-536E-41A4-8908-0E8BB4D013E8.png"
-          alt="Appearance option 7"
-        >
-        <span>Look 7</span>
-      </button>
-
-      <button
-        type="button"
-        class="creatorAppearanceOption"
-        data-preset="8"
-      >
-        <img
-          src="player-sprites/CB7DD06E-B5B7-4946-BBC2-B8F4489B5D8A.png"
-          alt="Appearance option 8"
-        >
-        <span>Look 8</span>
-      </button>
+  <div
+    id="creatorStepTwo"
+    class="creatorStep hidden"
+  >
+
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>2 of 8</strong>
+    </div>
+
+    <div class="creatorQuestion">
+
+      <p class="creatorEyebrow">
+        TELL US ABOUT YOURSELF
+      </p>
+
+      <h1>Your life outside the villa</h1>
+
+      <p>
+        These details will be used during introductions
+        and future conversations.
+      </p>
 
     </div>
 
-    <p
-      id="creatorAppearancePreview"
-      class="creatorIdentityPreview"
-    >
-      Select your appearance to continue.
-    </p>
+    <div class="creatorForm">
 
-  </div>
+      <label for="playerAge">
+        Your age
+      </label>
 
-  <div class="creatorNavigation">
+      <input
+        id="playerAge"
+        type="number"
+        min="18"
+        max="99"
+        inputmode="numeric"
+        placeholder="Enter your age"
+      >
 
-    <button
-      id="creatorStepFourContinue"
-      type="button"
-      disabled
-    >
-      Continue
-    </button>
+      <label for="playerHometown">
+        Your hometown
+      </label>
 
-    <button
-      id="creatorStepFourBack"
-      type="button"
-      class="creatorBackButton"
-    >
-      Back
-    </button>
+      <input
+        id="playerHometown"
+        type="text"
+        maxlength="40"
+        placeholder="Example: New York, NY"
+        autocomplete="off"
+      >
 
-  </div>
+      <label for="playerOccupation">
+        Your occupation
+      </label>
 
-</div>
+      <input
+        id="playerOccupation"
+        type="text"
+        maxlength="40"
+        placeholder="Example: Soccer coach"
+        autocomplete="off"
+      >
 
-<div
-  id="creatorStepFive"
-  class="creatorStep hidden"
->
+      <p
+        id="creatorProfilePreview"
+        class="creatorIdentityPreview"
+      >
+        Complete your profile to continue.
+      </p>
 
-  <div class="creatorProgress">
-    <span>YOUR ISLANDER</span>
-    <strong>5 of 8</strong>
-  </div>
+    </div>
 
-  <div class="creatorQuestion">
+    <div class="creatorNavigation">
 
-    <p class="creatorEyebrow">
-      MEET THE NEW ISLANDER
-    </p>
+      <button
+        id="creatorStepTwoContinue"
+        type="button"
+        disabled
+      >
+        Continue
+      </button>
 
-    <h1>Your contestant profile</h1>
-
-    <p>
-      Review your information before continuing.
-    </p>
-
-  </div>
-
-  <div class="creatorForm creatorProfileCard">
-
-    <img
-      id="creatorReviewImage"
-      class="creatorReviewImage"
-      src=""
-      alt="Your selected character"
-    >
-
-    <h2 id="creatorReviewName">
-      Your Name
-    </h2>
-
-    <p id="creatorReviewBasicInfo">
-      Age · Occupation · Hometown
-    </p>
-
-    <div class="creatorReviewDetails">
-
-      <div>
-        <span>Pronouns</span>
-        <strong id="creatorReviewPronouns">
-          —
-        </strong>
-      </div>
-
-      <div>
-        <span>Personality</span>
-        <strong id="creatorReviewPersonality">
-          —
-        </strong>
-      </div>
-
-      <div>
-        <span>Looking for</span>
-        <strong id="creatorReviewDatingGoal">
-          —
-        </strong>
-      </div>
-
-      <div>
-        <span>Entrance energy</span>
-        <strong id="creatorReviewFirstImpression">
-          —
-        </strong>
-      </div>
+      <button
+        id="creatorStepTwoBack"
+        type="button"
+        class="creatorBackButton"
+      >
+        Back
+      </button>
 
     </div>
 
   </div>
 
-  <div class="creatorNavigation">
+  <div
+    id="creatorStepThree"
+    class="creatorStep hidden"
+  >
 
-    <button
-      id="creatorStepFiveContinue"
-      type="button"
-    >
-      Confirm Profile
-    </button>
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>3 of 8</strong>
+    </div>
 
-    <button
-      id="creatorStepFiveBack"
-      type="button"
-      class="creatorBackButton"
-    >
-      Back
-    </button>
+    <div class="creatorQuestion">
 
-  </div>
+      <p class="creatorEyebrow">
+        WHAT ARE YOU BRINGING TO THE VILLA?
+      </p>
 
-</div>
+      <h1>Your personality</h1>
 
-<div
-  id="creatorStepSix"
-  class="creatorStep hidden"
->
-
-  <div class="creatorProgress">
-    <span>YOUR ISLANDER</span>
-    <strong>6 of 8</strong>
-  </div>
-
-  <div class="creatorQuestion">
-
-    <p class="creatorEyebrow">
-      DRESS FOR YOUR ARRIVAL
-    </p>
-
-    <h1>Choose your outfit</h1>
-
-    <p>
-      Pick the look you want to wear when you first
-      enter the Flame Cay villa.
-    </p>
-
-  </div>
-
-  <div class="creatorForm">
-
-    <div class="creatorOutfitGrid">
-
-      <button
-        type="button"
-        class="creatorOutfitOption"
-        data-outfit="sunset"
-        aria-pressed="false"
-      >
-        <span class="creatorOutfitIcon">
-          🌅
-        </span>
-
-        <strong>
-          Sunset Glow
-        </strong>
-
-        <small>
-          Bold and confident
-        </small>
-      </button>
-
-      <button
-        type="button"
-        class="creatorOutfitOption"
-        data-outfit="ocean"
-        aria-pressed="false"
-      >
-        <span class="creatorOutfitIcon">
-          🌊
-        </span>
-
-        <strong>
-          Ocean Breeze
-        </strong>
-
-        <small>
-          Calm and effortless
-        </small>
-      </button>
-
-      <button
-        type="button"
-        class="creatorOutfitOption"
-        data-outfit="midnight"
-        aria-pressed="false"
-      >
-        <span class="creatorOutfitIcon">
-          🌙
-        </span>
-
-        <strong>
-          Midnight Flame
-        </strong>
-
-        <small>
-          Mysterious and elegant
-        </small>
-      </button>
-
-      <button
-        type="button"
-        class="creatorOutfitOption"
-        data-outfit="tropical"
-        aria-pressed="false"
-      >
-        <span class="creatorOutfitIcon">
-          🌴
-        </span>
-
-        <strong>
-          Tropical Heat
-        </strong>
-
-        <small>
-          Fun and adventurous
-        </small>
-      </button>
+      <p>
+        Your choices can unlock different dialogue
+        and influence how the Islanders see you.
+      </p>
 
     </div>
 
-    <p
-      id="creatorOutfitPreview"
-      class="creatorIdentityPreview"
-    >
-      Select your arrival outfit to continue.
-    </p>
+    <div class="creatorForm">
 
-  </div>
+      <label for="playerPersonality">
+        Choose your personality
+      </label>
 
-  <div class="creatorNavigation">
+      <select id="playerPersonality">
 
-    <button
-      id="creatorStepSixContinue"
-      type="button"
-      disabled
-    >
-      Continue
-    </button>
+        <option value="">
+          Select a personality
+        </option>
 
-    <button
-      id="creatorStepSixBack"
-      type="button"
-      class="creatorBackButton"
-    >
-      Back
-    </button>
+        <option value="romantic">
+          💕 Romantic — You follow your heart
+        </option>
 
-  </div>
+        <option value="loyal">
+          💚 Loyal — Trust matters most
+        </option>
 
-</div>
+        <option value="bold">
+          🔥 Bold — You are not afraid to make a move
+        </option>
 
-<div
-  id="creatorStepSeven"
-  class="creatorStep hidden"
->
+        <option value="strategic">
+          🧠 Strategic — You think before you act
+        </option>
 
-  <div class="creatorProgress">
-    <span>YOUR ISLANDER</span>
-    <strong>7 of 8</strong>
-  </div>
+        <option value="funny">
+          😄 Funny — You use humor to connect
+        </option>
 
-  <div class="creatorQuestion">
+        <option value="mysterious">
+          🌙 Mysterious — You keep people guessing
+        </option>
 
-    <p class="creatorEyebrow">
-      YOUR JOURNEY BEGINS
-    </p>
+      </select>
 
-    <h1>Ready for Flame Cay?</h1>
+      <label for="playerDatingGoal">
+        What are you looking for?
+      </label>
 
-    <p id="creatorArrivalMessage">
-      The boat is waiting. Your first day in the villa
-      is about to begin.
-    </p>
+      <select id="playerDatingGoal">
 
-  </div>
+        <option value="">
+          Select your dating intention
+        </option>
 
-  <div class="creatorForm creatorFinalProfile">
+        <option value="love">
+          ❤️ A serious relationship
+        </option>
 
-    <img
-      id="creatorArrivalImage"
-      class="creatorArrivalImage"
-      src=""
-      alt="Your contestant"
-    >
+        <option value="connection">
+          ✨ A real connection
+        </option>
 
-    <h2 id="creatorArrivalName">
-      New Islander
-    </h2>
+        <option value="adventure">
+          🌴 Romance and adventure
+        </option>
 
-    <p id="creatorArrivalBasicInfo">
-      Age · Occupation · Hometown
-    </p>
+        <option value="open">
+          👀 I am keeping my options open
+        </option>
 
-    <div class="creatorReviewDetails">
+        <option value="competition">
+          🏆 I am here to win
+        </option>
 
-      <div>
-        <span>Pronouns</span>
-        <strong id="creatorArrivalPronouns">
-          —
-        </strong>
-      </div>
+      </select>
 
-      <div>
-        <span>Personality</span>
-        <strong id="creatorArrivalPersonality">
-          —
-        </strong>
-      </div>
+      <label for="playerFirstImpression">
+        How do you want to enter the villa?
+      </label>
 
-      <div>
-        <span>Looking for</span>
-        <strong id="creatorArrivalDatingGoal">
-          —
-        </strong>
-      </div>
+      <select id="playerFirstImpression">
 
-      <div>
-        <span>Entrance energy</span>
-        <strong id="creatorArrivalFirstImpression">
-          —
-        </strong>
-      </div>
+        <option value="">
+          Select your entrance energy
+        </option>
 
-      <div class="creatorArrivalOutfitRow">
-        <span>Arrival outfit</span>
-        <strong id="creatorArrivalOutfit">
-          —
-        </strong>
-      </div>
+        <option value="confident">
+          🔥 Confident
+        </option>
+
+        <option value="friendly">
+          ☀️ Friendly
+        </option>
+
+        <option value="flirty">
+          💋 Flirty
+        </option>
+
+        <option value="calm">
+          🌊 Calm
+        </option>
+
+        <option value="mysterious">
+          🌙 Mysterious
+        </option>
+
+      </select>
+
+      <p
+        id="creatorPersonalityPreview"
+        class="creatorIdentityPreview"
+      >
+        Choose all three options to continue.
+      </p>
+
+    </div>
+
+    <div class="creatorNavigation">
+
+      <button
+        id="creatorStepThreeContinue"
+        type="button"
+        disabled
+      >
+        Continue
+      </button>
+
+      <button
+        id="creatorStepThreeBack"
+        type="button"
+        class="creatorBackButton"
+      >
+        Back
+      </button>
 
     </div>
 
   </div>
 
-  <div class="creatorNavigation">
+  <div
+    id="creatorStepFour"
+    class="creatorStep hidden"
+  >
 
-    <button
-      id="creatorEnterIsland"
-      type="button"
-    >
-      Enter Flame Cay
-    </button>
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>4 of 8</strong>
+    </div>
 
-    <button
-      id="creatorReturnToStepSix"
-      type="button"
-      class="creatorBackButton"
-    >
-      Back
-    </button>
+    <div class="creatorQuestion">
+
+      <p class="creatorEyebrow">
+        CHOOSE YOUR LOOK
+      </p>
+
+      <h1>Your appearance</h1>
+
+      <p>
+        Select the character you want to represent
+        you during your story.
+      </p>
+
+    </div>
+
+    <div class="creatorForm">
+
+      <div
+        id="creatorAppearanceGrid"
+        class="creatorAppearanceGrid"
+      >
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="1"
+        >
+          <img
+            src="player-sprites/2FFB9EAD-79CB-47C9-93DB-B75F1A3C0DF5.png"
+            alt="Appearance option 1"
+          >
+          <span>Look 1</span>
+        </button>
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="2"
+        >
+          <img
+            src="player-sprites/AD4DA575-4307-4915-A00B-5840D120177B.png"
+            alt="Appearance option 2"
+          >
+          <span>Look 2</span>
+        </button>
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="3"
+        >
+          <img
+            src="player-sprites/E1FB32B8-80B6-436D-9FF4-22DFC345AE83.png"
+            alt="Appearance option 3"
+          >
+          <span>Look 3</span>
+        </button>
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="4"
+        >
+          <img
+            src="player-sprites/618E0EFF-7956-45BE-BC38-F6E6DF5847A9.png"
+            alt="Appearance option 4"
+          >
+          <span>Look 4</span>
+        </button>
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="5"
+        >
+          <img
+            src="player-sprites/50DC97F4-3772-4E16-BC7A-9427F3A06FC0.png"
+            alt="Appearance option 5"
+          >
+          <span>Look 5</span>
+        </button>
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="6"
+        >
+          <img
+            src="player-sprites/DE96B228-6D9B-4C45-BA1F-F8F7869A480A.png"
+            alt="Appearance option 6"
+          >
+          <span>Look 6</span>
+        </button>
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="7"
+        >
+          <img
+            src="player-sprites/AB762639-536E-41A4-8908-0E8BB4D013E8.png"
+            alt="Appearance option 7"
+          >
+          <span>Look 7</span>
+        </button>
+
+        <button
+          type="button"
+          class="creatorAppearanceOption"
+          data-preset="8"
+        >
+          <img
+            src="player-sprites/CB7DD06E-B5B7-4946-BBC2-B8F4489B5D8A.png"
+            alt="Appearance option 8"
+          >
+          <span>Look 8</span>
+        </button>
+
+      </div>
+
+      <p
+        id="creatorAppearancePreview"
+        class="creatorIdentityPreview"
+      >
+        Select your appearance to continue.
+      </p>
+
+    </div>
+
+    <div class="creatorNavigation">
+
+      <button
+        id="creatorStepFourContinue"
+        type="button"
+        disabled
+      >
+        Continue
+      </button>
+
+      <button
+        id="creatorStepFourBack"
+        type="button"
+        class="creatorBackButton"
+      >
+        Back
+      </button>
+
+    </div>
 
   </div>
 
-</div>
+  <div
+    id="creatorStepFive"
+    class="creatorStep hidden"
+  >
+
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>5 of 8</strong>
+    </div>
+
+    <div class="creatorQuestion">
+
+      <p class="creatorEyebrow">
+        MEET THE NEW ISLANDER
+      </p>
+
+      <h1>Your contestant profile</h1>
+
+      <p>
+        Review your information before continuing.
+      </p>
+
+    </div>
+
+    <div class="creatorForm creatorProfileCard">
+
+      <img
+        id="creatorReviewImage"
+        class="creatorReviewImage"
+        src=""
+        alt="Your selected character"
+      >
+
+      <h2 id="creatorReviewName">
+        Your Name
+      </h2>
+
+      <p id="creatorReviewBasicInfo">
+        Age · Occupation · Hometown
+      </p>
+
+      <div class="creatorReviewDetails">
+
+        <div>
+          <span>Pronouns</span>
+          <strong id="creatorReviewPronouns">
+            —
+          </strong>
+        </div>
+
+        <div>
+          <span>Personality</span>
+          <strong id="creatorReviewPersonality">
+            —
+          </strong>
+        </div>
+
+        <div>
+          <span>Looking for</span>
+          <strong id="creatorReviewDatingGoal">
+            —
+          </strong>
+        </div>
+
+        <div>
+          <span>Entrance energy</span>
+          <strong id="creatorReviewFirstImpression">
+            —
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="creatorNavigation">
+
+      <button
+        id="creatorStepFiveContinue"
+        type="button"
+      >
+        Confirm Profile
+      </button>
+
+      <button
+        id="creatorStepFiveBack"
+        type="button"
+        class="creatorBackButton"
+      >
+        Back
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    id="creatorStepSix"
+    class="creatorStep hidden"
+  >
+
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>6 of 8</strong>
+    </div>
+
+    <div class="creatorQuestion">
+
+      <p class="creatorEyebrow">
+        DRESS FOR YOUR ARRIVAL
+      </p>
+
+      <h1>Choose your outfit</h1>
+
+      <p>
+        Pick the look you want to wear when you first
+        enter the Flame Cay villa.
+      </p>
+
+    </div>
+
+    <div class="creatorForm">
+
+      <div class="creatorOutfitGrid">
+
+        <button
+          type="button"
+          class="creatorOutfitOption"
+          data-outfit="sunset"
+          aria-pressed="false"
+        >
+          <span class="creatorOutfitIcon">
+            🌅
+          </span>
+
+          <strong>
+            Sunset Glow
+          </strong>
+
+          <small>
+            Bold and confident
+          </small>
+        </button>
+
+        <button
+          type="button"
+          class="creatorOutfitOption"
+          data-outfit="ocean"
+          aria-pressed="false"
+        >
+          <span class="creatorOutfitIcon">
+            🌊
+          </span>
+
+          <strong>
+            Ocean Breeze
+          </strong>
+
+          <small>
+            Calm and effortless
+          </small>
+        </button>
+
+        <button
+          type="button"
+          class="creatorOutfitOption"
+          data-outfit="midnight"
+          aria-pressed="false"
+        >
+          <span class="creatorOutfitIcon">
+            🌙
+          </span>
+
+          <strong>
+            Midnight Flame
+          </strong>
+
+          <small>
+            Mysterious and elegant
+          </small>
+        </button>
+
+        <button
+          type="button"
+          class="creatorOutfitOption"
+          data-outfit="tropical"
+          aria-pressed="false"
+        >
+          <span class="creatorOutfitIcon">
+            🌴
+          </span>
+
+          <strong>
+            Tropical Heat
+          </strong>
+
+          <small>
+            Fun and adventurous
+          </small>
+        </button>
+
+      </div>
+
+      <p
+        id="creatorOutfitPreview"
+        class="creatorIdentityPreview"
+      >
+        Select your arrival outfit to continue.
+      </p>
+
+    </div>
+
+    <div class="creatorNavigation">
+
+      <button
+        id="creatorStepSixContinue"
+        type="button"
+        disabled
+      >
+        Continue
+      </button>
+
+      <button
+        id="creatorStepSixBack"
+        type="button"
+        class="creatorBackButton"
+      >
+        Back
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    id="creatorStepSeven"
+    class="creatorStep hidden"
+  >
+
+    <div class="creatorProgress">
+      <span>YOUR ISLANDER</span>
+      <strong>7 of 8</strong>
+    </div>
+
+    <div class="creatorQuestion">
+
+      <p class="creatorEyebrow">
+        YOUR JOURNEY BEGINS
+      </p>
+
+      <h1>Ready for Flame Cay?</h1>
+
+      <p id="creatorArrivalMessage">
+        The boat is waiting. Your first day in the villa
+        is about to begin.
+      </p>
+
+    </div>
+
+    <div class="creatorForm creatorFinalProfile">
+
+      <img
+        id="creatorArrivalImage"
+        class="creatorArrivalImage"
+        src=""
+        alt="Your contestant"
+      >
+
+      <h2 id="creatorArrivalName">
+        New Islander
+      </h2>
+
+      <p id="creatorArrivalBasicInfo">
+        Age · Occupation · Hometown
+      </p>
+
+      <div class="creatorReviewDetails">
+
+        <div>
+          <span>Pronouns</span>
+          <strong id="creatorArrivalPronouns">
+            —
+          </strong>
+        </div>
+
+        <div>
+          <span>Personality</span>
+          <strong id="creatorArrivalPersonality">
+            —
+          </strong>
+        </div>
+
+        <div>
+          <span>Looking for</span>
+          <strong id="creatorArrivalDatingGoal">
+            —
+          </strong>
+        </div>
+
+        <div>
+          <span>Entrance energy</span>
+          <strong id="creatorArrivalFirstImpression">
+            —
+          </strong>
+        </div>
+
+        <div class="creatorArrivalOutfitRow">
+          <span>Arrival outfit</span>
+          <strong id="creatorArrivalOutfit">
+            —
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="creatorNavigation">
+
+      <button
+        id="creatorEnterIsland"
+        type="button"
+      >
+        Enter Flame Cay
+      </button>
+
+      <button
+        id="creatorReturnToStepSix"
+        type="button"
+        class="creatorBackButton"
+      >
+        Back
+      </button>
+
+    </div>
+
+  </div>
 
 </section>
 
-<section id="game" class="hidden">
-  
 <section
-  id="arrivalScene"
-  class="arrivalScene"
+  id="game"
+  class="hidden"
 >
 
-  <div class="arrivalSceneOverlay">
+  <section
+    id="arrivalScene"
+    class="arrivalScene"
+  >
 
-    <div class="arrivalSceneContent">
+    <div class="arrivalSceneOverlay">
 
-      <p class="arrivalSceneEpisode">
-        EPISODE 1
-      </p>
+      <div class="arrivalSceneContent">
 
-      <h1>
-        Welcome to
-        <span>Flame Cay</span>
-      </h1>
+        <p class="arrivalSceneEpisode">
+          EPISODE 1
+        </p>
 
-      <p id="arrivalSceneText">
-        The boat slows as Flame Cay appears ahead.
-        Your new life in the villa begins now.
-      </p>
+        <h1>
+          Welcome to
+          <span>Flame Cay</span>
+        </h1>
 
-      <div class="arrivalScenePlayer">
+        <p id="arrivalSceneText">
+          The boat slows as Flame Cay appears ahead.
+          Your new life in the villa begins now.
+        </p>
+
+        <div class="arrivalScenePlayer">
+
+          <img
+            id="arrivalScenePlayerImage"
+            src=""
+            alt="Your Islander"
+          >
+
+          <div>
+
+            <strong id="arrivalScenePlayerName">
+              New Islander
+            </strong>
+
+            <span id="arrivalScenePlayerOutfit">
+              Arrival outfit
+            </span>
+
+          </div>
+
+        </div>
+
+        <button
+          id="arrivalSceneContinue"
+          type="button"
+        >
+          Step Onto the Island
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section
+    id="openingDialogueScene"
+    class="openingDialogueScene hidden"
+  >
+
+    <div class="openingDialogueOverlay">
+
+      <div class="openingDialogueCharacter">
 
         <img
-          id="arrivalScenePlayerImage"
+          id="openingDialoguePlayerImage"
           src=""
           alt="Your Islander"
         >
 
-        <div>
+      </div>
 
-          <strong id="arrivalScenePlayerName">
-            New Islander
+      <div class="openingDialogueBox">
+
+        <p
+          id="openingDialogueSpeaker"
+          class="openingDialogueSpeaker"
+        >
+          Narrator
+        </p>
+
+        <p
+          id="openingDialogueText"
+          class="openingDialogueText"
+        >
+          Warm ocean air reaches you as the boat
+          approaches the shore.
+        </p>
+
+        <button
+          id="openingDialogueContinue"
+          type="button"
+        >
+          Continue
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section
+    id="openingChoiceScene"
+    class="openingChoiceScene hidden"
+  >
+
+    <div class="openingChoiceOverlay">
+
+      <div class="openingChoiceCard">
+
+        <p class="openingChoiceLabel">
+          FIRST IMPRESSION
+        </p>
+
+        <h2>
+          How will you enter the villa?
+        </h2>
+
+        <p>
+          The Islanders are waiting on the other
+          side of the doors.
+        </p>
+
+        <div class="openingChoiceButtons">
+
+          <button
+            type="button"
+            class="openingChoiceButton"
+            data-opening-choice="confident"
+          >
+            🔥 Walk in confidently
+          </button>
+
+          <button
+            type="button"
+            class="openingChoiceButton"
+            data-opening-choice="friendly"
+          >
+            😊 Enter with a friendly smile
+          </button>
+
+          <button
+            type="button"
+            class="openingChoiceButton"
+            data-opening-choice="mysterious"
+          >
+            🌙 Keep everyone guessing
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section
+    id="openingChoiceResultScene"
+    class="openingChoiceResultScene hidden"
+  >
+
+    <div class="openingChoiceResultOverlay">
+
+      <div class="openingChoiceResultCard">
+
+        <p class="openingChoiceResultLabel">
+          FIRST IMPRESSION
+        </p>
+
+        <h2 id="openingChoiceResultTitle">
+          The villa doors open.
+        </h2>
+
+        <p id="openingChoiceResultText">
+          The Islanders turn toward you as you make
+          your entrance.
+        </p>
+
+        <button
+          id="openingChoiceResultContinue"
+          type="button"
+        >
+          Meet the Islanders
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section
+    id="meetIslandersScene"
+    class="meetIslandersScene hidden"
+  >
+
+    <div class="meetIslandersOverlay">
+
+      <div class="meetIslandersHeader">
+
+        <p>
+          EPISODE 1
+        </p>
+
+        <h2>
+          Meet the Islanders
+        </h2>
+
+        <span>
+          Everyone gathers beside the villa pool.
+        </span>
+
+      </div>
+
+      <div class="meetIslandersCharacter">
+
+        <img
+          id="meetIslandersCharacterImage"
+          src="characters/lucas.png"
+          alt="Lucas"
+        >
+
+      </div>
+
+      <div class="meetIslandersDialogue">
+
+        <p
+          id="meetIslandersSpeaker"
+          class="meetIslandersSpeaker"
+        >
+          Lucas
+        </p>
+
+        <p
+          id="meetIslandersText"
+          class="meetIslandersText"
+        >
+          Welcome to Flame Cay. We have all been waiting
+          to meet the new Islander.
+        </p>
+
+        <div
+          id="meetIslandersChoices"
+          class="meetIslandersChoices"
+        >
+
+          <button
+            type="button"
+            class="meetIslandersChoiceButton"
+            data-lucas-choice="confident"
+          >
+            🔥 “I hope you’re ready for some competition.”
+          </button>
+
+          <button
+            type="button"
+            class="meetIslandersChoiceButton"
+            data-lucas-choice="friendly"
+          >
+            😊 “It’s really nice to meet you.”
+          </button>
+
+          <button
+            type="button"
+            class="meetIslandersChoiceButton"
+            data-lucas-choice="mysterious"
+          >
+            🌙 “You’ll learn more about me soon.”
+          </button>
+
+        </div>
+
+        <div
+          id="mayaIslandersChoices"
+          class="meetIslandersChoices hidden"
+        >
+
+          <button
+            type="button"
+            class="mayaIslandersChoiceButton"
+            data-maya-choice="warm"
+          >
+            😊 “I was hoping to meet someone friendly.”
+          </button>
+
+          <button
+            type="button"
+            class="mayaIslandersChoiceButton"
+            data-maya-choice="playful"
+          >
+            😄 “Only if you can keep up with me.”
+          </button>
+
+          <button
+            type="button"
+            class="mayaIslandersChoiceButton"
+            data-maya-choice="careful"
+          >
+            👀 “Maybe. I’m still figuring everyone out.”
+          </button>
+
+        </div>
+
+        <button
+          id="meetIslandersContinue"
+          type="button"
+          class="hidden"
+        >
+          Continue
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <div
+    id="mainGameInterface"
+    class="hidden"
+  >
+
+    <h2 id="welcome">
+      Welcome to Flame Cay
+    </h2>
+
+    <div
+      id="playerScenePortrait"
+      class="playerScenePortrait hidden"
+    >
+
+      <div
+        id="playerSceneAvatar"
+        class="playerSceneAvatar short"
+      >
+
+        <div
+          id="playerSceneHair"
+          class="playerSceneHair"
+        ></div>
+
+        <div
+          id="playerSceneFace"
+          class="playerSceneFace"
+        >
+
+          <div class="playerSceneEyes">
+            ● ●
+          </div>
+
+          <div class="playerSceneMouth">
+            ⌣
+          </div>
+
+        </div>
+
+        <div
+          id="playerSceneBody"
+          class="playerSceneBody"
+        ></div>
+
+      </div>
+
+      <div class="playerSceneInformation">
+
+        <h3 id="playerSceneName">
+          Player
+        </h3>
+
+        <p id="playerScenePersonality">
+          New Islander
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h3>
+        📅 Day <span id="dayNumber">1</span>
+      </h3>
+
+      <h3>
+        <span id="timeIcon">☀️</span>
+        <span id="timePeriod">Morning</span>
+      </h3>
+
+      <p id="actionStatus">
+        ⭐ One activity available
+      </p>
+
+    </div>
+
+    <div
+      id="portraitBox"
+      class="hidden dialoguePortraitRow"
+    >
+
+      <div
+        id="npcDialogueSide"
+        class="dialogueCharacterSide"
+      >
+
+        <img
+          id="portraitImage"
+          alt="Character Portrait"
+        >
+
+        <div id="portrait">
+          🌴
+        </div>
+
+        <div class="dialogueSpeakerInformation">
+
+          <h3 id="speakerName">
+            Narrator
+          </h3>
+
+          <p id="speakerTitle">
+            The Story Begins
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="playerDialogueSide"
+        class="dialoguePlayerSide hidden"
+      >
+
+        <div
+          id="playerDialogueAvatar"
+          class="playerDialogueAvatar short"
+        >
+
+          <div
+            id="playerDialogueHair"
+            class="playerDialogueHair"
+          ></div>
+
+          <div
+            id="playerDialogueFace"
+            class="playerDialogueFace"
+          >
+
+            <div class="playerDialogueEyes">
+              ● ●
+            </div>
+
+            <div class="playerDialogueMouth">
+              ⌣
+            </div>
+
+          </div>
+
+          <div
+            id="playerDialogueBody"
+            class="playerDialogueBody"
+          ></div>
+
+        </div>
+
+        <div class="playerDialogueInformation">
+
+          <strong id="playerDialogueName">
+            Player
           </strong>
 
-          <span id="arrivalScenePlayerOutfit">
-            Arrival outfit
+          <span>
+            You
           </span>
 
         </div>
 
       </div>
 
+    </div>
+
+    <div
+      id="dialogueCard"
+      class="card"
+    >
+
+      <p
+        id="story"
+        style="
+          font-size:17px;
+          line-height:1.6;
+          min-height:40px;
+        "
+      ></p>
+
       <button
-        id="arrivalSceneContinue"
-        type="button"
+        id="continueButton"
+        onclick="nextDialogue()"
       >
-        Step Onto the Island
+        ▶ Continue
       </button>
 
     </div>
 
-  </div>
+    <div
+      id="choices"
+      class="hidden"
+    ></div>
 
-</section>
+    <section
+      id="walkingScreen"
+      class="hidden"
+    >
 
-<section
-  id="openingDialogueScene"
-  class="openingDialogueScene hidden"
->
+      <div class="card">
 
-  <div class="openingDialogueOverlay">
+        <h2 id="walkingTitle">
+          🚶 Exploring Flame Cay
+        </h2>
 
-    <div class="openingDialogueCharacter">
+        <p id="walkingText"></p>
 
-      <img
-        id="openingDialoguePlayerImage"
-        src=""
-        alt="Your Islander"
-      >
+        <button onclick="finishWalking()">
+          Continue Walking ➜
+        </button>
 
-    </div>
+      </div>
 
-    <div class="openingDialogueBox">
+    </section>
 
-      <p
-        id="openingDialogueSpeaker"
-        class="openingDialogueSpeaker"
-      >
-        Narrator
-      </p>
+    <section
+      id="islandMap"
+      class="hidden"
+    >
 
-      <p
-        id="openingDialogueText"
-        class="openingDialogueText"
-      >
-        Warm ocean air reaches you as the boat
-        approaches the shore.
+      <div class="card">
+
+        <h2>
+          🗺️ Flame Cay Map
+        </h2>
+
+        <p id="mapTimeText"></p>
+
+        <p id="mapActionText"></p>
+
+        <button onclick="startWalking('volcano')">
+          🌋 Volcano Peak
+        </button>
+
+        <button onclick="startWalking('jungle')">
+          🌿 Whispering Jungle
+        </button>
+
+        <button onclick="startWalking('shrine')">
+          💎 Crystal Shrine
+        </button>
+
+        <button onclick="startWalking('beach')">
+          🏖 Arrival Beach
+        </button>
+
+        <button onclick="startWalking('villa')">
+          🏡 Main Villa
+        </button>
+
+        <button onclick="startWalking('village')">
+          🏝️ Flame Village
+        </button>
+
+        <button onclick="startWalking('gym')">
+          💪 Gym
+        </button>
+
+        <button onclick="startWalking('kitchen')">
+          🍳 Kitchen
+        </button>
+
+        <button onclick="startWalking('pool')">
+          🏊 Infinity Pool
+        </button>
+
+        <button onclick="startWalking('firepit')">
+          🔥 Fire Pit
+        </button>
+
+        <button onclick="startWalking('cove')">
+          🌙 Moonlight Cove
+        </button>
+
+        <button
+          id="advanceTimeButton"
+          onclick="advanceTime()"
+        >
+          ⏰ Skip This Time Period
+        </button>
+
+      </div>
+
+    </section>
+
+    <div
+      class="card"
+      id="savePanel"
+    >
+
+      <h3>
+        💾 Save Game
+      </h3>
+
+      <p id="saveStatus">
+        Choose a save slot.
       </p>
 
       <button
-        id="openingDialogueContinue"
-        type="button"
+        class="saveButton"
+        onclick="saveGame(1)"
       >
-        Continue
+        💾 Save Slot 1
       </button>
 
-    </div>
+      <button
+        class="saveButton"
+        onclick="saveGame(2)"
+      >
+        💾 Save Slot 2
+      </button>
 
-  </div>
+      <button
+        class="saveButton"
+        onclick="saveGame(3)"
+      >
+        💾 Save Slot 3
+      </button>
 
-</section>
+      <button
+        class="loadButton"
+        onclick="openInGameLoadMenu()"
+      >
+        📂 Load Another Save
+      </button>
 
-<section
-  id="openingChoiceScene"
-  class="openingChoiceScene hidden"
->
-  <div class="openingChoiceOverlay">
+      <div
+        id="inGameLoadMenu"
+        class="hidden"
+      >
 
-    <div class="openingChoiceCard">
+        <div id="inGameLoadSlotList"></div>
 
-      <p class="openingChoiceLabel">
-        FIRST IMPRESSION
-      </p>
-
-      <h2>
-        How will you enter the villa?
-      </h2>
-
-      <p>
-        The Islanders are waiting on the other
-        side of the doors.
-      </p>
-
-      <div class="openingChoiceButtons">
-
-        <button
-          type="button"
-          class="openingChoiceButton"
-          data-opening-choice="confident"
-        >
-          🔥 Walk in confidently
-        </button>
-
-        <button
-          type="button"
-          class="openingChoiceButton"
-          data-opening-choice="friendly"
-        >
-          😊 Enter with a friendly smile
-        </button>
-
-        <button
-          type="button"
-          class="openingChoiceButton"
-          data-opening-choice="mysterious"
-        >
-          🌙 Keep everyone guessing
+        <button onclick="closeInGameLoadMenu()">
+          ⬅ Close Load Menu
         </button>
 
       </div>
 
     </div>
 
-  </div>
-</section>
+    <div
+      class="card consequenceCard"
+      id="choiceConsequencesPanel"
+    >
 
-<section
-  id="openingChoiceResultScene"
-  class="openingChoiceResultScene hidden"
->
-  <div class="openingChoiceResultOverlay">
+      <h3>
+        🧭 Choice Consequences
+      </h3>
 
-    <div class="openingChoiceResultCard">
-
-      <p class="openingChoiceResultLabel">
-        FIRST IMPRESSION
-      </p>
-
-      <h2 id="openingChoiceResultTitle">
-        The villa doors open.
-      </h2>
-
-      <p id="openingChoiceResultText">
-        The Islanders turn toward you as you make
-        your entrance.
+      <p id="consequenceSummary">
+        Your important decisions are remembered.
       </p>
 
       <button
-        id="openingChoiceResultContinue"
-        type="button"
+        class="consequenceButton"
+        onclick="openChoiceConsequencesDashboard()"
       >
-        Meet the Islanders
+        📜 View Consequences
       </button>
 
     </div>
 
-  </div>
-</section>
+    <div
+      class="card relationshipCard"
+      id="relationshipSystemPanel"
+    >
 
-<section
-  id="meetIslandersScene"
-  class="meetIslandersScene hidden"
->
+      <h3>
+        ❤️ Relationship System 2.0
+      </h3>
 
-  <div class="meetIslandersOverlay">
+      <p
+        id="reputationSummary"
+        class="reputationBox"
+      >
+        Reputation: New Arrival
+      </p>
 
-    <div class="meetIslandersHeader">
+      <button
+        class="relationshipButton"
+        onclick="openRelationshipDashboard()"
+      >
+        📊 Open Relationship Dashboard
+      </button>
+
+    </div>
+
+    <div
+      class="card"
+      id="villaLifePanel"
+    >
+
+      <h3>
+        🏡 Better Villa Life
+      </h3>
 
       <p>
-        EPISODE 1
+        See what the Islanders are doing between
+        major story scenes.
       </p>
 
-      <h2>
-        Meet the Islanders
-      </h2>
-
-      <span>
-        Everyone gathers beside the villa pool.
-      </span>
-
-    </div>
-
-    <div class="meetIslandersCharacter">
-
-      <img
-        id="meetIslandersCharacterImage"
-        src="characters/lucas.png"
-        alt="Lucas"
+      <button
+        class="villaLifeButton"
+        onclick="openVillaLifeHub()"
       >
-
-    </div>
-
-    <div class="meetIslandersDialogue">
+        👀 Explore Living Villa
+      </button>
 
       <p
-        id="meetIslandersSpeaker"
-        class="meetIslandersSpeaker"
+        id="villaLifeStatus"
+        class="memoryNote"
       >
-        Lucas
+        NPC conversations, gossip, and changing
+        daily schedules are active.
       </p>
-
-      <p
-        id="meetIslandersText"
-        class="meetIslandersText"
-      >
-        Welcome to Flame Cay. We have all been waiting
-        to meet the new Islander.
-      </p>
-
-   <div
-  id="meetIslandersChoices"
-  class="meetIslandersChoices"
->
-
-  <button
-    type="button"
-    class="meetIslandersChoiceButton"
-    data-lucas-choice="confident"
-  >
-    🔥 “I hope you’re ready for some competition.”
-  </button>
-
-  <button
-    type="button"
-    class="meetIslandersChoiceButton"
-    data-lucas-choice="friendly"
-  >
-    😊 “It’s really nice to meet you.”
-  </button>
-
-  <button
-    type="button"
-    class="meetIslandersChoiceButton"
-    data-lucas-choice="mysterious"
-  >
-    🌙 “You’ll learn more about me soon.”
-  </button>
-
-</div>
-
-<button
-  id="meetIslandersContinue"
-  type="button"
-  class="hidden"
->
-  Continue
-</button>
 
     </div>
 
-  </div>
-
-</section>
-
-<div
-  id="mainGameInterface"
-  class="hidden"
->
-
-<h2 id="welcome">
-  Welcome to Flame Cay
-</h2>
-
-<div
-id="playerScenePortrait"
-class="playerScenePortrait hidden"
->
-
-<div
-id="playerSceneAvatar"
-class="playerSceneAvatar short"
->
-
-<div
-id="playerSceneHair"
-class="playerSceneHair"
-></div>
-
-<div
-id="playerSceneFace"
-class="playerSceneFace"
->
-
-<div class="playerSceneEyes">● ●</div>
-
-<div class="playerSceneMouth">⌣</div>
-
-</div>
-
-<div
-id="playerSceneBody"
-class="playerSceneBody"
-></div>
-
-</div>
-
-<div class="playerSceneInformation">
-
-<h3 id="playerSceneName">Player</h3>
-
-<p id="playerScenePersonality">
-New Islander
-</p>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>
-📅 Day <span id="dayNumber">1</span>
-</h3>
-
-<h3>
-<span id="timeIcon">☀️</span>
-<span id="timePeriod">Morning</span>
-</h3>
-
-<p id="actionStatus">
-⭐ One activity available
-</p>
-
-</div>
-
-<div
-id="portraitBox"
-class="hidden dialoguePortraitRow"
->
-
-<div
-id="npcDialogueSide"
-class="dialogueCharacterSide"
->
-
-<img
-id="portraitImage"
-alt="Character Portrait"
->
-
-<div id="portrait">🌴</div>
-
-<div class="dialogueSpeakerInformation">
-
-<h3 id="speakerName">
-Narrator
-</h3>
-
-<p id="speakerTitle">
-The Story Begins
-</p>
-
-</div>
-
-</div>
-
-<div
-id="playerDialogueSide"
-class="dialoguePlayerSide hidden"
->
-
-<div
-id="playerDialogueAvatar"
-class="playerDialogueAvatar short"
->
-
-<div
-id="playerDialogueHair"
-class="playerDialogueHair"
-></div>
-
-<div
-id="playerDialogueFace"
-class="playerDialogueFace"
->
-
-<div class="playerDialogueEyes">● ●</div>
-
-<div class="playerDialogueMouth">⌣</div>
-
-</div>
-
-<div
-id="playerDialogueBody"
-class="playerDialogueBody"
-></div>
-
-</div>
-
-<div class="playerDialogueInformation">
-
-<strong id="playerDialogueName">
-Player
-</strong>
-
-<span>You</span>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="dialogueCard" class="card">
-
-<p
-id="story"
-style="font-size:17px;line-height:1.6;min-height:40px"
-></p>
-
-<button
-id="continueButton"
-onclick="nextDialogue()"
->
-▶ Continue
-</button>
-
-</div>
-
-<div id="choices" class="hidden"></div>
-
-<section id="walkingScreen" class="hidden">
-
-<div class="card">
-
-<h2 id="walkingTitle">
-🚶 Exploring Flame Cay
-</h2>
-
-<p id="walkingText"></p>
-
-<button onclick="finishWalking()">
-Continue Walking ➜
-</button>
-
-</div>
-
-</section>
-
-<section id="islandMap" class="hidden">
-
-<div class="card">
-
-<h2>🗺️ Flame Cay Map</h2>
-
-<p id="mapTimeText"></p>
-
-<p id="mapActionText"></p>
-
-<button onclick="startWalking('volcano')">
-🌋 Volcano Peak
-</button>
-
-<button onclick="startWalking('jungle')">
-🌿 Whispering Jungle
-</button>
-
-<button onclick="startWalking('shrine')">
-💎 Crystal Shrine
-</button>
-
-<button onclick="startWalking('beach')">
-🏖 Arrival Beach
-</button>
-
-<button onclick="startWalking('villa')">
-🏡 Main Villa
-</button>
-
-<button onclick="startWalking('village')">
-🏝️ Flame Village
-</button>
-
-<button onclick="startWalking('gym')">
-💪 Gym
-</button>
-
-<button onclick="startWalking('kitchen')">
-🍳 Kitchen
-</button>
-
-<button onclick="startWalking('pool')">
-🏊 Infinity Pool
-</button>
-
-<button onclick="startWalking('firepit')">
-🔥 Fire Pit
-</button>
-
-<button onclick="startWalking('cove')">
-🌙 Moonlight Cove
-</button>
-
-<button
-id="advanceTimeButton"
-onclick="advanceTime()"
->
-⏰ Skip This Time Period
-</button>
-
-</div>
-
-</section>
-
-<div
-  class="card"
-  id="savePanel"
->
-
-  <h3>💾 Save Game</h3>
-
-  <p id="saveStatus">
-    Choose a save slot.
-  </p>
-
-  <button
-    class="saveButton"
-    onclick="saveGame(1)"
-  >
-    💾 Save Slot 1
-  </button>
-
-  <button
-    class="saveButton"
-    onclick="saveGame(2)"
-  >
-    💾 Save Slot 2
-  </button>
-
-  <button
-    class="saveButton"
-    onclick="saveGame(3)"
-  >
-    💾 Save Slot 3
-  </button>
-
-  <button
-    class="loadButton"
-    onclick="openInGameLoadMenu()"
-  >
-    📂 Load Another Save
-  </button>
-
-  <div
-    id="inGameLoadMenu"
-    class="hidden"
-  >
-
-    <div id="inGameLoadSlotList"></div>
-
-    <button
-      onclick="closeInGameLoadMenu()"
-    >
-      ⬅ Close Load Menu
-    </button>
+    <div
+      class="card"
+      id="relationshipBox"
+    ></div>
 
   </div>
-
-</div>
-
-<div
-class="card consequenceCard"
-id="choiceConsequencesPanel"
->
-
-<h3>🧭 Choice Consequences</h3>
-
-<p id="consequenceSummary">
-Your important decisions are remembered.
-</p>
-
-<button
-class="consequenceButton"
-onclick="openChoiceConsequencesDashboard()"
->
-📜 View Consequences
-</button>
-
-</div>
-
-<div
-class="card relationshipCard"
-id="relationshipSystemPanel"
->
-
-<h3>❤️ Relationship System 2.0</h3>
-
-<p
-id="reputationSummary"
-class="reputationBox"
->
-Reputation: New Arrival
-</p>
-
-<button
-class="relationshipButton"
-onclick="openRelationshipDashboard()"
->
-📊 Open Relationship Dashboard
-</button>
-
-</div>
-
-<div
-class="card"
-id="villaLifePanel"
->
-
-<h3>🏡 Better Villa Life</h3>
-
-<p>
-See what the Islanders are doing between major story scenes.
-</p>
-
-<button
-class="villaLifeButton"
-onclick="openVillaLifeHub()"
->
-👀 Explore Living Villa
-</button>
-
-<p
-id="villaLifeStatus"
-class="memoryNote"
->
-NPC conversations, gossip, and changing daily schedules are active.
-</p>
-
-</div>
-
-<div
-  class="card"
-  id="relationshipBox"
-></div>
-
-</div>
 
 </section>
 
